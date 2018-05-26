@@ -6,6 +6,8 @@ import xyz.thepathfinder.simulatedannealing.SearchState
 
 class GhStep(private val csf: ControlSiteFinder, val points: List<GHPoint>) : SearchState<GhStep> {
 
+    var scores: List<Double>? = null
+
     override fun step(): GhStep {
         val worst = findIndexOfWorst()
         val p: GHPoint = csf.findControlSiteNear(points[worst], Math.random() * 500.0)
@@ -14,7 +16,9 @@ class GhStep(private val csf: ControlSiteFinder, val points: List<GHPoint>) : Se
         return GhStep(csf, ps)
     }
 
-
-    private fun findIndexOfWorst() = (1 + Math.random() * (points.size - 2)).toInt()
+    private fun findIndexOfWorst() = when (scores) {
+        null -> (1 + Math.random() * (points.size - 2)).toInt()
+        else -> scores!!.indexOf(scores!!.max())
+    }
 }
 

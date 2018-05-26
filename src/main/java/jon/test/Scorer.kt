@@ -25,9 +25,9 @@ class Scorer(val csf: ControlSiteFinder, val params: Params) {
                 val scores = featureScorers.map { it.score(routes, response) }
 
                 val avs = legs.mapIndexed { idx, _ ->
-                    return  scores.fold(0.0, {acc, s -> acc + s[idx]})/ featureScorers.size.toDouble()
+                    scores.fold(0.0, {acc, s -> acc + s[idx]})/ featureScorers.size.toDouble()
                 }
-
+                step.scores = avs
                 return avs.fold(0.0, {acc:Double, s:Double -> acc + s}) / avs.size
             }
         }
