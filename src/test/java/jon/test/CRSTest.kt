@@ -72,7 +72,7 @@ class CRSTest {
         env.expandToInclude(d)
 
         assertTrue { env.contains( centre )}
-        println ("${env.width}  ${env.height}")
+        println ("${env.width}  ${env.height}  (${env.minX}, ${env.minY}) (${env.maxX}, ${env.maxY})")
 
     }
 

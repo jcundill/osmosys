@@ -68,7 +68,7 @@ object MapPrinter {
         val controlsList = formatControlsList(controls)
 
 
-        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=0.2,0.3|scale=10000|centre=$centreLat,$centreLon|title=OpenOrienteeringMap|club=|id=5603178056f05|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
+        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=0.297,0.21|scale=10000|centre=$centreLat,$centreLon|title=OpenOrienteeringMap|club=|id=5603178056f05|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
         val obj = URL(url)
 
         with(obj.openConnection() as HttpURLConnection) {
