@@ -1,5 +1,6 @@
 package jon.test
 
+import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Envelope
 import com.vividsolutions.jts.geom.Geometry
@@ -53,12 +54,12 @@ class CRSTest {
     fun box() {
 
 
-        val a = Coordinate(-137095.0,6983933.0)
-        val b = Coordinate(-137095.0,6980908.0)
-        val c = Coordinate(-132439.0,6983936.0)
-        val d = Coordinate(-132433.0,6980905.0)
+        val a = Coordinate(-1.2315453387636581, 53.00505492801988)
+        val b = convert(-137095.0,6980908.0).coordinate
+        val c = convert(-132439.0,6983936.0).coordinate
+        val d = convert(-132433.0,6980905.0).coordinate
 
-        val centre = Coordinate(-134764.0,6982422.0)
+        val centre = convert(-134764.0,6982422.0).coordinate
 
         println(a)
         println(b)
@@ -75,10 +76,17 @@ class CRSTest {
 
     }
 
-     //http://tiler1.oobrien.com/pdf/?style=streeto_global|paper=0.21000000000000002,0.29700000000000004|scale=10000|centre=6982438,-135151|title=OpenOrienteeringMap|club=|id=5b03178056f05|start=6980833,-133946|crosses=|cps=|controls=1,45,6981557,-134761,2,45,6982516,-133773,3,45,6983578,-134206,4,45,6983379,-134943,5,45,6982485,-134904,6,45,6981572,-133950
     @Test
-    fun fuelTest() {
-        val url = "http://tiler1.oobrien.com/pdf/?style=streeto_global|paper=0.21000000000000002,0.29700000000000004|scale=10000|centre=6982438,-135151|title=OpenOrienteeringMap|club=|id=5603178056f05|start=6980833,-133946|crosses=|cps=|controls=1,45,6981557,-134761,2,45,6982516,-133773,3,45,6983578,-134206,4,45,6983379,-134943,5,45,6982485,-134904,6,45,6981572,-133950"
+    fun mapFits() {
+        val centre = Coordinate(-1.18794, 52.99247)
+        val c = convertBack(-1.18794, 52.99247).coordinate
+        fuelTest(filename = "jon.pdf", centre = c)
+    }
+
+
+     //http://tiler1.oobrien.com/pdf/?style=streeto_global|paper=0.21000000000000002,0.29700000000000004|scale=10000|centre=6982438,-135151|title=OpenOrienteeringMap|club=|id=5b03178056f05|start=6980833,-133946|crosses=|cps=|controls=1,45,6981557,-134761,2,45,6982516,-133773,3,45,6983578,-134206,4,45,6983379,-134943,5,45,6982485,-134904,6,45,6981572,-133950
+    fun fuelTest(filename: String = "somefile.pdf", centre:Coordinate) {
+        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=0.3,0.2|scale=12500|centre=${centre.y.toInt()},${centre.x.toInt()}|title=OpenOrienteeringMap|club=|id=5603178056f05|start=6980833,-133946|finish=6980833,-133946|crosses=|cps=|controls="
         val obj = URL(url)
 
         with(obj.openConnection() as HttpURLConnection) {
@@ -92,8 +100,9 @@ class CRSTest {
                 while (inputLine != -1) {
                     response.write(inputLine)
                     inputLine = it.read()
+
                 }
-                File("somefile.pdf").writeBytes(response.toByteArray())
+                File(filename).writeBytes(response.toByteArray())
             }
         }    }
 

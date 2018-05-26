@@ -4,8 +4,7 @@ import com.graphhopper.GHRequest
 import com.graphhopper.GHResponse
 import com.graphhopper.GraphHopper
 import com.graphhopper.routing.util.DefaultEdgeFilter
-import com.graphhopper.storage.index.LocationIndex
-import com.graphhopper.util.DistancePlaneProjection
+import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
 import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
@@ -17,10 +16,16 @@ import java.util.*
  */
 class ControlSiteFinder(val gh: GraphHopper) {
 
-    private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("foot"))
+    private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
     private val rnd = Random(System.currentTimeMillis())
+    private val bbox: BBox = gh.graphHopperStorage.bounds
 
-    fun findControlSiteNear(point: GHPoint): GHPoint? = findControlSiteNear(point.lat, point.lon)
+
+    fun findControlSiteNear(point: GHPoint, distance: Double = 100.0): GHPoint {
+        var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
+        while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
+        return GHPoint(node?.first, node?.second)
+    }
 
     fun routeRequest(req: GHRequest, numAlternatives: Int = 0): GHResponse {
         req.weighting = "shortest"
@@ -29,27 +34,21 @@ class ControlSiteFinder(val gh: GraphHopper) {
             req.hints.put(Parameters.Algorithms.AltRoute.MAX_SHARE, 0.5)
         }
 
-       return gh.route(req)
+        return gh.route(req)
 
     }
 
 
-    fun getRandomLocationAtDistance(loc: GHPoint, dist: Double): GHResponse? {
-        val point = findControlSiteNear(getCoords(loc, randomBearing, dist))
-
-        return when (point) {
-            is GHPoint -> routeRequest(GHRequest(loc, point), 2)
-            else -> null
-        }
-    }
-
-
-    private fun findControlSiteNear(x: Double, y: Double): GHPoint? {
-        val qr = gh.locationIndex.findClosest(x, y, filter)
-        return if (!qr.isValid) null
-        else {
-            val point = qr.snappedPoint
-            GHPoint(point.lat, point.lon)
+    private fun findControlSiteNearInternal(p: GHPoint): Pair<Double, Double>? {
+        val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
+        return when {
+            !qr.isValid -> null
+            qr.snappedPosition != QueryResult.Position.TOWER -> null
+            else -> {
+                //qr.calcSnappedPoint(DistanceCalc())
+                val point = qr.snappedPoint
+                Pair(point.lat, point.lon)
+            }
         }
     }
 

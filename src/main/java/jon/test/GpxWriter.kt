@@ -16,18 +16,18 @@ import java.io.FileOutputStream
  */
 class GpxWriter {
 
-    fun writeToFile(controls: List<GHPoint>, best: PathWrapper, filename: String)  {
-        val gpx =  GPX()
+    fun writeToFile(controls: List<GHPoint>, best: PathWrapper, filename: String) {
+        val gpx = GPX()
         val rte = Route()
         rte.name = "Course"
         gpx.addRoute(rte)
 
         controls.forEachIndexed { idx, pt ->
-            val wpt =  Waypoint()
+            val wpt = Waypoint()
             wpt.latitude = pt.lat
             wpt.longitude = pt.lon
             wpt.name = when {
-                idx == 0  || idx == controls.size - 1  -> "Start / Finish"
+                idx == 0 || idx == controls.size - 1 -> "Start / Finish"
                 else -> "Control: $idx"
             }
 
@@ -41,8 +41,7 @@ class GpxWriter {
 
         //  now you can fetch the closest edge via:
         val ctrls = best.instructions.createGPXList()
-        val wpts = ctrls.map {
-            gpxEntry ->
+        val wpts = ctrls.map { gpxEntry ->
             val wpt = Waypoint()
             wpt.latitude = gpxEntry.lat
             wpt.longitude = gpxEntry.lon
@@ -54,11 +53,10 @@ class GpxWriter {
 
         val fred = File(filename)
         val fos = FileOutputStream(fred)
-        parser.writeGPX(gpx, fos )
+        parser.writeGPX(gpx, fos)
         fos.close()
 
     }
-
 
 
 }

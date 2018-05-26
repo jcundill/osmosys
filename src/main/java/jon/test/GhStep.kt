@@ -19,8 +19,7 @@ class GhStep(private val csf: ControlSiteFinder, val points: List<GHPoint>) : Se
 
     override fun step(): GhStep {
         val worst = findIndexOfWorst()
-        val p: GHPoint = csf.getRandomLocationAtDistance(points[worst], Math.random() * 500.0)?.best?.waypoints?.last()
-                ?: points[worst]
+        val p: GHPoint = csf.findControlSiteNear(points[worst], Math.random() * 500.0)
         val ps: List<GHPoint> = points.subList(0, worst) + listOf(p) + points.subList(worst + 1, points.size)
 
 
