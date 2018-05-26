@@ -6,20 +6,26 @@ import com.graphhopper.GraphHopper
 import com.graphhopper.routing.util.DefaultEdgeFilter
 import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
+import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
+import com.vividsolutions.jts.geom.Envelope
 import java.util.*
+import kotlin.collections.HashMap
 
 
 /**
  * Created by jcundill on 18/01/2017.
  */
-class ControlSiteFinder(val gh: GraphHopper) {
+class ControlSiteFinder(private val gh: GraphHopper) {
 
     private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
     private val rnd = Random(System.currentTimeMillis())
     private val bbox: BBox = gh.graphHopperStorage.bounds
 
+    val env = Envelope()
+
+    val cache = HashMap<Pair<GHPoint, GHPoint>, GHResponse>()
 
     fun findControlSiteNear(point: GHPoint, distance: Double = 100.0): GHPoint {
         var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
@@ -36,6 +42,22 @@ class ControlSiteFinder(val gh: GraphHopper) {
 
         return gh.route(req)
 
+    }
+
+    fun findRoutes(from: GHPoint, to: GHPoint): GHResponse {
+        val p = Pair(from, to)
+        return when {
+            cache.containsKey(p) -> cache[p]!!
+            else -> {
+                val req = GHRequest(from, to)
+                req.weighting = "shortest"
+                req.algorithm = Parameters.Algorithms.ALT_ROUTE
+                req.hints.put(Parameters.Algorithms.AltRoute.MAX_SHARE, 0.8)
+                val resp = gh.route(req)
+                cache[p] = resp
+                resp
+            }
+        }
     }
 
 
@@ -69,5 +91,13 @@ class ControlSiteFinder(val gh: GraphHopper) {
 
     private val randomBearing: Double
         get() = 2 * Math.PI * rnd.nextDouble()
+
+    fun routeFitsBox(points: PointList, width: Double, height: Double): Boolean {
+        env.setToNull()
+        points.forEach { env.expandToInclude(it.lon, it.lat) }
+        return env.width < width && env.height < height
+    }
+
+
 
 }

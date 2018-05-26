@@ -15,21 +15,13 @@ data class Params(val distance: Double = 6000.0, val points: Int = 6, val start:
 class GhProblem(private val csf: ControlSiteFinder, private val params: Params) : Problem<GhStep> {
 
     private val cache = HashMap<Int, Double>()
-    val env = Envelope()
+    val scorer = Scorer(csf, params)
     var hit = 0
     var miss = 0
     var bad = 0
 
 
-    override fun initialState(): GhStep {
-        //val near = csf.findControlSiteNear(params.start)
-        val ps = chooseInitialPoints(params.start)
-
-        return GhStep(csf, ps)
-    }
-
-
-
+    override fun initialState(): GhStep = GhStep(csf, chooseInitialPoints(params.start))
 
     override fun energy(step: GhStep?): Double {
         val e =  when {
@@ -38,7 +30,7 @@ class GhProblem(private val csf: ControlSiteFinder, private val params: Params) 
                 val response = csf.routeRequest(GHRequest(step.points))
                 when {
                     response.hasErrors() -> 10000.0
-                    !routeFitsOnMap(response.best.points) -> 10000.0
+                    !csf.routeFitsBox(response.best.points, params.maxWidth, params.maxHeight) -> 10000.0
                     else -> {
                         when {
                             cache.containsKey(step.hashCode()) -> {
@@ -46,8 +38,9 @@ class GhProblem(private val csf: ControlSiteFinder, private val params: Params) 
                             }
                             else -> {
                                 miss++
-                                val ans = score(response)
+                                val ans = scorer.score(step) * 1000
                                 cache[step.hashCode()] = ans
+                                println(ans)
                                 ans
                             }
                         }
@@ -59,24 +52,13 @@ class GhProblem(private val csf: ControlSiteFinder, private val params: Params) 
         return e
     }
 
-    private fun routeFitsOnMap(points: PointList): Boolean {
-        env.setToNull()
-        points.forEach { env.expandToInclude(it.lon, it.lat) }
-        return env.width < params.maxWidth && env.height < params.maxHeight
-    }
-
-    private fun score(response: GHResponse): Double {
-        val points = response.best.points
-        val distinct = points.distinct()
-        return (points.size.toDouble() - distinct.size.toDouble()) + Math.abs(response.best.distance - params.distance) / 500.0
-    }
 
 
     tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
         val possible = csf.findControlSiteNear(seed.last(), 500.0)
         val pl = seed.fold(PointList(), {acc, pt -> acc.add(pt); acc})
         pl.add(possible)
-        return if (routeFitsOnMap(pl)) possible
+        return if (csf.routeFitsBox(pl, params.maxWidth, params.maxHeight)) possible
         else findMappableControlSite(seed)
     }
 

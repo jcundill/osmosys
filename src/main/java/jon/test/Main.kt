@@ -12,13 +12,13 @@ object Main {
     fun main(args: Array<String>) {
 
 
-        val params = Params(distance = 8000.0, points = 10, start = GHPoint(52.988304, -1.203265))
-        //val params = Params(distance = 8000.0, points = 10, start = GHPoint(53.223482, -1.461053))
+        //val params = Params(distance = 8000.0, points = 10, start = GHPoint(52.988304, -1.203265))
+        val params = Params(distance = 8000.0, points = 10, start = GHPoint(53.223482, -1.461053))
 
-        val gh = GhWrapper.initGH("NG86BA")
-        //val gh = GhWrapper.initGH("S403DF")
+        //val gh = GhWrapper.initGH("NG86BA")
+        val gh = GhWrapper.initGH("S403DF")
         val problem = GhProblem(gh, params)
-        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, 1000))
+        val solver = Solver(problem, LinearDecayScheduler(1000.0, 1000))
         val solution = solver.solve();
 
         val best = gh.routeRequest(GHRequest(solution.points)).best
