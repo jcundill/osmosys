@@ -65,7 +65,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
         return when {
             !qr.isValid -> null
-            qr.snappedPosition != QueryResult.Position.TOWER -> null
+            qr.snappedPosition == QueryResult.Position.EDGE  -> null
             else -> {
                 //qr.calcSnappedPoint(DistanceCalc())
                 val point = qr.snappedPoint
