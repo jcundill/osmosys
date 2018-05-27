@@ -3,7 +3,7 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import jon.test.Params
 
-data class RouteChoiceScorer(val params: Params) : FeatureScorer {
+data class FollowingLegRouteChoiceScorer(val params: Params) : FeatureScorer {
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> =
             legs.map {
                 when {

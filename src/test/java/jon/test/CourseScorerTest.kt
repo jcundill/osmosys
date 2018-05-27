@@ -59,7 +59,7 @@ internal class CourseScorerTest {
 
         every { mockResponse.hasErrors() } returns false
         every { mockResponse.best.points } returns PointList.EMPTY
-        every { csf.routeFitsBox(any(), any(), any()) } returns false
+        every { csf.routeFitsBox(any(), any()) } returns false
 
         val score = scorer.score(step)
         assertEquals(10000.0, score)
@@ -70,7 +70,7 @@ internal class CourseScorerTest {
     fun scoreNoErrors() {
         every { mockResponse.hasErrors() } returns false
         every { mockResponse.best.points } returns PointList.EMPTY
-        every { csf.routeFitsBox(any(), any(), any()) } returns true
+        every { csf.routeFitsBox(any(), any()) } returns true
         every { csf.findRoutes(any(), any()) } returns mockResponse
 
         val score = scorer.score(step)
@@ -84,7 +84,7 @@ internal class CourseScorerTest {
     fun scoresAreCorrect() {
         every { mockResponse.hasErrors() } returns false
         every { mockResponse.best.points } returns PointList.EMPTY
-        every { csf.routeFitsBox(any(), any(), any()) } returns true
+        every { csf.routeFitsBox(any(), any()) } returns true
         every { csf.findRoutes(any(), any()) } returns mockResponse
 
         every {mockFS1.score(any(), any())} returns listOf(0.0) + controls.drop(1).map { 0.2 }

@@ -22,7 +22,7 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
                 val response = csf.routeRequest(GHRequest(step.points))
                 when {
                     response.hasErrors() -> 10000.0
-                    !csf.routeFitsBox(response.best.points, params.maxWidth, params.maxHeight) -> 10000.0
+                    !csf.routeFitsBox(response.best.points, params.allowedBoxes) -> 10000.0
                     else -> {
                         when {
                             cache.containsKey(step.hashCode()) -> {
@@ -50,7 +50,7 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
         val possible = csf.findControlSiteNear(seed.last(), 500.0)
         val pl = seed.fold(PointList(), {acc, pt -> acc.add(pt); acc})
         pl.add(possible)
-        return if (csf.routeFitsBox(pl, params.maxWidth, params.maxHeight)) possible
+        return if (csf.routeFitsBox(pl, params.allowedBoxes)) possible
         else findMappableControlSite(seed)
     }
 

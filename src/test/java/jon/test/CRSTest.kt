@@ -52,7 +52,7 @@ class CRSTest {
     // 6980905,-132433
 
     @Test
-    fun box() {
+    fun landscapeBox() {
 
 
         val a = Coordinate(-1.2315453387636581, 53.00505492801988)
@@ -73,6 +73,28 @@ class CRSTest {
         env.expandToInclude(d)
 
         assertTrue { env.contains( centre )}
+        println ("${env.width}  ${env.height}  (${env.minX}, ${env.minY}) (${env.maxX}, ${env.maxY})")
+
+    }
+
+    //1,45,7165854,-110696,2,45,7165855,-107410,3,45,7161274,-107406,4,45,7161279,-110695
+    @Test
+    fun portraitBox() {
+        val a = convert(-110696.0, 7165854.0).coordinate
+        val b = convert(-107410.0,7165855.0).coordinate
+        val c = convert(-107406.0,7161274.0).coordinate
+        val d = convert(-110695.0,7161279.0).coordinate
+
+        println(a)
+        println(b)
+        println(c)
+        println(d)
+
+        val env = Envelope(a)
+        env.expandToInclude(b)
+        env.expandToInclude(c)
+        env.expandToInclude(d)
+
         println ("${env.width}  ${env.height}  (${env.minX}, ${env.minY}) (${env.maxX}, ${env.maxY})")
 
     }

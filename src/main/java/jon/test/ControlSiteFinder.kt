@@ -98,10 +98,10 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     private val randomBearing: Double
         get() = 2 * Math.PI * rnd.nextDouble()
 
-    fun routeFitsBox(points: PointList, width: Double, height: Double): Boolean {
+    fun routeFitsBox(points: PointList, possibleBoxes: List<MapBox>): Boolean {
         env.setToNull()
         points.forEach { env.expandToInclude(it.lon, it.lat) }
-        return env.width < width && env.height < height
+        return possibleBoxes.any {env.width < it.maxWidth && env.height < it.maxHeight}
     }
 
 

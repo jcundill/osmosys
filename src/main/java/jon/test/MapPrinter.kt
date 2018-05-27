@@ -15,7 +15,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-object MapPrinter {
+class MapPrinter(val params: Params) {
 
     //create reference system WGS84 Web Mercator
     val wgs84Web: CoordinateReferenceSystem = CRS.decode("EPSG:3857", true)
@@ -52,11 +52,21 @@ object MapPrinter {
     //http://tiler1.oobrien.com/pdf/?style=streeto_global|paper=0.21000000000000002,0.29700000000000004|scale=10000|centre=6982438,-135151|title=OpenOrienteeringMap|club=|id=5b03178056f05|start=6980833,-133946|crosses=|cps=|controls=1,45,6981557,-134761,2,45,6982516,-133773,3,45,6983578,-134206,4,45,6983379,-134943,5,45,6982485,-134904,6,45,6981572,-133950
     fun generatePDF(filename: String = "somefile.pdf", points: List<GHPoint>) {
 
+        val env = Envelope()
+        points.forEach {env.expandToInclude(it.lon, it.lat)}
+
+        val orientation =
+                when {
+                    env.width < params.landscape.maxWidth && env.height < params.landscape.maxHeight -> "0.297,0.21"
+                    env.width < params.portrait.maxWidth && env.height < params.portrait.maxHeight -> "0.21,0.297"
+                    else -> "0.297,0.297"
+                }
+
         val controls: List<Coordinate> = points.map { convertBack(it.lon, it.lat).coordinate }
 
-        val env = Envelope()
         env.setToNull()
         controls.forEach { env.expandToInclude(it.x, it.y) }
+
 
         val centre = env.centre()
         val centreLat = centre.y.toInt()
@@ -68,7 +78,7 @@ object MapPrinter {
         val controlsList = formatControlsList(controls)
 
 
-        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=0.297,0.21|scale=10000|centre=$centreLat,$centreLon|title=OpenOrienteeringMap|club=|id=5603178056f05|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
+        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=$orientation|scale=10000|centre=$centreLat,$centreLon|title=OpenOrienteeringMap|club=|id=5b0af1bf10d89|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
         val obj = URL(url)
 
         with(obj.openConnection() as HttpURLConnection) {
