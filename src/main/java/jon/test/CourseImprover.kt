@@ -37,7 +37,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val points: List<GHPoin
     }
 
     private fun allTheSameScore(scores: List<Double>): Boolean {
-        return scores.all { it == scores[0] }
+        return scores.drop(1).all { it == scores[1] } //we won't choose the start so don't check it
     }
 }
 

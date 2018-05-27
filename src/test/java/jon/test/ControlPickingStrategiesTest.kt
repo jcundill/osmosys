@@ -32,10 +32,10 @@ internal class ControlPickingStrategiesTest{
     fun threshold() {
         val scores = listOf(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)
         val av = scores.average()
-        val above = scores.filter { it > av }
+        val above = scores.drop(1).filter { it > av }
         val ans = ControlPickingStrategies.pickAboveAverage(scores, 4)
 
-        assertEquals(4, ans.size)
+        assertEquals(above.size, ans.size)
         assertFalse(ans.contains(0))
         assertFalse(ans.contains(8))
         ans.forEach {
@@ -53,9 +53,9 @@ internal class ControlPickingStrategiesTest{
     fun thresholdTooMany() {
         val scores = listOf(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)
         val av = scores.average()
-        val above = scores.filter { it > av }
+        val above = scores.drop(1).filter { it > av }
         val ans = ControlPickingStrategies.pickAboveAverage(scores, 10)
-        assertEquals(4, ans.size) //not offered the last in the scores and can't pick the start
+        assertEquals(above.size, ans.size) //not offered the last in the scores and can't pick the start
         assertFalse(ans.contains(0))
         assertFalse(ans.contains(8))
         ans.forEach {
