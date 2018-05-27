@@ -3,18 +3,9 @@ package jon.test
 import com.graphhopper.GHRequest
 import jon.test.scorers.*
 
-class Scorer(val csf: ControlSiteFinder, val params: Params) {
+class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: Params) {
 
-    private val featureScorers = listOf(
-            CourseLengthScorer(params),
-            LegLengthScorer(params),
-            RouteChoiceScorer(params),
-            LegComplexityScorer(params),
-            BeenThisWayBeforeScorer(params),
-            DidntMoveScorer(params)
-    )
-
-    fun score(step: GhStep): Double {
+    fun score(step: CourseImprover): Double {
         val response = csf.routeRequest(GHRequest(step.points))
         return when {
             response.hasErrors() -> 10000.0
@@ -27,7 +18,7 @@ class Scorer(val csf: ControlSiteFinder, val params: Params) {
                 val avs = legs.mapIndexed { idx, _ ->
                     scores.fold(0.0, {acc, s -> acc + s[idx]})/ featureScorers.size.toDouble()
                 }
-                step.scores = avs
+                step.legScores = avs
                 return avs.fold(0.0, {acc:Double, s:Double -> acc + s}) / avs.size
             }
         }

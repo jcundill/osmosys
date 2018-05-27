@@ -2,8 +2,8 @@ package jon.test
 
 import com.graphhopper.GHRequest
 import com.graphhopper.util.shapes.GHPoint
+import jon.test.scorers.*
 import xyz.thepathfinder.simulatedannealing.ExponentialDecayScheduler
-import xyz.thepathfinder.simulatedannealing.LinearDecayScheduler
 import xyz.thepathfinder.simulatedannealing.Solver
 
 
@@ -13,15 +13,27 @@ object Main {
 
 
         //val params = Params(distance = 8000.0, points = 10, start = GHPoint(52.988304, -1.203265))
-        val params = Params(distance = 8000.0, points = 10, start = GHPoint(53.223482, -1.461053))
+        val params = Params(distance = 6000.0, points = 12, start = GHPoint(53.234060, -1.436845))
+
+        val featureScorers = listOf(
+                CourseLengthScorer(params),
+                PreviousLegLengthScorer(params),
+                FollowingLegLengthScorer(params),
+                RouteChoiceScorer(params),
+                LegComplexityScorer(params),
+                BeenThisWayBeforeScorer(params),
+                DidntMoveScorer(params)
+        )
 
         //val gh = GhWrapper.initGH("NG86BA")
-        val gh = GhWrapper.initGH("S403DF")
-        val problem = GhProblem(gh, params)
-        val solver = Solver(problem, LinearDecayScheduler(1000.0, 1000))
-        val solution = solver.solve();
+        val csf = GhWrapper.initGH("S403DF")
+        val scorer = CourseScorer(csf, featureScorers,params)
 
-        val best = gh.routeRequest(GHRequest(solution.points)).best
+        val problem = CourseFinder(csf, scorer, params)
+        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, 1000))
+        val solution = solver.solve()
+
+        val best = csf.routeRequest(GHRequest(solution.points)).best
 
 
         GpxWriter().writeToFile(solution.points, best, "jon.gpx")

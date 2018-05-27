@@ -3,7 +3,7 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import jon.test.Params
 
-class BeenThisWayBeforeScorer(params: Params): FeatureScorer {
+data class BeenThisWayBeforeScorer(val params: Params): FeatureScorer {
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
         val points = course.best.points
         val distinct = points.distinct()

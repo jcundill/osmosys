@@ -7,7 +7,6 @@ import com.graphhopper.routing.util.DefaultEdgeFilter
 import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
-import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import java.util.*
@@ -21,16 +20,23 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
     private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
     private val rnd = Random(System.currentTimeMillis())
-    private val bbox: BBox = gh.graphHopperStorage.bounds
 
     val env = Envelope()
 
     val cache = HashMap<Pair<GHPoint, GHPoint>, GHResponse>()
 
+
+
     fun findControlSiteNear(point: GHPoint, distance: Double = 100.0): GHPoint {
         var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
         while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
-        return GHPoint(node?.first, node?.second)
+        return GHPoint(node.first, node.second)
+    }
+    fun findAlternativeControlSiteFor(point: GHPoint): GHPoint {
+       val distance =  Math.random() * 150.0
+        var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
+        while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
+        return GHPoint(node.first, node.second)
     }
 
     fun routeRequest(req: GHRequest, numAlternatives: Int = 0): GHResponse {

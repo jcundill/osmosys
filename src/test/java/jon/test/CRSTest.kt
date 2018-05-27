@@ -4,6 +4,7 @@ import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Envelope
 import com.vividsolutions.jts.geom.Geometry
+import jdk.nashorn.internal.ir.annotations.Ignore
 import org.geotools.geometry.jts.JTS
 import org.geotools.geometry.jts.JTSFactoryFinder
 import org.geotools.referencing.CRS
@@ -76,9 +77,7 @@ class CRSTest {
 
     }
 
-    @Test
     fun mapFits() {
-        val centre = Coordinate(-1.18794, 52.99247)
         val c = convertBack(-1.18794, 52.99247).coordinate
         fuelTest(filename = "jon.pdf", centre = c)
     }

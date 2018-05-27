@@ -149,6 +149,12 @@
             <version>1.5.10.RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
+            <version>1.7.17</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 

@@ -3,7 +3,7 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import jon.test.Params
 
-class LegComplexityScorer(params: Params) : FeatureScorer {
+data class LegComplexityScorer(val params: Params) : FeatureScorer {
 
     private val minTurns = 6
 
@@ -12,8 +12,11 @@ class LegComplexityScorer(params: Params) : FeatureScorer {
                 val turns = it.best.instructions.size
                 when {
                     turns > minTurns -> 0.0
-                    else -> (minTurns - turns)/ minTurns.toDouble()
+                    else -> delta(turns, minTurns)
                 }
             }
+
+    private fun delta(actual: Number, threshold:Number): Double =
+            Math.abs(threshold.toDouble() - actual.toDouble()) / threshold.toDouble()
 
 }

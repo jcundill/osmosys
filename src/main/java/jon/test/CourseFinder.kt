@@ -1,29 +1,21 @@
 package jon.test
 
 import com.graphhopper.GHRequest
-import com.graphhopper.GHResponse
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
-import com.vividsolutions.jts.geom.Envelope
 import xyz.thepathfinder.simulatedannealing.Problem
 
-data class Params(val distance: Double = 6000.0, val points: Int = 6, val start: GHPoint) {
-    val maxWidth = 0.04187945854565234 * 0.99
-    val maxHeight = 0.01638736589702461 * 0.99
-}
-
-class GhProblem(private val csf: ControlSiteFinder, private val params: Params) : Problem<GhStep> {
+class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, private val params: Params) : Problem<CourseImprover> {
 
     private val cache = HashMap<Int, Double>()
-    val scorer = Scorer(csf, params)
     var hit = 0
     var miss = 0
     var bad = 0
 
 
-    override fun initialState(): GhStep = GhStep(csf, chooseInitialPoints(params.start))
+    override fun initialState(): CourseImprover = CourseImprover(csf, chooseInitialPoints(params.start))
 
-    override fun energy(step: GhStep?): Double {
+    override fun energy(step: CourseImprover?): Double {
         val e =  when {
             step === null -> 10000.0
             else -> {
