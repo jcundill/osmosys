@@ -16,7 +16,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
             CourseImprover(csf, replaceSelectedControls(findIndexesOfWorst(legScores, controls.size / 3), controls))
 
     fun replaceSelectedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
-            selected.fold(existing, { current, ctrl ->
+            selected.filter {it != 0 && it != existing.size - 1}.fold(existing, { current, ctrl ->
                 current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
                         current.subList(ctrl + 1, current.size)
