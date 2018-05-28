@@ -13,6 +13,7 @@ class DogLegScorer(val params: CourseParameters) : FeatureScorer {
             routes.windowed(2, 1, false).map { dogLegScore(it.first().toList(), it.last().toList()) }
 
     fun <T>dogLegScore(a2b: List<T>, b2c: List<T>): Double {
+        if( a2b.size < 2 || b2c.size < 2) return 1.0 //controls are in the same place
         val numInAandB = a2b.dropLast(1).filter { b2c.drop(1).contains(it) }.size
         val ratioAtoB =  numInAandB.toDouble() / (a2b.size.toDouble() - 1.0) // we dropped one
         val ratioBtoC = numInAandB.toDouble() / (b2c.size.toDouble() - 1.0)

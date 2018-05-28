@@ -53,4 +53,13 @@ internal class DogLegScorerTest {
         val score = scorer.dogLegScore(a2b, b2c)
         assertEquals(0.5, score)
     }
+
+    @Test
+    fun controlsInSamePlace() {
+        val a2b = listOf(10)
+        val b2c = listOf(10, 1, 2, 3, 11, 12, 13)
+        val score = scorer.dogLegScore(a2b, b2c)
+        assertEquals(1.0, score)
+
+    }
 }
