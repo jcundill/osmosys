@@ -12,8 +12,8 @@ object Main {
     fun main(args: Array<String>) {
 
 
-        val params = Params(distance = 6000.0, points = 10, start = GHPoint(52.988304, -1.203265))
-        //val params = Params(distance = 6000.0, points = 12, start = GHPoint(53.234060, -1.436845))
+        val params = CourseParameters(distance = 6000.0, points = 10, start = GHPoint(52.988304, -1.203265))
+        //val params = CourseParameters(distance = 6000.0, points = 12, start = GHPoint(53.234060, -1.436845))
 
         val featureScorers = listOf(
                 CourseLengthScorer(params),

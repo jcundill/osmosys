@@ -3,7 +3,7 @@ package jon.test
 import com.graphhopper.GHRequest
 import jon.test.scorers.*
 
-class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: Params) {
+class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: CourseParameters) {
 
     fun score(step: CourseImprover): Double {
         val response = csf.routeRequest(GHRequest(step.controls))

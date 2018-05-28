@@ -1,9 +1,9 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.Params
+import jon.test.CourseParameters
 
-class LastControlNearTheFinishScorer(val params: Params) : FeatureScorer{
+class LastControlNearTheFinishScorer(val params: CourseParameters) : FeatureScorer{
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
         val avLegLength = course.best.distance / legs.size
         val lastLegLength = legs.last().best.distance

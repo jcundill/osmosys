@@ -5,7 +5,7 @@ import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import xyz.thepathfinder.simulatedannealing.Problem
 
-class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, private val params: Params) : Problem<CourseImprover> {
+class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, private val params: CourseParameters) : Problem<CourseImprover> {
 
     private val cache = HashMap<Int, Double>()
     var hit = 0

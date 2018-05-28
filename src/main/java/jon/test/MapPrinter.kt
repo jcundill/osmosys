@@ -15,7 +15,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-class MapPrinter(val params: Params) {
+class MapPrinter(val params: CourseParameters) {
 
     //create reference system WGS84 Web Mercator
     val wgs84Web: CoordinateReferenceSystem = CRS.decode("EPSG:3857", true)

@@ -4,7 +4,7 @@ import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.Params
+import jon.test.CourseParameters
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 
@@ -20,7 +20,7 @@ internal class PreviousLegLengthScorerTest {
     lateinit var rsFinish: GHResponse
     lateinit var cr: GHResponse
 
-    val scorer = PreviousLegLengthScorer(Params(distance=3000.0, start= GHPoint(1.0, 33.2)))
+    val scorer = PreviousLegLengthScorer(CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2)))
 
     @BeforeAll
     fun beforeTests() {

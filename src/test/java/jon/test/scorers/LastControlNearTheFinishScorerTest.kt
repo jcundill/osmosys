@@ -4,8 +4,7 @@ import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.Params
-import org.junit.jupiter.api.Assertions.assertSame
+import jon.test.CourseParameters
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -35,7 +34,7 @@ internal class LastControlNearTheFinishScorerTest {
         every { rs2ToFinish.best.distance } returns 200.0
         every { cr.best.distance } returns 400.0
 
-        val scorer = LastControlNearTheFinishScorer(Params(distance = 400.0, start = GHPoint(1.0, 33.2)))
+        val scorer = LastControlNearTheFinishScorer(CourseParameters(distance = 400.0, start = GHPoint(1.0, 33.2)))
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
 
         assertEquals(listOf(0.0, 0.0, 1.0), scores)
@@ -48,7 +47,7 @@ internal class LastControlNearTheFinishScorerTest {
         every { rs2ToFinish.best.distance } returns 100.0
         every { cr.best.distance } returns 500.0
 
-        val scorer = LastControlNearTheFinishScorer(Params(distance = 500.0, start = GHPoint(1.0, 33.2)))
+        val scorer = LastControlNearTheFinishScorer(CourseParameters(distance = 500.0, start = GHPoint(1.0, 33.2)))
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
 
         assertEquals(listOf(0.0, 0.0, 0.0), scores)

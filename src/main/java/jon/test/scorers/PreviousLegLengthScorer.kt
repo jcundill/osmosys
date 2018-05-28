@@ -1,9 +1,9 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.Params
+import jon.test.CourseParameters
 
-data class PreviousLegLengthScorer(val params: Params): FeatureScorer{
+data class PreviousLegLengthScorer(val params: CourseParameters): FeatureScorer{
 
     private val minAllowed = 20.0
     private val maxAllowed = params.distance / 3.0  // third of the course on a single leg

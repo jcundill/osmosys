@@ -1,9 +1,9 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.Params
+import jon.test.CourseParameters
 
-data class LegComplexityScorer(val params: Params) : FeatureScorer {
+data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
 
     private val minTurns = 6
 

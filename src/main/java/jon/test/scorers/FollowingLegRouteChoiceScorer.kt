@@ -1,9 +1,9 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.Params
+import jon.test.CourseParameters
 
-data class FollowingLegRouteChoiceScorer(val params: Params) : FeatureScorer {
+data class FollowingLegRouteChoiceScorer(val params: CourseParameters) : FeatureScorer {
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> =
             legs.map {
                 when {

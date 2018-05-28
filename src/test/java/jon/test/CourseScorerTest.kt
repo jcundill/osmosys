@@ -14,7 +14,7 @@ internal class CourseScorerTest {
 
     lateinit var scorer: CourseScorer
     lateinit var csf: ControlSiteFinder
-    val params = Params(distance=3000.0, start= GHPoint(1.0, 33.2))
+    val params = CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2))
     lateinit var mockResponse: GHResponse
     lateinit var step: CourseImprover
     lateinit var controls: List<GHPoint>

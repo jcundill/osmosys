@@ -4,7 +4,7 @@ import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.Params
+import jon.test.CourseParameters
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 
@@ -27,7 +27,7 @@ internal class RouteChoiceScorerTest {
 
     @Test
     fun score() {
-        val scorer = FollowingLegRouteChoiceScorer(Params(start= GHPoint(1.0, 33.2)))
+        val scorer = FollowingLegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
         every { rs1.hasAlternatives() } returns true
         every { rs2.hasAlternatives() } returns false
