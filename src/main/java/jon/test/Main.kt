@@ -31,18 +31,18 @@ object Main {
         val scorer = CourseScorer(csf, featureScorers,params)
 
         val problem = CourseFinder(csf, scorer, params)
-        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, 100))
+        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, 1000))
         val solution = solver.solve()
 
-        val best = csf.routeRequest(GHRequest(solution.points)).best
+        val best = csf.routeRequest(GHRequest(solution.controls)).best
 
 
-        GpxWriter().writeToFile(solution.points, best, "jon.gpx")
-        MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.points)
+        GpxWriter().writeToFile(solution.controls, best, "jon.gpx")
+        MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
         println()
         println("Hit: ${problem.hit}, Miss: ${problem.miss}, Bad: ${problem.bad}")
         println(best.distance)
-        println(solution.points.size)
+        println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")
     }
 }

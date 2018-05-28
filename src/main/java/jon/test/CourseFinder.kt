@@ -19,7 +19,7 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
         val e =  when {
             step === null -> 10000.0
             else -> {
-                val response = csf.routeRequest(GHRequest(step.points))
+                val response = csf.routeRequest(GHRequest(step.controls))
                 when {
                     response.hasErrors() -> 10000.0
                     !csf.routeFitsBox(response.best.points, params.allowedBoxes) -> 10000.0
@@ -46,7 +46,7 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
 
 
 
-    tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
+    private tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
         val possible = csf.findControlSiteNear(seed.last(), 500.0)
         val pl = seed.fold(PointList(), {acc, pt -> acc.add(pt); acc})
         pl.add(possible)

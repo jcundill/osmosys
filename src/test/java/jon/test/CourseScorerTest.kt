@@ -51,7 +51,6 @@ internal class CourseScorerTest {
         every { mockResponse.hasErrors() } returns true
         val score = scorer.score(step)
         assertEquals(10000.0, score)
-        assertNull(step.legScores)
     }
 
     @Test
@@ -63,7 +62,6 @@ internal class CourseScorerTest {
 
         val score = scorer.score(step)
         assertEquals(10000.0, score)
-        assertNull(step.legScores)
     }
 
     @Test
@@ -76,8 +74,8 @@ internal class CourseScorerTest {
         val score = scorer.score(step)
         assertEquals(0.5, score)
         assertNotNull(step.legScores)
-        assertEquals(controls.size - 1, step.legScores!!.size)
-        assertTrue(step.legScores!!.all {it == 0.5})
+        assertEquals(controls.size - 1, step.legScores.size)
+        assertTrue(step.legScores.all {it == 0.5})
     }
 
     @Test
@@ -91,7 +89,7 @@ internal class CourseScorerTest {
         every {mockFS2.score(any(), any())} returns listOf(0.0) + controls.drop(1).map { 0.4 }
 
         scorer.score(step)
-        assertTrue(step.legScores!!.drop(1).all {it > 0.299999 && it < 3.00001})
-        assertEquals(0.0, step.legScores!!.first())
+        assertTrue(step.legScores.drop(1).all {it > 0.299999 && it < 3.00001})
+        assertEquals(0.0, step.legScores.first())
     }
 }

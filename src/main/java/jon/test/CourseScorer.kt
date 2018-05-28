@@ -6,12 +6,12 @@ import jon.test.scorers.*
 class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: Params) {
 
     fun score(step: CourseImprover): Double {
-        val response = csf.routeRequest(GHRequest(step.points))
+        val response = csf.routeRequest(GHRequest(step.controls))
         return when {
             response.hasErrors() -> 10000.0
             !csf.routeFitsBox(response.best.points, params.allowedBoxes) -> 10000.0
             else -> {
-                val legs = step.points.windowed(2, 1, false)
+                val legs = step.controls.windowed(2, 1, false)
                 val routes = legs.map{ ab -> csf.findRoutes(ab.first(), ab.last())}
                 val scores = featureScorers.map { it.score(routes, response) }
 

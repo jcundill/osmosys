@@ -3,40 +3,33 @@ package jon.test
 import com.graphhopper.util.shapes.GHPoint
 import xyz.thepathfinder.simulatedannealing.SearchState
 
-class CourseImprover(private val csf: ControlSiteFinder, val points: List<GHPoint>) : SearchState<CourseImprover> {
+class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPoint>) : SearchState<CourseImprover> {
 
-    private val threshold = 0.25
+    private val noChoicePicker = ControlPickingStrategies::pickRandomly
+    private val hasChoicePicker = ControlPickingStrategies::pickAboveAverage
+    private val dummyScores get() = DoubleArray(controls.size, { 0.5 }).toList()
 
-    var legScores: List<Double>? = null
+    var legScores: List<Double> = dummyScores
 
-    private val pickRandomly = ControlPickingStrategies::pickRandomly
-    private val pickAboveAverage = ControlPickingStrategies::pickAboveAverage
+    override fun step(): CourseImprover =
+            CourseImprover(csf, replaceSelectedControls(findIndexesOfWorst(legScores, controls.size / 3), controls))
 
-    override fun step(): CourseImprover {
-        val worsts = findIndexesOfWorst()
-        println(worsts)
-        val ps = worsts.fold(points, {_, worst ->
-            val p: GHPoint = csf.findAlternativeControlSiteFor(points[worst])
-            points.subList(0, worst) + listOf(p) + points.subList(worst + 1, points.size)
-        })
+    fun replaceSelectedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
+            selected.fold(existing, { current, ctrl ->
+                current.subList(0, ctrl) +
+                        listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
+                        current.subList(ctrl + 1, current.size)
+            })
 
-        return CourseImprover(csf, ps)
-    }
-
-    private fun findIndexesOfWorst(): List<Int> = when (legScores) {
-        null -> pickRandomly(DoubleArray(points.size, {0.5}).toList(), points.size / 3)
-        else -> {
-
-            val legs = legScores!!
-            when {
-                allTheSameScore(legs) -> pickRandomly(legs, points.size / 3)
-                else -> pickAboveAverage(legs, points.size / 3)
-            }
+    fun findIndexesOfWorst(scores: List<Double>, num:Int): List<Int> {
+        return when {
+            allTheSameScore(scores) -> noChoicePicker(scores, num)
+            else -> hasChoicePicker(scores, num)
 
         }
     }
 
-    private fun allTheSameScore(scores: List<Double>): Boolean {
+    fun allTheSameScore(scores: List<Double>): Boolean {
         return scores.drop(1).all { it == scores[1] } //we won't choose the start so don't check it
     }
 }
