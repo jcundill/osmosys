@@ -14,14 +14,14 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class RouteChoiceScorerTest {
 
-    lateinit var rs1: GHResponse
-    lateinit var rs2: GHResponse
+    lateinit var rsStartTo1: GHResponse
+    lateinit var rs1ToFinish: GHResponse
     lateinit var cr: GHResponse
 
     @BeforeAll
     fun beforeTests() {
-        rs1 = classMockk(GHResponse::class)
-        rs2 = classMockk(GHResponse::class)
+        rsStartTo1 = classMockk(GHResponse::class)
+        rs1ToFinish = classMockk(GHResponse::class)
         cr = classMockk(GHResponse::class)
     }
 
@@ -29,12 +29,11 @@ internal class RouteChoiceScorerTest {
     fun score() {
         val scorer = FollowingLegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
-        every { rs1.hasAlternatives() } returns true
-        every { rs2.hasAlternatives() } returns false
+        every { rsStartTo1.hasAlternatives() } returns true
+        every { rs1ToFinish.hasAlternatives() } returns false
 
-        val scores = scorer.score(listOf(rs1, rs2), cr)
+        val scores = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
 
-        assertEquals(0.0, scores[0])
-        assertEquals(1.0, scores[1])
+        assertEquals(1.0, scores[0])
     }
 }

@@ -6,12 +6,15 @@ import jon.test.CourseParameters
 
 data class DidntMoveScorer(val params: CourseParameters) : FeatureScorer {
     private val dist2d = DistancePlaneProjection()
-    private val minAllowed = 5
 
+    /**
+     * scores each numbered control based on the length of the previous leg.
+     * i.e. control 2 is in a bad place as it in the same place as 1
+     */
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> =
             legs.windowed(2, 1, false).map { ls ->
                 if (isSameStartPoint(ls.first(), ls.last())) 1.0 else 0.0
-            } + 0.0
+            }
 
     private fun isSameStartPoint(first: GHResponse, second: GHResponse): Boolean {
         val xs = first.best.points

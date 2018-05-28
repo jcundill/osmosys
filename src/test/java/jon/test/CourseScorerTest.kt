@@ -74,7 +74,7 @@ internal class CourseScorerTest {
         val score = scorer.score(step)
         assertEquals(0.5, score)
         assertNotNull(step.legScores)
-        assertEquals(controls.size - 1, step.legScores.size)
+        assertEquals(controls.size - 2, step.legScores.size)
         assertTrue(step.legScores.all {it == 0.5})
     }
 

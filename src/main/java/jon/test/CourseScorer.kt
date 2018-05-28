@@ -13,11 +13,17 @@ class CourseScorer(private val csf: ControlSiteFinder, private val featureScorer
             else -> {
                 val legs = step.controls.windowed(2, 1, false)
                 val routes = legs.map{ ab -> csf.findRoutes(ab.first(), ab.last())}
-                val scores: List<List<Double>> = featureScorers.map { it.score(routes, response) }
+                val scores: List<List<Double>> = featureScorers.map {
+                    val ss = it.score(routes, response)
+                    if( ss.size  + 2 != step.controls.size) {
+                        println("whoops " + it::class.java.simpleName)
+                    }
+                    ss
+                }
 
-                val featureScores = scores.map {it.drop(1).average()} // don't include the start when seeing how this feature scored
+                val featureScores = scores.map {it.average()} // don't include the start when seeing how this feature scored
 
-                val avs = legs.mapIndexed { idx, _ ->
+                val avs = legs.drop(1).mapIndexed { idx, _ ->
                     scores.fold(0.0, {acc, s -> acc + s[idx]})/ featureScorers.size.toDouble()
                 }
                 step.legScores = avs

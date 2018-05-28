@@ -43,7 +43,6 @@ internal class PreviousLegLengthScorerTest {
         assertEquals(0.0, scores[0])
         assertEquals(0.0, scores[1])
         assertEquals(0.0, scores[2])
-        assertEquals(0.0, scores[3])
     }
 
     private fun legScores() = listOf(rsStart, rs1, rs2, rsFinish)
@@ -58,9 +57,8 @@ internal class PreviousLegLengthScorerTest {
         val scores = scorer.score(legScores(), cr)
 
         assertEquals(0.0, scores[0])
-        assertEquals(0.0, scores[1])
-        assertEquals(1.0, scores[2])
-        assertEquals(0.0, scores[3])
+        assertEquals(1.0, scores[1])
+        assertEquals(0.0, scores[2])
     }
 
     @Test
@@ -73,9 +71,8 @@ internal class PreviousLegLengthScorerTest {
         val scores = scorer.score(legScores(), cr)
 
         assertEquals(0.0, scores[0])
-        assertEquals(0.0, scores[1])
-        assertEquals(1.0, scores[2])
-        assertEquals(0.0, scores[3])
+        assertEquals(1.0, scores[1])
+        assertEquals(0.0, scores[2])
     }
 
     @Test
@@ -87,9 +84,8 @@ internal class PreviousLegLengthScorerTest {
 
         val scores = scorer.score(legScores(), cr)
 
-        assertEquals(0.0, scores[0])
+        assertEquals(1.0, scores[0])
         assertEquals(1.0, scores[1])
         assertEquals(1.0, scores[2])
-        assertEquals(0.0, scores[3])
     }
 }

@@ -43,9 +43,8 @@ internal class DidntMoveScorerTest {
 
         assertEquals(0.0, scores[0])
         assertEquals(0.0, scores[1])
-        assertEquals(0.0, scores[2])
 
-        assertEquals(3, scores.size)
+        assertEquals(2, scores.size) // 3 legs = 2 scores
     }
     @Test
     fun scoreDidntMove() {
@@ -63,7 +62,6 @@ internal class DidntMoveScorerTest {
 
         assertEquals(0.0, scores[0])
         assertEquals(1.0, scores[1])
-        assertEquals(0.0, scores[2])
     }
 
     @Test
@@ -82,6 +80,5 @@ internal class DidntMoveScorerTest {
 
         assertEquals(1.0, scores[0])
         assertEquals(1.0, scores[1])
-        assertEquals(0.0, scores[2])
     }
 }

@@ -7,7 +7,6 @@ import io.mockk.every
 import jon.test.CourseParameters
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -16,29 +15,42 @@ import org.junit.jupiter.api.TestInstance
 internal class CourseLengthScorerTest {
 
     lateinit var rsStartTo1: GHResponse
-    lateinit var rs1ToFinish: GHResponse
+    lateinit var rs1To2: GHResponse
+    lateinit var rs2ToFinish: GHResponse
     lateinit var cr: GHResponse
-    lateinit var scorer: FeatureScorer
 
     private val params = CourseParameters(distance = 10.0, start= GHPoint(1.0, 33.2))
+    val scorer = CourseLengthScorer(params)
+
 
     @BeforeAll
     fun beforeTests() {
         rsStartTo1 = classMockk(GHResponse::class)
-        rs1ToFinish = classMockk(GHResponse::class)
+        rs1To2 = classMockk(GHResponse::class)
+        rs2ToFinish = classMockk(GHResponse::class)
         cr = classMockk(GHResponse::class)
     }
 
-    @BeforeEach
-    fun setUp() {
-        scorer = CourseLengthScorer(params)
+    @Test
+    fun algo() {
+        val legs = listOf(100.0, 50.0, 50.0)
+
+        val scores = scorer.algo(legs, 200.0)
+
+        assertEquals(listOf(0.5, 0.25), scores) // 3 legs = 2 scores
+
     }
 
     @Test
     fun correctLength() {
-        every { cr.best.distance } returns 10.0
+        val dist = params.distance
 
-        val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        every { cr.best.distance } returns dist
+        every { rsStartTo1.best.distance } returns dist * 0.5
+        every { rs1To2.best.distance } returns dist * 0.25
+        every { rs2ToFinish.best.distance } returns dist * 0.25
+
+        val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
 
         assertEquals(0.0, score[0])
         assertEquals(0.0, score[1])
@@ -46,40 +58,58 @@ internal class CourseLengthScorerTest {
 
     @Test
     fun tooShort() {
-        every { cr.best.distance } returns params.minAllowedDistance * 0.8
+        val dist = params.minAllowedDistance * 0.8
 
-        val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        every { cr.best.distance } returns dist
+        every { rsStartTo1.best.distance } returns dist * 0.5
+        every { rs1To2.best.distance } returns dist * 0.25
+        every { rs2ToFinish.best.distance } returns dist * 0.25
 
-        assertEquals(1.0, score[0])
-        assertEquals(1.0, score[1])
+        val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
+
+        assertEquals(0.5, score[0])
+        assertEquals(0.75, score[1])
     }
 
     @Test
     fun shortButInTolerance() {
-        every { cr.best.distance } returns params.minAllowedDistance * 1.2
+        val dist = params.minAllowedDistance * 1.2
 
-        val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        every { cr.best.distance } returns dist
+        every { rsStartTo1.best.distance } returns dist * 0.5
+        every { rs1To2.best.distance } returns dist * 0.25
+        every { rs2ToFinish.best.distance } returns dist * 0.25
 
+        val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
         assertEquals(0.0, score[0])
         assertEquals(0.0, score[1])
     }
 
     @Test
     fun tooLong() {
-        every { cr.best.distance } returns params.maxAllowedDistance * 1.2
+        val dist = params.maxAllowedDistance * 1.2
 
-        val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        every { cr.best.distance } returns dist
+        every { rsStartTo1.best.distance } returns dist * 0.5
+        every { rs1To2.best.distance } returns dist * 0.25
+        every { rs2ToFinish.best.distance } returns dist * 0.25
 
-        assertEquals(1.0, score[0])
-        assertEquals(1.0, score[1])
+        val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
+
+        assertEquals(0.5, score[0])
+        assertEquals(0.25, score[1])
     }
 
     @Test
     fun longButInTolerance() {
-        every { cr.best.distance } returns params.maxAllowedDistance * 0.8
+        val dist = params.maxAllowedDistance * 0.8
 
-        val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        every { cr.best.distance } returns dist
+        every { rsStartTo1.best.distance } returns dist * 0.5
+        every { rs1To2.best.distance } returns dist * 0.25
+        every { rs2ToFinish.best.distance } returns dist * 0.25
 
+        val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
         assertEquals(0.0, score[0])
         assertEquals(0.0, score[1])
     }

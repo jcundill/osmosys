@@ -94,12 +94,12 @@ internal class CourseImproverTest {
         val scores = listOf(0.2, 0.2, 0.2, 0.2, 0.9)
         val idxes = improver.findIndexesOfWorst(scores, 1)
         assertEquals(1, idxes.size )
-        assertEquals(4,idxes[0])
+        assertEquals(5,idxes[0])
     }
 
     @Test
     fun maxWorstsDoesNotIncludeTheStart() {
-        val scores = listOf(0.2, 0.2, 0.2, 0.2, 0.2)
+        val scores = listOf(0.2, 0.2, 0.2, 0.2)
         val idxes = improver.findIndexesOfWorst(scores, 15)
         assertEquals(4, idxes.size )
         assertFalse(idxes.any { it == 0 })
@@ -115,12 +115,6 @@ internal class CourseImproverTest {
     fun allTheSameFalse() {
         val scores = listOf(0.2, 0.3, 0.1, 0.2, 0.9)
         assertFalse(improver.allTheSameScore(scores))
-    }
-
-    @Test
-    fun allTheSameIgnoresTheStart() {
-        val scores = listOf(0.9, 0.2, 0.2, 0.2, 0.2)
-        assertTrue(improver.allTheSameScore(scores))
     }
 
     @Test
