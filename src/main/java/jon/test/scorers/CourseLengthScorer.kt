@@ -6,7 +6,12 @@ import jon.test.Params
 data class CourseLengthScorer(val params: Params) : FeatureScorer {
 
     override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
-        val delta = Math.abs(course.best.distance - params.distance) / Math.max(course.best.distance, params.distance)
+        val distance = course.best.distance
+        val delta = when {
+            distance < params.minAllowedDistance -> 1.0
+            distance > params.maxAllowedDistance -> 1.0
+            else -> 0.0
+        }
         return legs.map{ _ -> delta }
     }
 }

@@ -20,6 +20,8 @@ internal class CourseLengthScorerTest {
     lateinit var cr: GHResponse
     lateinit var scorer: FeatureScorer
 
+    private val params = Params(distance = 10.0, start= GHPoint(1.0, 33.2))
+
     @BeforeAll
     fun beforeTests() {
         rsStartTo1 = classMockk(GHResponse::class)
@@ -29,7 +31,7 @@ internal class CourseLengthScorerTest {
 
     @BeforeEach
     fun setUp() {
-        scorer = CourseLengthScorer(Params(distance = 10.0, start= GHPoint(1.0, 33.2)))
+        scorer = CourseLengthScorer(params)
     }
 
     @Test
@@ -43,42 +45,42 @@ internal class CourseLengthScorerTest {
     }
 
     @Test
-    fun half() {
-        every { cr.best.distance } returns 5.0
+    fun tooShort() {
+        every { cr.best.distance } returns params.minAllowedDistance * 0.8
 
         val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
 
-        assertEquals(0.5, score[0])
-        assertEquals(0.5, score[1])
+        assertEquals(1.0, score[0])
+        assertEquals(1.0, score[1])
     }
 
     @Test
-    fun double() {
-        every { cr.best.distance } returns 20.0
+    fun shortButInTolerance() {
+        every { cr.best.distance } returns params.minAllowedDistance * 1.2
 
         val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
 
-        assertEquals(0.5, score[0])
-        assertEquals(0.5, score[1])
+        assertEquals(0.0, score[0])
+        assertEquals(0.0, score[1])
     }
 
     @Test
-    fun triple() {
-        every { cr.best.distance } returns 30.0
+    fun tooLong() {
+        every { cr.best.distance } returns params.maxAllowedDistance * 1.2
 
         val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
 
-        assertEquals(0.6666666666666666, score[0])
-        assertEquals(0.6666666666666666, score[1])
+        assertEquals(1.0, score[0])
+        assertEquals(1.0, score[1])
     }
 
     @Test
-    fun quarter() {
-        every { cr.best.distance } returns 2.5
+    fun longButInTolerance() {
+        every { cr.best.distance } returns params.maxAllowedDistance * 0.8
 
         val score = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
 
-        assertEquals(0.75, score[0])
-        assertEquals(0.75, score[1])
+        assertEquals(0.0, score[0])
+        assertEquals(0.0, score[1])
     }
 }

@@ -4,7 +4,11 @@ import com.graphhopper.util.shapes.GHPoint
 
 data class MapBox(val maxWidth: Double, val maxHeight: Double)
 
-data class Params(val distance: Double = 6000.0, val points: Int = 6, val start: GHPoint) {
+data class Params(
+        val distance: Double = 6000.0,
+        private val allowedLengthDelta:Double = 0.2,
+        val points: Int = 6,
+        val start: GHPoint) {
 
     val landscape = MapBox(
             maxWidth = 0.04187945854565234 * 0.99,
@@ -17,4 +21,9 @@ data class Params(val distance: Double = 6000.0, val points: Int = 6, val start:
     )
 
     val allowedBoxes = listOf(portrait, landscape)
+
+
+    val minAllowedDistance = distance - distance * allowedLengthDelta
+
+    val maxAllowedDistance = distance + distance * allowedLengthDelta
 }
