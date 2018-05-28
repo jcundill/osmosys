@@ -38,6 +38,32 @@ internal class CourseImproverTest {
     }
 
     @Test
+    fun hashCodeWorksSame() {
+        val improver2 = CourseImprover(csf, controls)
+        assertEquals(improver.hashCode(), improver2.hashCode())
+    }
+
+    @Test
+    fun hashCodeWorksDifferent() {
+        val controls2 = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
+        val improver2 = CourseImprover(csf, controls2)
+        assertNotEquals(improver.hashCode(), improver2.hashCode())
+    }
+
+    @Test
+    fun equalsWorksSame() {
+        val improver2 = CourseImprover(csf, controls)
+        assertEquals(improver, improver2)
+    }
+
+    @Test
+    fun equalsWorksDifferent() {
+        val controls2 = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
+        val improver2 = CourseImprover(csf, controls2)
+        assertNotEquals(improver, improver2)
+    }
+
+    @Test
     fun ifNoLegScoresChooseRandom() {
 
         val improved = improver.step()

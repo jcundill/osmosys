@@ -33,6 +33,17 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     fun allTheSameScore(scores: List<Double>): Boolean {
         return scores.drop(1).all { it == scores[1] } //we won't choose the start so don't check it
     }
+
+    override fun equals(other: Any?): Boolean {
+        return when(other) {
+            is CourseImprover -> other.controls == this.controls
+            else -> false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return 31 * controls.hashCode()
+    }
 }
 
 
