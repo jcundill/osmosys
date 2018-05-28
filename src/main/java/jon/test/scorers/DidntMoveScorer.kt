@@ -17,7 +17,7 @@ data class DidntMoveScorer(val params: CourseParameters) : FeatureScorer {
         val xs = first.best.points
         val ys = second.best.points
         val dist = dist2d.calcDist(xs.getLat(0), xs.getLon(0), ys.getLat(0), ys.getLon(0))
-        return dist < minAllowed
+        return dist < params.minControlSeparation
     }
 
 }
