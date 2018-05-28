@@ -10,6 +10,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     private val dummyScores get() = DoubleArray(controls.size, { 0.5 }).toList()
 
     var legScores: List<Double> = dummyScores
+    var featureScores: List<Double>? = null
 
     override fun step(): CourseImprover =
             CourseImprover(csf, replaceSelectedControls(findIndexesOfWorst(legScores, controls.size / 3), controls))

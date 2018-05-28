@@ -24,7 +24,8 @@ object Main {
                 LegComplexityScorer(params),
                 BeenThisWayBeforeScorer(params),
                 DidntMoveScorer(params),
-                LastControlNearTheFinishScorer(params)
+                LastControlNearTheFinishScorer(params),
+                DogLegScorer(params)
         )
 
         val csf = GhWrapper.initGH("NG86BA")
@@ -39,12 +40,16 @@ object Main {
 
 
         GpxWriter().writeToFile(solution.controls, best, "jon.gpx")
-        MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
+        //MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
         println()
         println("Hit: ${problem.hit}, Miss: ${problem.miss}, Bad: ${problem.bad}")
         println(best.distance)
         println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")
         println("Scores: ${solution.legScores}")
+
+        featureScorers.map {
+            it::class.java.simpleName
+        }.zip(solution.featureScores!!).forEach { println(it) }
     }
 }
