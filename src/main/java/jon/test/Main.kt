@@ -23,7 +23,8 @@ object Main {
                 FollowingLegRouteChoiceScorer(params),
                 LegComplexityScorer(params),
                 BeenThisWayBeforeScorer(params),
-                DidntMoveScorer(params)
+                DidntMoveScorer(params),
+                LastControlNearTheFinishScorer(params)
         )
 
         val csf = GhWrapper.initGH("NG86BA")
@@ -44,5 +45,6 @@ object Main {
         println(best.distance)
         println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")
+        println("Scores: ${solution.legScores}")
     }
 }
