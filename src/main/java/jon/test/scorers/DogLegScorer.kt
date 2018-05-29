@@ -9,8 +9,8 @@ class DogLegScorer(val params: CourseParameters) : FeatureScorer {
      * scores each numbered control based on the repetition of the route to it and the route to the next control.
      * i.e. control 2 is in a bad place as the route from 1 to 2 is pretty much the same as the route from 2 to 3
      */
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
-        return dogLegs(legs.map { it.best.points })
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
+        return dogLegs(routedLegs.map { it.best.points })
     }
 
     fun <T>dogLegs(routes: List<Iterable<T>>): List<Double> =

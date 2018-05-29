@@ -11,8 +11,8 @@ data class DidntMoveScorer(val params: CourseParameters) : FeatureScorer {
      * scores each numbered control based on the length of the previous leg.
      * i.e. control 2 is in a bad place as it in the same place as 1
      */
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> =
-            legs.windowed(2, 1, false).map { ls ->
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+            routedLegs.windowed(2, 1, false).map { ls ->
                 if (isSameStartPoint(ls.first(), ls.last())) 1.0 else 0.0
             }
 

@@ -10,10 +10,10 @@ data class BeenThisWayBeforeScorer(val params: CourseParameters): FeatureScorer 
      * works out how much of the leg to this numbered control has been travelled along
      * already
      */
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
 
-        val points = course.best.points.drop(1).dropLast(1)
+        val points = routedCourse.best.points.drop(1).dropLast(1)
         val distinct = points.distinct()
-        return legs.dropLast(1).map {_ -> (points.size.toDouble() - distinct.size.toDouble()) / points.size.toDouble()}
+        return routedLegs.dropLast(1).map { _ -> (points.size.toDouble() - distinct.size.toDouble()) / points.size.toDouble()}
     }
 }

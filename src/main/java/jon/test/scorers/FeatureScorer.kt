@@ -9,5 +9,5 @@ interface FeatureScorer {
      * so the returned list is 2 less than the number of controls
      * and score[0] refers to control numbered 1
      */
-    fun score(legs: List<GHResponse>, course: GHResponse): List<Double>
+    fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double>
 }

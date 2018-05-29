@@ -13,6 +13,7 @@ object Main {
 
 
         val params = CourseParameters(distance = 6000.0, points = 10, start = GHPoint(52.988304, -1.203265))
+        //val params = CourseParameters(distance = 6000.0, points = 6, start = GHPoint(53.253731, -1.469357))
         //val params = CourseParameters(distance = 6000.0, points = 12, start = GHPoint(53.234060, -1.436845))
 
         val featureScorers = listOf(
@@ -40,13 +41,13 @@ object Main {
 
 
         GpxWriter().writeToFile(solution.controls, best, "jon.gpx")
-        //MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
+        MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
         println()
         println("Hit: ${problem.hit}, Miss: ${problem.miss}, Bad: ${problem.bad}")
         println(best.distance)
         println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")
-        println("Scores: ${solution.legScores}")
+        println("Scores: ${solution.numberedControlScores}")
 
         featureScorers.map {
             it::class.java.simpleName

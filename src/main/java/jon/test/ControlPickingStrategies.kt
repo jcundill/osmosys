@@ -10,15 +10,15 @@ package jon.test
  */
 object ControlPickingStrategies {
 
-    fun pickRandomly(legScores: List<Double>, num: Int): List<Int> =
-            pick(legScores, num, {_ -> true})
+    fun pickRandomly(numberedControlScores: List<Double>, num: Int): List<Int> =
+            pick(numberedControlScores, num, { _ -> true})
 
-    fun pickAboveAverage(legScores: List<Double>, num: Int): List<Int> =
-            pick(legScores, num, { x -> x.second > legScores.average() })
+    fun pickAboveAverage(numberedControlScores: List<Double>, num: Int): List<Int> =
+            pick(numberedControlScores, num, { x -> x.second > numberedControlScores.average() })
 
-    fun pick(legScores: List<Double>, num: Int, selector: (Pair<Int, Double>) -> Boolean): List<Int> {
-        val indexedScores = (1..(legScores.size)).zip(legScores)
-        val choices = indexedScores.filter { selector(it) }.sortedByDescending { it.second }
+    fun pick(numberedControlScores: List<Double>, num: Int, selector: (Pair<Int, Double>) -> Boolean): List<Int> {
+        val indexedControlScores = (1..(numberedControlScores.size)).zip(numberedControlScores)
+        val choices = indexedControlScores.filter { selector(it) }.sortedByDescending { it.second }
         val selectedIndexes = choices.map { it.first }
 
         return when {

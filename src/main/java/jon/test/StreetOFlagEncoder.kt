@@ -54,7 +54,7 @@ class StreetOFlagEncoder @JvmOverloads constructor(speedBits: Int = 4, speedFact
         this.isBlockFords = properties.getBool("block_fords", true)
     }
 
-    constructor(propertiesStr: String) : this(PMap(propertiesStr)) {}
+    constructor(propertiesStr: String) : this(PMap(propertiesStr))
 
     init {
         restrictions.addAll(Arrays.asList("foot", "access"))

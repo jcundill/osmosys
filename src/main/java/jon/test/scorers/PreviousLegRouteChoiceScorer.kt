@@ -10,8 +10,8 @@ data class PreviousLegRouteChoiceScorer(val params: CourseParameters) : FeatureS
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too straightforward
      */
 
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> =
-            legs.dropLast(1).map { // the finish can't be in the wrong place
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+            routedLegs.dropLast(1).map { // the finish can't be in the wrong place
                 when {
                     it.hasAlternatives() -> 0.0 //TODO: maybe work out how good the alternatives are
                     else -> 1.0

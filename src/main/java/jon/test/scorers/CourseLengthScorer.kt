@@ -8,9 +8,9 @@ data class CourseLengthScorer(val params: CourseParameters) : FeatureScorer {
     /**
      * Here
      */
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
-        val distance = course.best.distance
-        val components = legs.map { it.best.distance }
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
+        val distance = routedCourse.best.distance
+        val components = routedLegs.map { it.best.distance }
 
         return algo(components, distance)
     }

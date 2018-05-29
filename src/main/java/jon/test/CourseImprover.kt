@@ -12,17 +12,24 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     /**
      * the improver is given the leg scores for the numbered controls only
      */
-    var legScores: List<Double> = dummyScores
+    var numberedControlScores: List<Double> = dummyScores
     var featureScores: List<Double>? = null
 
-    override fun step(): CourseImprover =
-            CourseImprover(csf, replaceSelectedControls(findIndexesOfWorst(legScores, controls.size / 3), controls))
+    override fun step(): CourseImprover {
+        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, controls.size / 3)
+        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, controls)
+        return CourseImprover(csf, newCourse)
+    }
 
-    fun replaceSelectedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
-            selected.filter {it != 0 && it != existing.size - 1}.fold(existing, { current, ctrl ->
-                current.subList(0, ctrl) +
+    fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
+            selected.filter {it != 0 || it != existing.size - 1}.fold(existing, { current, ctrl ->
+                val s =current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
                         current.subList(ctrl + 1, current.size)
+                if(s.size != existing.size) {
+                    println("whoops")
+                }
+                s
             })
 
     /**

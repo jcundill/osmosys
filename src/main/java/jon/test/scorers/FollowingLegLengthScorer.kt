@@ -13,9 +13,9 @@ data class FollowingLegLengthScorer(val params: CourseParameters): FeatureScorer
      * scores each numbered control based on the length of the coming leg.
      * i.e. control 2 is in a bad place as the route from 2 to 3 was too long
      */
-    override fun score(legs: List<GHResponse>, course: GHResponse): List<Double> {
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
 
-        return legs.drop(1).map { // the start can't be in the wrong place
+        return routedLegs.drop(1).map { // the start can't be in the wrong place
             val best = it.best.distance
             when {
                 best < minAllowed -> 1.0

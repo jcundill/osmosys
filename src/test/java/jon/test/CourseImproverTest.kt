@@ -125,7 +125,7 @@ internal class CourseImproverTest {
 
     @Test
     fun replaceSelected() {
-        val improved = improver.replaceSelectedControls(listOf(1, 2), controls)
+        val improved = improver.replaceSelectedNumberedControls(listOf(1, 2), controls)
 
         assertNotEquals(improved[0], replacedPoint)
         assertEquals(improved[1], replacedPoint)
@@ -136,7 +136,7 @@ internal class CourseImproverTest {
 
     @Test
     fun replaceSelectedNone() {
-        val improved = improver.replaceSelectedControls(emptyList(), controls)
+        val improved = improver.replaceSelectedNumberedControls(emptyList(), controls)
 
         assertNotEquals(improved[0], replacedPoint)
         assertNotEquals(improved[1], replacedPoint)
@@ -145,25 +145,26 @@ internal class CourseImproverTest {
 
     }
 
-    @Test
-    fun replaceSelectedWillNotMoveTheStart() {
-        val improved = improver.replaceSelectedControls(listOf(0, 1), controls)
-
-        assertNotEquals(improved[0], replacedPoint)
-        assertEquals(improved[1], replacedPoint)
-        assertNotEquals(improved[2], replacedPoint)
-        assertNotEquals(improved[3], replacedPoint)
-
-    }
-
-    @Test
-    fun replaceSelectedWillNotMoveTheFinish() {
-        val improved = improver.replaceSelectedControls(listOf(1, 2, 3), controls)
-
-        assertNotEquals(improved[0], replacedPoint)
-        assertEquals(improved[1], replacedPoint)
-        assertEquals(improved[2], replacedPoint)
-        assertNotEquals(improved[3], replacedPoint)
-
-    }
+    // ye it will - because we can't pass it the start or the finisg
+//    @Test
+//    fun replaceSelectedWillNotMoveTheStart() {
+//        val improved = improver.replaceSelectedNumberedControls(listOf(0, 1), controls)
+//
+//        assertNotEquals(improved[0], replacedPoint)
+//        assertEquals(improved[1], replacedPoint)
+//        assertNotEquals(improved[2], replacedPoint)
+//        assertNotEquals(improved[3], replacedPoint)
+//
+//    }
+//
+//    @Test
+//    fun replaceSelectedWillNotMoveTheFinish() {
+//        val improved = improver.replaceSelectedNumberedControls(listOf(1, 2, 3), controls)
+//
+//        assertNotEquals(improved[0], replacedPoint)
+//        assertEquals(improved[1], replacedPoint)
+//        assertEquals(improved[2], replacedPoint)
+//        assertNotEquals(improved[3], replacedPoint)
+//
+//    }
 }
