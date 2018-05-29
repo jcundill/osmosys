@@ -20,8 +20,7 @@ class CourseScorer(private val csf: ControlSiteFinder, private val featureScorer
 
                 val avs = numberedControlScores.map {it.average()} // don't include the start when seeing how this feature scored
 
-                val transpose: List<List<Double>> = transpose(numberedControlScores)
-                step.numberedControlScores = transpose.map {it.average()}
+                step.numberedControlScores = transpose(numberedControlScores).map {it.average()}
                 step.featureScores = avs
 
                 return avs.average()

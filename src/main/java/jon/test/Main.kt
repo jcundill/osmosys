@@ -47,7 +47,7 @@ object Main {
         println(best.distance)
         println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")
-        println("Scores: ${solution.numberedControlScores}")
+        println("Scores: ${solution.numberedControlScores.joinToString(", ")}")
 
         featureScorers.map {
             it::class.java.simpleName
