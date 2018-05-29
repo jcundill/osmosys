@@ -7,7 +7,7 @@ import jon.test.CourseParameters
 data class FollowingLegLengthScorer(val params: CourseParameters): FeatureScorer{
 
     private val minAllowed = 20.0
-    private val maxAllowed = params.distance / 3.0  // third of the course on a single leg
+    private val maxAllowed = 500.0  // third of the course on a single leg
 
     /**
      * scores each numbered control based on the length of the coming leg.
