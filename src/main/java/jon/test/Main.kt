@@ -43,7 +43,7 @@ object Main {
         GpxWriter().writeToFile(solution.controls, best, "jon.gpx")
         MapPrinter(params).generatePDF(filename = "jon.pdf", points = solution.controls)
         println()
-        println("Hit: ${problem.hit}, Miss: ${problem.miss}, Bad: ${problem.bad}")
+        println("Hit: ${csf.hit}, Miss: ${csf.miss}, Bad: ${problem.bad}")
         println(best.distance)
         println(solution.controls.size)
         println("Energy: ${problem.energy(solution)}")

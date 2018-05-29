@@ -23,7 +23,9 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
     val env = Envelope()
 
-    val cache = HashMap<Pair<GHPoint, GHPoint>, GHResponse>()
+    private val routedLegCache = HashMap<Pair<GHPoint, GHPoint>, GHResponse>()
+    var hit = 0
+    var miss = 0
 
 
 
@@ -53,14 +55,18 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     fun findRoutes(from: GHPoint, to: GHPoint): GHResponse {
         val p = Pair(from, to)
         return when {
-            cache.containsKey(p) -> cache[p]!!
+            routedLegCache.containsKey(p) -> {
+                hit++
+                routedLegCache[p]!!
+            }
             else -> {
+                miss++
                 val req = GHRequest(from, to)
                 req.weighting = "shortest"
                 req.algorithm = Parameters.Algorithms.ALT_ROUTE
                 req.hints.put(Parameters.Algorithms.AltRoute.MAX_SHARE, 0.8)
                 val resp = gh.route(req)
-                cache[p] = resp
+                routedLegCache[p] = resp
                 resp
             }
         }

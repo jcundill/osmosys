@@ -7,16 +7,18 @@ import xyz.thepathfinder.simulatedannealing.Problem
 
 class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, private val params: CourseParameters) : Problem<CourseImprover> {
 
-    private val cache = HashMap<Int, Double>()
-    var hit = 0
-    var miss = 0
     var bad = 0
-
 
     override fun initialState(): CourseImprover = CourseImprover(csf, chooseInitialPoints(params.start))
 
     override fun energy(step: CourseImprover?): Double {
-        val e =  when {
+        val score = scoreStep(step)
+        if (score > 1000.0) bad++
+        return score
+    }
+
+    private fun scoreStep(step: CourseImprover?): Double {
+        return when {
             step === null -> 10000.0
             else -> {
                 val response = csf.routeRequest(GHRequest(step.controls))
@@ -24,26 +26,14 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
                     response.hasErrors() -> 10000.0
                     !csf.routeFitsBox(response.best.points, params.allowedBoxes) -> 10000.0
                     else -> {
-                        when {
-                            cache.containsKey(step.hashCode()) -> {
-                                hit++; return cache[step.hashCode()]!!
-                            }
-                            else -> {
-                                miss++
-                                val ans = scorer.score(step) * 1000
-                                cache[step.hashCode()] = ans
-                                println(ans)
-                                ans
-                            }
-                        }
+                        val ans = scorer.score(step) * 1000
+                        println(ans)
+                        ans
                     }
                 }
             }
         }
-        if( e > 1000.0) bad++
-        return e
     }
-
 
 
     private tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
