@@ -9,23 +9,21 @@ package jon.test
  * if we don't like the first one in the list and we only have to choose 1 then we should return 1 rather than 0
  */
 object ControlPickingStrategies {
-    fun pickRandomly(legScores: List<Double>, num: Int): List<Int> {
 
-        val choices = (1..(legScores.size)).toList()
-        return when {
-            num >= legScores.size -> choices
-            else -> choices.shuffled().take(num)
-        }
-    }
+    fun pickRandomly(legScores: List<Double>, num: Int): List<Int> =
+            pick(legScores, num, {_ -> true})
 
-    fun pickAboveAverage(legScores: List<Double>, num: Int): List<Int> {
+    fun pickAboveAverage(legScores: List<Double>, num: Int): List<Int> =
+            pick(legScores, num, { x -> x.second > legScores.average() })
 
-        val mean = legScores.average()
-        val choices = legScores.zip((1..(legScores.size))).filter { it.first > mean }.map { it.second }
+    fun pick(legScores: List<Double>, num: Int, selector: (Pair<Int, Double>) -> Boolean): List<Int> {
+        val indexedScores = (1..(legScores.size)).zip(legScores)
+        val choices = indexedScores.filter { selector(it) }.sortedByDescending { it.second }
+        val selectedIndexes = choices.map { it.first }
 
         return when {
-            choices.size <= num -> choices
-            else -> choices.shuffled().take(num)
+            selectedIndexes.size <= num -> selectedIndexes
+            else -> selectedIndexes.take(num)
         }
     }
 }

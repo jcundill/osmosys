@@ -8,6 +8,15 @@ import org.junit.jupiter.api.TestInstance
 internal class ControlPickingStrategiesTest{
 
     @Test
+    fun pick() {
+        val selector: (Pair<Int, Double>) -> Boolean = { (idx, score) -> score == 0.8 || idx == 1}
+        val ans = ControlPickingStrategies.pick(listOf(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8), 4, selector)
+        assertEquals(2, ans.size)
+        assertTrue(ans.contains(1))
+        assertTrue(ans.contains(8))
+    }
+
+    @Test
     fun random() {
         val ans = ControlPickingStrategies.pickRandomly(listOf(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8), 4)
         assertEquals(4, ans.size)
