@@ -30,15 +30,17 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
 
     fun findControlSiteNear(point: GHPoint, distance: Double = 100.0): GHPoint {
-        var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
+        var node = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
         while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
-        return GHPoint(node.first, node.second)
+        return node
     }
-    fun findAlternativeControlSiteFor(point: GHPoint): GHPoint {
-       val distance =  Math.random() * 150.0
-        var node: Pair<Double, Double>? = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
-        while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
-        return GHPoint(node.first, node.second)
+    fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
+        var node = findControlSiteNearInternal(getCoords(point, randomBearing,  Math.random() * distance))
+        while (node == null || node == point ) {
+            node = findControlSiteNearInternal(getCoords(point, randomBearing,  Math.random() * distance))
+
+        }
+        return node
     }
 
     fun routeRequest(req: GHRequest, numAlternatives: Int = 0): GHResponse {
@@ -73,16 +75,12 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     }
 
 
-    private fun findControlSiteNearInternal(p: GHPoint): Pair<Double, Double>? {
+    private fun findControlSiteNearInternal(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
         return when {
             !qr.isValid -> null
             qr.snappedPosition == QueryResult.Position.EDGE  -> null
-            else -> {
-                //qr.calcSnappedPoint(DistanceCalc())
-                val point = qr.snappedPoint
-                Pair(point.lat, point.lon)
-            }
+            else -> qr.snappedPoint
         }
     }
 
