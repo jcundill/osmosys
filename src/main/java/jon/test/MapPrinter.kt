@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 
 class MapPrinter(val params: CourseParameters) {
 
@@ -50,7 +51,11 @@ class MapPrinter(val params: CourseParameters) {
     }
 
     //http://tiler1.oobrien.com/pdf/?style=streeto_global|paper=0.21000000000000002,0.29700000000000004|scale=10000|centre=6982438,-135151|title=OpenOrienteeringMap|club=|id=5b03178056f05|start=6980833,-133946|crosses=|cps=|controls=1,45,6981557,-134761,2,45,6982516,-133773,3,45,6983578,-134206,4,45,6983379,-134943,5,45,6982485,-134904,6,45,6981572,-133950
-    fun generatePDF(filename: String = "somefile.pdf", points: List<GHPoint>) {
+    fun generatePDF(filename: String = "somefile.pdf", title: String = "OPENORIENTEERINGMAP", points: List<GHPoint>) {
+
+        val mapKey = "5b0f9db8c7c9e"
+
+        val mapTitle = title//URLEncoder.encode(title, "utf-8")
 
         val env = Envelope()
         points.forEach {env.expandToInclude(it.lon, it.lat)}
@@ -78,7 +83,7 @@ class MapPrinter(val params: CourseParameters) {
         val controlsList = formatControlsList(controls)
 
 
-        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=$orientation|scale=10000|centre=$centreLat,$centreLon|title=OpenOrienteeringMap|club=|id=5b0af1bf10d89|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
+        val url = "http://tiler1.oobrien.com/pdf/?style=streeto|paper=$orientation|scale=10000|centre=$centreLat,$centreLon|title=$mapTitle|club=|id=$mapKey|start=$startLat,$startLon|crosses=|cps=|controls=$controlsList"
         val obj = URL(url)
 
         with(obj.openConnection() as HttpURLConnection) {
