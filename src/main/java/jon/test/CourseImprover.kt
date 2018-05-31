@@ -1,6 +1,8 @@
 package jon.test
 
 import com.graphhopper.util.shapes.GHPoint
+import jon.test.improvers.NumberedControlResequencer
+import jon.test.improvers.TSP
 import xyz.thepathfinder.simulatedannealing.SearchState
 
 class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPoint>) : SearchState<CourseImprover> {
@@ -16,21 +18,18 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     var featureScores: List<Double>? = null
 
     override fun step(): CourseImprover {
-        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, controls.size / 3)
-        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, controls)
+        val newControls = TSP(controls).run()!!
+        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, newControls.size / 3)
+        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, newControls)
         return CourseImprover(csf, newCourse)
     }
 
     fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
             selected.filter {it != 0 || it != existing.size - 1}.fold(existing, { current, ctrl ->
-                val s =current.subList(0, ctrl) +
+                current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
                         current.subList(ctrl + 1, current.size)
-                if(s.size != existing.size) {
-                    println("whoops")
-                }
-                s
-            })
+           })
 
     /**
      * find some of the numbered controls that we would like to reposition
