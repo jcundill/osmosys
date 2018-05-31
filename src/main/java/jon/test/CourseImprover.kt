@@ -1,7 +1,6 @@
 package jon.test
 
 import com.graphhopper.util.shapes.GHPoint
-import jon.test.improvers.NumberedControlResequencer
 import jon.test.improvers.TSP
 import xyz.thepathfinder.simulatedannealing.SearchState
 
