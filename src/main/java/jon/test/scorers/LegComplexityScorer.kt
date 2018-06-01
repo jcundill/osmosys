@@ -11,10 +11,10 @@ data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
      */
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
         // the finish can't be in the wrong place
-        routedLegs.dropLast(1).map{ complexity(it) }
+        routedLegs.dropLast(1).map{ evaluate(it) }
 
 
-    private fun complexity(leg: GHResponse): Double {
+    private fun evaluate(leg: GHResponse): Double {
         val turns = leg.best.instructions.size
         val length = leg.best.distance
 

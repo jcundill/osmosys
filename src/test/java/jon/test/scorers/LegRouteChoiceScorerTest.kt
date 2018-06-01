@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class RouteChoiceScorerTest {
+internal class LegRouteChoiceScorerTest {
 
     lateinit var rsStartTo1: GHResponse
     lateinit var rs1ToFinish: GHResponse
@@ -26,8 +26,32 @@ internal class RouteChoiceScorerTest {
     }
 
     @Test
+    fun scorePrevious() {
+        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+
+        every { rsStartTo1.hasAlternatives() } returns true
+        every { rs1ToFinish.hasAlternatives() } returns false
+
+        val scores = scorer.scorePrevious(listOf(rsStartTo1, rs1ToFinish))
+
+        assertEquals(0.0, scores[0])
+    }
+
+    @Test
+    fun scoreFollowing() {
+        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+
+        every { rsStartTo1.hasAlternatives() } returns true
+        every { rs1ToFinish.hasAlternatives() } returns false
+
+        val scores = scorer.scoreFollowing(listOf(rsStartTo1, rs1ToFinish))
+
+        assertEquals(1.0, scores[0])
+    }
+
+    @Test
     fun score() {
-        val scorer = FollowingLegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
         every { rsStartTo1.hasAlternatives() } returns true
         every { rs1ToFinish.hasAlternatives() } returns false
