@@ -7,7 +7,9 @@ import io.mockk.classMockk
 import io.mockk.every
 import jon.test.scorers.FeatureScorer
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CourseScorerTest {
@@ -20,6 +22,7 @@ internal class CourseScorerTest {
     lateinit var controls: List<GHPoint>
     lateinit var mockFS1: FeatureScorer
     lateinit var mockFS2: FeatureScorer
+    lateinit var mockFS3: FeatureScorer
 
     @BeforeAll
     fun beforeAll() {
@@ -28,17 +31,15 @@ internal class CourseScorerTest {
         every { csf.routeRequest(any(), any()) } returns mockResponse
         mockFS1 = classMockk(FeatureScorer::class)
         mockFS2 = classMockk(FeatureScorer::class)
+        mockFS3 = classMockk(FeatureScorer::class)
 
     }
 
     @BeforeEach
     fun setUp() {
-        controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
+        controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
         step = CourseImprover(csf, controls)
-        scorer = CourseScorer(csf, listOf(mockFS1, mockFS2), params)
-
-        every {mockFS1.score(any(), any())} returns controls.drop(2).map { 0.5 }
-        every {mockFS2.score(any(), any())} returns controls.drop(2).map { 0.5 }
+        scorer = CourseScorer(csf, listOf(mockFS1, mockFS2, mockFS3), params)
     }
 
     @AfterEach
@@ -71,12 +72,16 @@ internal class CourseScorerTest {
         every { csf.routeFitsBox(any(), any()) } returns true
         every { csf.findRoutes(any(), any()) } returns mockResponse
 
+        every {mockFS1.score(any(), any())} returns controls.drop(2).map { 0.0 }
+        every {mockFS2.score(any(), any())} returns controls.drop(2).map { 0.0 }
+        every {mockFS3.score(any(), any())} returns controls.drop(2).map { 0.0 }
+
         val score = scorer.score(step)
-        assertEquals(0.5, score)
+        assertEquals(0.0, score)
         assertNotNull(step.numberedControlScores)
         // there are 5 controls (inc s + f) then there are 3 numbered control scores
         assertEquals(controls.size - 2, step.numberedControlScores.size)
-        assertTrue(step.numberedControlScores.all {it == 0.5})
+        assertTrue(step.numberedControlScores.all {it == 0.0})
     }
 
     @Test
@@ -86,12 +91,68 @@ internal class CourseScorerTest {
         every { csf.routeFitsBox(any(), any()) } returns true
         every { csf.findRoutes(any(), any()) } returns mockResponse
 
-        every {mockFS1.score(any(), any())} returns listOf(0.0) + controls.drop(1).map { 0.2 }
-        every {mockFS2.score(any(), any())} returns listOf(0.0) + controls.drop(1).map { 0.4 }
+        /*
+                featureScores =
+                        1       2       3       4       5       6
+                FS1     0.1     0.2     0.1     0.1     0.5     0.0
+                FS2     0.2     0.1     0.1     0.4     0.2     0.0
+                FS3     0.3     0.1     0.2     0.0     0.0     0.4
 
-        scorer.score(step)
-        assertTrue(step.numberedControlScores.drop(1).all {it > 0.299999 && it < 3.00001})
-        assertEquals(0.0, step.numberedControlScores.first())
+                step.numberedControlScores = 0.2, 0.167, 0.167, 0.167, 0.267, 0.167
+          */
+        val fs1 = listOf( 0.1, 0.2, 0.1, 0.1, 0.5, 0.0)
+        val fs2 = listOf(0.2, 0.1, 0.1, 0.4, 0.2, 0.0)
+        val fs3 = listOf(0.3, 0.1, 0.2, 0.0, 0.0, 0.4)
+
+        every {mockFS1.score(any(), any())} returns  fs1
+        every {mockFS2.score(any(), any())} returns  fs2
+        every {mockFS3.score(any(), any())} returns  fs3
+
+        val expectedNumberedControlScores = listOf(
+                (fs1[0] + fs2[0] + fs3[0]) / 3,
+                (fs1[1] + fs2[1] + fs3[1]) / 3,
+                (fs1[2] + fs2[2] + fs3[2]) / 3,
+                (fs1[3] + fs2[3] + fs3[3]) / 3,
+                (fs1[4] + fs2[4] + fs3[4]) / 3,
+                (fs1[5] + fs2[5] + fs3[5]) / 3
+        )
+
+        val ans = scorer.score(step)
+        assertEquals(expectedNumberedControlScores, step.numberedControlScores)
+        assertEquals(expectedNumberedControlScores.average(), ans)
+    }
+
+    @Test
+    fun scoresAreNormalised() {
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.best.points } returns PointList.EMPTY
+        every { csf.routeFitsBox(any(), any()) } returns true
+        every { csf.findRoutes(any(), any()) } returns mockResponse
+
+        val fs1 = listOf( 0.1, 0.2, 0.1, 0.1, 0.5, 0.0)
+        val fs2 = listOf(0.2, 0.1, 0.1, 0.4, 0.2, 0.0)
+        val fs3 = listOf(0.3, 0.1, 0.2, 0.0, 0.0, 0.4)
+
+        val dn1 = fs1.map {it * 100}
+        val dn2 = fs2.map {it * 2}
+        val dn3 = fs3.map {it * 10}
+
+        every {mockFS1.score(any(), any())} returns  dn1
+        every {mockFS2.score(any(), any())} returns  dn2
+        every {mockFS3.score(any(), any())} returns  dn3
+
+        val expectedNumberedControlScores = listOf(
+                (fs1[0] + fs2[0] + fs3[0]) / 3,
+                (fs1[1] + fs2[1] + fs3[1]) / 3,
+                (fs1[2] + fs2[2] + fs3[2]) / 3,
+                (fs1[3] + fs2[3] + fs3[3]) / 3,
+                (fs1[4] + fs2[4] + fs3[4]) / 3,
+                (fs1[5] + fs2[5] + fs3[5]) / 3
+        )
+
+        val ans = scorer.score(step)
+        assertEquals(expectedNumberedControlScores, step.numberedControlScores)
+        assertEquals(expectedNumberedControlScores.average(), ans)
     }
 
     @Test
@@ -100,7 +161,6 @@ internal class CourseScorerTest {
         val expected = listOf(listOf(1,4,7), listOf(2,5,8), listOf(3,6,9))
 
         val ans = scorer.transpose(ins)
-
         assertEquals(expected, ans)
     }
 
@@ -110,17 +170,14 @@ internal class CourseScorerTest {
         val expected = listOf(listOf(1), listOf(2), listOf(3))
 
         val ans = scorer.transpose(ins)
-
         assertEquals(expected, ans)
     }
 
     @Test
     fun transpose0() {
-        val ins = listOf(emptyList<Int>())
-        val expected = emptyList<Int>()
+        val ins: List<List<Int>> = listOf(emptyList<Int>())
 
-        val ans = scorer.transpose(ins)
-
-        assertEquals(expected, ans)
+        val ans: List<List<Int>> = scorer.transpose(ins)
+        assertEquals(0, ans.size)
     }
 }

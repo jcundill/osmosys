@@ -5,22 +5,26 @@ import jon.test.CourseParameters
 
 data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
 
-    private val minTurns = 6
-
     /**
      * scores each numbered control based on the complexity of the route to that control.
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too direct
      */
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
-            routedLegs.dropLast(1).map{ // the finish can't be in the wrong place
-                val turns = it.best.instructions.size
-                when {
-                    turns > minTurns -> 0.0
-                    else -> delta(turns, minTurns)
-                }
-            }
+        // the finish can't be in the wrong place
+        routedLegs.dropLast(1).map{ complexity(it) }
 
-    private fun delta(actual: Number, threshold:Number): Double =
-            Math.abs(threshold.toDouble() - actual.toDouble()) / threshold.toDouble()
+
+    private fun complexity(leg: GHResponse): Double {
+        val turns = leg.best.instructions.size
+        val length = leg.best.distance
+
+        // we want on average a turn for every 100m travelled
+        return when {
+            turns == 0 -> 1.0
+            length == 0.0 -> 1.0
+            else -> 1.0 - turns / length / 100.0
+
+        }
+    }
 
 }

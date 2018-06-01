@@ -37,7 +37,7 @@ internal class CourseLengthScorerTest {
 
         val scores = scorer.algo(legs, 200.0)
 
-        assertEquals(listOf(0.5, 0.25), scores) // 3 legs = 2 scores
+        assertEquals(listOf( 0.75, 0.5 ), scores) // 3 legs = 2 scores
 
     }
 
@@ -67,8 +67,8 @@ internal class CourseLengthScorerTest {
 
         val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
 
-        assertEquals(0.5, score[0])
-        assertEquals(0.75, score[1])
+        assertEquals(0.25, score[0])
+        assertEquals(0.5, score[1])
     }
 
     @Test
@@ -96,8 +96,8 @@ internal class CourseLengthScorerTest {
 
         val score = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
 
-        assertEquals(0.5, score[0])
-        assertEquals(0.25, score[1])
+        assertEquals(0.75, score[0])
+        assertEquals(0.5, score[1])
     }
 
     @Test

@@ -14,7 +14,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
      * the improver is given the leg scores for the numbered controls only
      */
     var numberedControlScores: List<Double> = dummyScores
-    var featureScores: List<Double>? = null
+    var featureScores: List<List<Double>>? = null
 
     override fun step(): CourseImprover {
         val newControls = TSP(controls).run()!!

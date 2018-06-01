@@ -3,6 +3,9 @@ package jon.test
 import com.graphhopper.GHRequest
 import jon.test.scorers.*
 
+typealias ControlScoreList = List<Double>
+typealias FeatureScoreList = List<Double>
+
 class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: CourseParameters) {
 
     fun score(step: CourseImprover): Double {
@@ -16,15 +19,34 @@ class CourseScorer(private val csf: ControlSiteFinder, private val featureScorer
                 // needed currently for alternative routes
                 val legs = step.controls.windowed(2, 1, false)
                 val legRoutes = legs.map{ ab -> csf.findRoutes(ab.first(), ab.last())}
-                val numberedControlScores: List<List<Double>> = featureScorers.map { it.score(legRoutes, courseRoute) }
+                val featureScores: List<ControlScoreList> = featureScorers.map {
+                    normaliseScores(it.score(legRoutes, courseRoute))
+                }
 
-                val avs = numberedControlScores.map {it.average()} // don't include the start when seeing how this feature scored
+                /*
+                        featureScores =
+                                1       2       3       4       5       6
+                        FS1     0.1     0.2     0.1     0.1     0.5     0.1
+                        FS2     0.2     0.1     0.1     0.4     0.3     0.0
+                        FS3     0.3     0.1     0.2     0.0     0.0     0.4
 
-                step.numberedControlScores = transpose(numberedControlScores).map {it.average()}
-                step.featureScores = avs
+                        step.numberedControlScores = 0.2, 0.167, 0.167, 0.167, 0.267, 0.167
+                        featureScores =
+                 */
+                val numberedControlScores: List<FeatureScoreList> = transpose(featureScores)
 
-                return avs.average()
+                step.numberedControlScores = numberedControlScores.map { it.sum() / featureScorers.size }
+                step.featureScores = featureScores
+                return step.numberedControlScores.average()
             }
+        }
+    }
+
+    private fun normaliseScores(rawScores: List<Double>): List<Double> {
+        val sum = rawScores.sum()
+        return when (sum) {
+            0.0 -> rawScores
+            else -> rawScores.map { it / sum }
         }
     }
 
