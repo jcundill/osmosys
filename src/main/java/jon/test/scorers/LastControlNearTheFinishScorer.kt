@@ -14,6 +14,7 @@ class LastControlNearTheFinishScorer(val params: CourseParameters) : FeatureScor
         val lastLegLength = routedLegs.last().best.distance
 
         return List(routedLegs.size - 2, {0.0}) + when {
+            lastLegLength < 50.0 -> 1.0 // way too short
             lastLegLength < avLegLength / 2 -> 0.0 // all is good
             else ->  1.0 // last is bad
         }

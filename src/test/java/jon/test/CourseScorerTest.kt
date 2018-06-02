@@ -23,6 +23,7 @@ internal class CourseScorerTest {
     lateinit var mockFS1: FeatureScorer
     lateinit var mockFS2: FeatureScorer
     lateinit var mockFS3: FeatureScorer
+    lateinit var mockRoute: GHResponse
 
     @BeforeAll
     fun beforeAll() {
@@ -32,6 +33,7 @@ internal class CourseScorerTest {
         mockFS1 = classMockk(FeatureScorer::class)
         mockFS2 = classMockk(FeatureScorer::class)
         mockFS3 = classMockk(FeatureScorer::class)
+        mockRoute = classMockk(GHResponse::class)
 
     }
 
@@ -46,25 +48,27 @@ internal class CourseScorerTest {
     fun tearDown() {
     }
 
-    @Test
-    fun scoreHasErrors() {
+    // Constraints
 
-        every { mockResponse.hasErrors() } returns true
-        val score = scorer.score(step)
-        assertEquals(10000.0, score)
-    }
-
-    @Test
-    fun scoreTooBigToMap() {
-
-        every { mockResponse.hasErrors() } returns false
-        every { mockResponse.best.points } returns PointList.EMPTY
-        every { csf.routeFitsBox(any(), any()) } returns false
-
-        val score = scorer.score(step)
-        assertEquals(10000.0, score)
-    }
-
+//    @Test
+//    fun scoreHasErrors() {
+//
+//        every { mockRoute.hasErrors() } returns true
+//        val score = scorer.score(step, mockRoute)
+//        assertEquals(10000.0, score)
+//    }
+//
+//    @Test
+//    fun scoreTooBigToMap() {
+//
+//        every { mockResponse.hasErrors() } returns false
+//        every { mockResponse.best.points } returns PointList.EMPTY
+//        every { csf.routeFitsBox(any(), any()) } returns false
+//
+//        val score = scorer.score(step, mockRoute)
+//        assertEquals(10000.0, score)
+//    }
+//
     @Test
     fun scoreNoErrors() {
         every { mockResponse.hasErrors() } returns false
@@ -76,7 +80,7 @@ internal class CourseScorerTest {
         every {mockFS2.score(any(), any())} returns controls.drop(2).map { 0.0 }
         every {mockFS3.score(any(), any())} returns controls.drop(2).map { 0.0 }
 
-        val score = scorer.score(step)
+        val score = scorer.score(step, mockRoute)
         assertEquals(0.0, score)
         assertNotNull(step.numberedControlScores)
         // there are 5 controls (inc s + f) then there are 3 numbered control scores
@@ -117,43 +121,11 @@ internal class CourseScorerTest {
                 (fs1[5] + fs2[5] + fs3[5]) / 3
         )
 
-        val ans = scorer.score(step)
+        val ans = scorer.score(step, mockRoute)
         assertEquals(expectedNumberedControlScores, step.numberedControlScores)
         assertEquals(expectedNumberedControlScores.average(), ans)
     }
 
-    @Test
-    fun scoresAreNormalised() {
-        every { mockResponse.hasErrors() } returns false
-        every { mockResponse.best.points } returns PointList.EMPTY
-        every { csf.routeFitsBox(any(), any()) } returns true
-        every { csf.findRoutes(any(), any()) } returns mockResponse
-
-        val fs1 = listOf( 0.1, 0.2, 0.1, 0.1, 0.5, 0.0)
-        val fs2 = listOf(0.2, 0.1, 0.1, 0.4, 0.2, 0.0)
-        val fs3 = listOf(0.3, 0.1, 0.2, 0.0, 0.0, 0.4)
-
-        val dn1 = fs1.map {it * 100}
-        val dn2 = fs2.map {it * 2}
-        val dn3 = fs3.map {it * 10}
-
-        every {mockFS1.score(any(), any())} returns  dn1
-        every {mockFS2.score(any(), any())} returns  dn2
-        every {mockFS3.score(any(), any())} returns  dn3
-
-        val expectedNumberedControlScores = listOf(
-                (fs1[0] + fs2[0] + fs3[0]) / 3,
-                (fs1[1] + fs2[1] + fs3[1]) / 3,
-                (fs1[2] + fs2[2] + fs3[2]) / 3,
-                (fs1[3] + fs2[3] + fs3[3]) / 3,
-                (fs1[4] + fs2[4] + fs3[4]) / 3,
-                (fs1[5] + fs2[5] + fs3[5]) / 3
-        )
-
-        val ans = scorer.score(step)
-        assertEquals(expectedNumberedControlScores, step.numberedControlScores)
-        assertEquals(expectedNumberedControlScores.average(), ans)
-    }
 
     @Test
     fun transpose() {

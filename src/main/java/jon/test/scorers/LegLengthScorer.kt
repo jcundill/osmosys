@@ -9,7 +9,7 @@ data class LegLengthScorer(val params: CourseParameters): FeatureScorer {
 
 
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
-        return scorePrevious(routedLegs).zip(scoreFollowing(routedLegs)).map { it.first + it.second }
+        return scorePrevious(routedLegs)//.zip(scoreFollowing(routedLegs)).map { (it.first + it.second) / 2.0 }
     }
 
 

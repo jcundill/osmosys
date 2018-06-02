@@ -77,8 +77,8 @@ internal class CourseImproverTest {
     @Test
     fun findWorsts() {
         val scores = listOf(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.1, 0.2, 0.3)
-        val idxes = improver.findIndexesOfWorst(scores, 3)
-        assertEquals(3, idxes.size )
+        val idxes = improver.findIndexesOfWorst(scores, 100)
+        assertEquals(5, idxes.size )
     }
 
     @Test

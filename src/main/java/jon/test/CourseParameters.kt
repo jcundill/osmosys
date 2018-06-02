@@ -8,7 +8,7 @@ data class CourseParameters(
         val distance: Double = 6000.0,
         private val allowedLengthDelta:Double = 0.2,
         val points: Int = 6,
-        val minControlSeparation: Double = 5.0,
+        val minControlSeparation: Double = 50.0,
         val start: GHPoint) {
 
     val landscape = MapBox(

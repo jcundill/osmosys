@@ -3,9 +3,15 @@ package jon.test
 import com.graphhopper.GHRequest
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
+import jon.test.constraints.CourseConstraint
 import xyz.thepathfinder.simulatedannealing.Problem
+import java.util.*
 
-class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, private val params: CourseParameters) : Problem<CourseImprover> {
+class CourseFinder(
+        private val csf: ControlSiteFinder,
+        private val constraints: List<CourseConstraint>,
+        private val scorer:CourseScorer,
+        private val params: CourseParameters) : Problem<CourseImprover> {
 
     var bad = 0
 
@@ -21,12 +27,11 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
         return when {
             step === null -> 10000.0
             else -> {
-                val response = csf.routeRequest(GHRequest(step.controls))
+                val courseRoute = csf.routeRequest(GHRequest(step.controls))
                 when {
-                    response.hasErrors() -> 10000.0
-                    !csf.routeFitsBox(response.best.points, params.allowedBoxes) -> 10000.0
+                    constraints.any { !it.valid(courseRoute) } -> 10000.0
                     else -> {
-                        val ans = scorer.score(step) * 1000
+                        val ans = scorer.score(step, courseRoute) * 1000
                         println(ans)
                         ans
                     }
@@ -37,7 +42,7 @@ class CourseFinder(private val csf: ControlSiteFinder, val scorer:CourseScorer, 
 
 
     private tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
-        val possible = csf.findControlSiteNear(seed.last(), 500.0)
+        val possible = csf.findControlSiteNear(seed.last(), Random().nextDouble() * 500.0)
         val pl = seed.fold(PointList(), {acc, pt -> acc.add(pt); acc})
         pl.add(possible)
         return if (csf.routeFitsBox(pl, params.allowedBoxes)) possible

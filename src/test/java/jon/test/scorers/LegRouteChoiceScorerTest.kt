@@ -15,49 +15,60 @@ import org.junit.jupiter.api.TestInstance
 internal class LegRouteChoiceScorerTest {
 
     lateinit var rsStartTo1: GHResponse
-    lateinit var rs1ToFinish: GHResponse
+    lateinit var rs1To2: GHResponse
+    lateinit var rs2To3: GHResponse
+    lateinit var rs3ToFinish: GHResponse
     lateinit var cr: GHResponse
 
     @BeforeAll
     fun beforeTests() {
         rsStartTo1 = classMockk(GHResponse::class)
-        rs1ToFinish = classMockk(GHResponse::class)
+        rs1To2 = classMockk(GHResponse::class)
+        rs2To3 = classMockk(GHResponse::class)
+        rs3ToFinish = classMockk(GHResponse::class)
         cr = classMockk(GHResponse::class)
     }
 
     @Test
-    fun scorePrevious() {
+    fun scoreNoChoice() {
         val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
-        every { rsStartTo1.hasAlternatives() } returns true
-        every { rs1ToFinish.hasAlternatives() } returns false
+        every { rsStartTo1.hasAlternatives() } returns false
+        every { rs1To2.hasAlternatives() } returns false
+        every { rs2To3.hasAlternatives() } returns false
+        every { rs3ToFinish.hasAlternatives() } returns false
 
-        val scores = scorer.scorePrevious(listOf(rsStartTo1, rs1ToFinish))
+        val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish), cr)
 
-        assertEquals(0.0, scores[0])
+
+        assertEquals(listOf(1.0,1.0,1.0), scores)
     }
 
     @Test
-    fun scoreFollowing() {
+    fun scoreSomeWithChoice() {
         val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
         every { rsStartTo1.hasAlternatives() } returns true
-        every { rs1ToFinish.hasAlternatives() } returns false
+        every { rs1To2.hasAlternatives() } returns false
+        every { rs2To3.hasAlternatives() } returns true
+        every { rs3ToFinish.hasAlternatives() } returns true
 
-        val scores = scorer.scoreFollowing(listOf(rsStartTo1, rs1ToFinish))
+        val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish), cr)
 
-        assertEquals(1.0, scores[0])
+
+        assertEquals(listOf(0.0,1.0,0.0), scores)
     }
+
 
     @Test
     fun score() {
         val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
 
         every { rsStartTo1.hasAlternatives() } returns true
-        every { rs1ToFinish.hasAlternatives() } returns false
+        every { rs3ToFinish.hasAlternatives() } returns false
 
-        val scores = scorer.score(listOf(rsStartTo1, rs1ToFinish), cr)
+        val scores = scorer.score(listOf(rsStartTo1, rs3ToFinish), cr)
 
-        assertEquals(1.0, scores[0])
+        assertEquals(0.0, scores[0])
     }
 }
