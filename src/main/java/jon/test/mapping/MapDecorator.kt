@@ -62,15 +62,32 @@ class MapDecorator(val params: CourseParameters) {
         val offsetsInPts = offsetsInMetres.map {p ->
             val xPt = mm2pt(p.first / 10.toFloat()) //lon
             val yPt = mm2pt(p.second / 10.toFloat()) //lat
-            Pair(xPt, yPt)
+            Pair(xPt + 0.5f, yPt - 1.0f)
         }
 
 
         offsetsInPts.windowed(2).forEach { drawLine(contentStream, centre, it) }
+        drawFinish(contentStream, centre, offsetsInPts.last())
         contentStream.close()
 
         return doc.save(outFile)
 
+    }
+
+    private fun drawFinish(content: PDPageContentStream, centre: Pair<Float, Float>, last: Pair<Float, Float>) {
+        val cx = centre.first + last.first
+        val cy = centre.second + last.second
+        val r = 9.5f
+        content.moveTo(centre.first + last.first, centre.second + last.second)
+        content.setLineWidth(1.5.toFloat())
+        content.setStrokingColor(Color.MAGENTA)
+        val k = 0.552284749831f;
+        content.moveTo(cx - r, cy);
+        content.curveTo(cx - r, cy + k * r, cx - k * r, cy + r, cx, cy + r);
+        content.curveTo(cx + k * r, cy + r, cx + r, cy + k * r, cx + r, cy);
+        content.curveTo(cx + r, cy - k * r, cx + k * r, cy - r, cx, cy - r);
+        content.curveTo(cx - k * r, cy - r, cx - r, cy - k * r, cx - r, cy);
+        content.stroke();
     }
 
     fun drawLine(content: PDPageContentStream, centre:Pair<Float, Float>, line: List<Pair<Float, Float>>) {
