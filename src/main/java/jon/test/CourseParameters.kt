@@ -3,7 +3,12 @@ package jon.test
 import com.graphhopper.util.DistancePlaneProjection
 import com.graphhopper.util.shapes.GHPoint
 
-data class MapBox(val maxWidth: Double, val maxHeight: Double)
+data class MapBox(val maxWidth: Double, val maxHeight: Double) {
+    val dist2d = DistancePlaneProjection()
+    val widthInMetres = dist2d.calcDist(0.0, 0.0, 0.0, this.maxWidth)
+    val heightInMetres = dist2d.calcDist(0.0, 0.0, this.maxHeight, 0.0)
+}
+
 
 data class CourseParameters(
         val distance: Double = 6000.0,
@@ -14,6 +19,7 @@ data class CourseParameters(
         val finish: GHPoint = start) {
 
     val dist2d = DistancePlaneProjection()
+
     val landscape = MapBox(
             maxWidth = 0.04187945854565234 * 0.99,
             maxHeight = 0.01638736589702461 * 0.99

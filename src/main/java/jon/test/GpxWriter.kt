@@ -9,6 +9,7 @@ import org.alternativevision.gpx.beans.Route
 import org.alternativevision.gpx.beans.Track
 import org.alternativevision.gpx.beans.Waypoint
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.DecimalFormat
 
@@ -17,6 +18,17 @@ import java.text.DecimalFormat
  * Created by jcundill on 23/02/2017.
  */
 class GpxWriter {
+
+    fun readFromFile(filename: String): List<GHPoint> {
+
+        val fis = FileInputStream(filename)
+        val parser = GPXParser()
+        val gpx = parser.parseGPX(fis)
+
+        fis.close()
+        val route = gpx.routes.toList()[0]
+        return route.routePoints.map { wpt -> GHPoint(wpt.latitude, wpt.longitude) }
+    }
 
     fun writeToFile(controls: List<GHPoint>, best: PathWrapper, score: Double, controlScores: List<Double>,
                     detailedScores: List<Pair<String, List<Double>>>, filename: String) {

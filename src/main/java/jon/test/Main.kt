@@ -5,10 +5,10 @@ import com.graphhopper.util.shapes.GHPoint
 import jon.test.constraints.CourseLengthConstraint
 import jon.test.constraints.IsRouteableConstraint
 import jon.test.constraints.PrintableOnMapConstraint
+import jon.test.mapping.MapPrinter
 import jon.test.scorers.*
 import xyz.thepathfinder.simulatedannealing.ExponentialDecayScheduler
 import xyz.thepathfinder.simulatedannealing.InfeasibleProblemException
-import xyz.thepathfinder.simulatedannealing.LinearDecayScheduler
 import xyz.thepathfinder.simulatedannealing.Solver
 import java.util.*
 
@@ -18,9 +18,9 @@ object Main {
     fun main(args: Array<String>) {
 
 
-        //val params = CourseParameters(distance = 8000.0, points = 10, start = GHPoint(52.988304, -1.203265))
+        val params = CourseParameters(distance = 9000.0, points = 12, start = GHPoint(52.988304, -1.203265))
         //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(53.233456, -1.433246))
-        val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(51.511287, -0.113695))
+        //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(51.511287, -0.113695))
         //val params = CourseParameters(distance = 9000.0, points = 9, start = GHPoint(53.234060, -1.436845))  //york
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.490507, -0.616562)) //whitby
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(51.511287, -0.113695)) //london
