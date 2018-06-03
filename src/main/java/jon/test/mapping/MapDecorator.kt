@@ -62,7 +62,7 @@ class MapDecorator(val params: CourseParameters) {
         val offsetsInPts = offsetsInMetres.map {p ->
             val xPt = mm2pt(p.first / 10.toFloat()) //lon
             val yPt = mm2pt(p.second / 10.toFloat()) //lat
-            Pair(xPt + 0.5f, yPt - 1.0f)
+            Pair(xPt + 0.2f, yPt - 1.3f)
         }
 
 
