@@ -7,7 +7,8 @@ image: maven:3.3.9
 
 pipelines:
   custom:
-    - step:
+    build_manually:
+     - step:
         caches:
           - maven
         script: # Modify the commands below to build your repository.
