@@ -6,7 +6,7 @@
 image: maven:3.3.9
 
 pipelines:
-  default:
+  custom:
     - step:
         caches:
           - maven
