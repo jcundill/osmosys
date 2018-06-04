@@ -7,15 +7,11 @@ import jon.test.mapping.MapDecorator
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.awt.Color
 import java.awt.Rectangle
 import java.io.File
-import java.io.FileInputStream
-import javax.swing.Spring.height
 import java.io.IOException
-import kotlin.test.assertEquals
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -23,7 +19,7 @@ class PdfBoxTest {
 
     //@Test
     fun decorator() {
-        val params = CourseParameters(points = 10, start = GHPoint(52.988304, -1.203265))
+        val params = CourseParameters(numControls = 10, start = GHPoint(52.988304, -1.203265))
 
         val points = GpxWriter().readFromFile("/Users/jcundill/Documents/jon.gpx")
         val original = File("/Users/jcundill/Documents/map.pdf")
