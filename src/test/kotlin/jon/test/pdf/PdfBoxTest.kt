@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PdfBoxTest {
 
-    @Test
+    //@Test
     fun decorator() {
         val params = CourseParameters(points = 10, start = GHPoint(52.988304, -1.203265))
 
@@ -34,7 +34,7 @@ class PdfBoxTest {
         d.decorate(pdfStream = original.inputStream(), controls = points, orientation = params.landscape,outFile = File(modified))
     }
 
-    @Test
+    //@Test
     fun draw() {
         val original = File("/Users/jcundill/Documents/map.pdf")
         val modified = "map-out.pdf"
