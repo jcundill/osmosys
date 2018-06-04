@@ -18,7 +18,8 @@ object Main {
     fun main(args: Array<String>) {
 
 
-        val params = CourseParameters(distance = 9000.0, points = 12, start = GHPoint(52.988304, -1.203265))
+        val params = CourseParameters(distance = 6000.0, points = 6, start = GHPoint(52.988304, -1.203265))
+        //val params = CourseParameters(distance = 5000.0, points = 6, start = GHPoint(51.469109, -0.094237)) //venetian road
         //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(53.233456, -1.433246))
         //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(51.511287, -0.113695))
         //val params = CourseParameters(distance = 9000.0, points = 9, start = GHPoint(53.234060, -1.436845))  //york
@@ -66,7 +67,7 @@ object Main {
             }.zip(solution.featureScores!!)
 
             GpxWriter().writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "jon.gpx")
-            MapPrinter(params).generatePDF(filename = "Map-${Date().time}.pdf", title = "Test+${(best.distance/1000).toInt()}K+${params.points -2 }+Controls", points = solution.controls)
+            MapPrinter(params).generatePDF(filename = "Map-${Date().time}.pdf", title = "Test+${(best.distance/1000).toInt()}K+${params.points}+Controls", points = solution.controls)
             println()
             println("Hit: ${csf.hit}, Miss: ${csf.miss}, Bad: ${problem.bad}")
             println(best.distance)

@@ -34,15 +34,6 @@ class CourseScorer(private val csf: ControlSiteFinder, private val featureScorer
         return step.numberedControlScores.average()
     }
 
-
-    private fun normaliseScores(rawScores: List<Double>): List<Double> {
-        val sum = rawScores.sum()
-        return when (sum) {
-            0.0 -> rawScores
-            else -> rawScores.map { it / sum }
-        }
-    }
-
     /**
      * Returns a list of lists, each built from elements of all lists with the same indexes.
      * Output has length of shortest input list.

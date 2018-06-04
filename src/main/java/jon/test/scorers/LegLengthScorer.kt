@@ -8,23 +8,14 @@ data class LegLengthScorer(val params: CourseParameters): FeatureScorer {
     private val maxAllowed = 500.0  // third of the course on a single leg
 
 
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
-        return scorePrevious(routedLegs)//.zip(scoreFollowing(routedLegs)).map { (it.first + it.second) / 2.0 }
-    }
-
-
-    /**
-     * scores each numbered control based on the length of the coming leg.
-     * i.e. control 2 is in a bad place as the route from 2 to 3 was too long
-     */
-    fun scoreFollowing(routedLegs: List<GHResponse>): List<Double> = routedLegs.drop(1).map { evaluate(it) }
-
-
     /**
      * scores each numbered control based on the length of the previous leg.
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too long
      */
-    fun scorePrevious(routedLegs: List<GHResponse>): List<Double> = routedLegs.dropLast(1).map { evaluate(it) }
+    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
+        return routedLegs.dropLast(1).map { evaluate(it) }//.zip(scoreFollowing(routedLegs)).map { (it.first + it.second) / 2.0 }
+    }
+
 
     private fun evaluate(leg: GHResponse): Double {
         val best = leg.best.distance
