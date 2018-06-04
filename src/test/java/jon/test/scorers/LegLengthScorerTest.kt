@@ -33,15 +33,14 @@ internal class LegLengthScorerTest {
         legScores = listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish)
     }
 
-
     @Test
-    fun scoreFollowingAllInBounds() {
+    fun scoreAllInBounds() {
         every { rsStartTo1.best.distance } returns 150.0
         every { rs1To2.best.distance } returns 150.0
         every { rs2To3.best.distance } returns 150.0
         every { rs3ToFinish.best.distance } returns 150.0
 
-        val scores = scorer.scoreFollowing(legScores)
+        val scores = scorer.score(legScores, cr)
 
         assertEquals(0.0, scores[0])
         assertEquals(0.0, scores[1])
@@ -49,110 +48,41 @@ internal class LegLengthScorerTest {
     }
 
     @Test
-    fun scoreFollowing1TooCloseToStart() {
-        every { rsStartTo1.best.distance } returns 15.0
-        every { rs1To2.best.distance } returns 150.0
+    fun score1TooCloseTo2() {
+        every { rsStartTo1.best.distance } returns 150.0
+        every { rs1To2.best.distance } returns 15.0
         every { rs2To3.best.distance } returns 150.0
         every { rs3ToFinish.best.distance } returns 150.0
 
-        val scores = scorer.scoreFollowing(legScores)
+        val scores = scorer.score(legScores, cr)
 
-        assertEquals(0.0, scores[0]) // following leg, we are not interested in moving the start
-        assertEquals(0.0, scores[1])
+        assertEquals(0.0, scores[0])
+        assertEquals(1.0, scores[1])
         assertEquals(0.0, scores[2])
     }
 
     @Test
-    fun scoreFollowing2TooFarAwayFrom1() {
+    fun score1TooFarAwayFrom2() {
         every { rsStartTo1.best.distance } returns 150.0
         every { rs1To2.best.distance } returns 1500.0
         every { rs2To3.best.distance } returns 150.0
         every { rs3ToFinish.best.distance } returns 150.0
 
-        val scores = scorer.scoreFollowing(legScores)
+        val scores = scorer.score(legScores, cr)
 
-        assertEquals(1.0, scores[0])
-        assertEquals(0.0, scores[1])
+        assertEquals(0.0, scores[0])
+        assertEquals(1.0, scores[1])
         assertEquals(0.0, scores[2])
     }
 
     @Test
-    fun scoreFollowing2TooCloseTo1() {
-        every { rsStartTo1.best.distance } returns 150.0
-        every { rs1To2.best.distance } returns 15.0
-        every { rs2To3.best.distance } returns 150.0
-        every { rs3ToFinish.best.distance } returns 150.0
-
-        val scores = scorer.scoreFollowing(legScores)
-
-        assertEquals(1.0, scores[0])
-        assertEquals(0.0, scores[1])
-        assertEquals(0.0, scores[2])
-    }
-
-    @Test
-    fun scoreFollowingAllTooClose() {
+    fun scoreAllTooClose() {
         every { rsStartTo1.best.distance } returns 15.0
         every { rs1To2.best.distance } returns 15.0
         every { rs2To3.best.distance } returns 15.0
         every { rs3ToFinish.best.distance } returns 15.0
 
-        val scores = scorer.scoreFollowing(legScores)
-
-        assertEquals(1.0, scores[0])
-        assertEquals(1.0, scores[1])
-        assertEquals(1.0, scores[2])
-    }
-    @Test
-    fun scorePreviousAllInBounds() {
-        every { rsStartTo1.best.distance } returns 150.0
-        every { rs1To2.best.distance } returns 150.0
-        every { rs2To3.best.distance } returns 150.0
-        every { rs3ToFinish.best.distance } returns 150.0
-
-        val scores = scorer.scorePrevious(legScores)
-
-        assertEquals(0.0, scores[0])
-        assertEquals(0.0, scores[1])
-        assertEquals(0.0, scores[2])
-    }
-
-    @Test
-    fun scorePrevious1TooCloseTo2() {
-        every { rsStartTo1.best.distance } returns 150.0
-        every { rs1To2.best.distance } returns 15.0
-        every { rs2To3.best.distance } returns 150.0
-        every { rs3ToFinish.best.distance } returns 150.0
-
-        val scores = scorer.scorePrevious(legScores)
-
-        assertEquals(0.0, scores[0])
-        assertEquals(1.0, scores[1])
-        assertEquals(0.0, scores[2])
-    }
-
-    @Test
-    fun scorePrevious1TooFarAwayFrom2() {
-        every { rsStartTo1.best.distance } returns 150.0
-        every { rs1To2.best.distance } returns 1500.0
-        every { rs2To3.best.distance } returns 150.0
-        every { rs3ToFinish.best.distance } returns 150.0
-
-        val scores = scorer.scorePrevious(legScores)
-
-        assertEquals(0.0, scores[0])
-        assertEquals(1.0, scores[1])
-        assertEquals(0.0, scores[2])
-    }
-
-    @Test
-    fun scorePreviousAllTooClose() {
-        every { rsStartTo1.best.distance } returns 15.0
-        every { rs1To2.best.distance } returns 15.0
-        every { rs2To3.best.distance } returns 15.0
-        every { rs3ToFinish.best.distance } returns 15.0
-
-        val scores = scorer.scorePrevious(legScores)
+        val scores = scorer.score(legScores, cr)
 
         assertEquals(1.0, scores[0])
         assertEquals(1.0, scores[1])
