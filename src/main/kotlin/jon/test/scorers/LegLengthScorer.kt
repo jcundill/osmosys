@@ -4,8 +4,6 @@ import com.graphhopper.GHResponse
 import jon.test.CourseParameters
 
 data class LegLengthScorer(val params: CourseParameters): FeatureScorer {
-    private val minAllowed = 20.0
-    private val maxAllowed = 500.0  // third of the course on a single leg
 
 
     /**
@@ -20,8 +18,8 @@ data class LegLengthScorer(val params: CourseParameters): FeatureScorer {
     private fun evaluate(leg: GHResponse): Double {
         val best = leg.best.distance
         return when {
-            best < minAllowed -> 1.0
-            best > maxAllowed -> 1.0
+            best < params.minLegLength -> 1.0
+            best > params.maxLegLength -> 1.0
             else -> 0.0
         }
     }

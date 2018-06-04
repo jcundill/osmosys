@@ -2,7 +2,6 @@ package jon.test
 
 import com.graphhopper.GHRequest
 import com.graphhopper.util.PointList
-import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import jon.test.constraints.CourseConstraint
@@ -62,7 +61,7 @@ class CourseFinder(
         val initialControls: List<GHPoint> = if (!canBeMapped(env)) {
             throw InfeasibleProblemException("start is too far away from finish to be mapped")
         } else {
-            (1..(params.points)).map {
+            (1..(params.numControls)).map {
                 val p = findMappableControlSiteIn(env, params.boxRadius)
                 when (p) {
                     null -> throw InfeasibleProblemException("cannot find sites for initial controls")

@@ -1,7 +1,6 @@
 package jon.test
 
 
-import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
@@ -29,12 +28,12 @@ internal class CourseFinderTest {
         val dummyPoint = GHPoint(12.0, 12.0)
 
         every {csf.findControlSiteNear(any(), any())} returns dummyPoint
-        val params = CourseParameters(points = 10, start = GHPoint(52.988304, -1.203265))
+        val params = CourseParameters(numControls = 10, start = GHPoint(52.988304, -1.203265))
         val finder = CourseFinder(csf, emptyList(), scorer, params)
         val points = finder.chooseInitialPoints(start = GHPoint(52.988304, -1.203265), finish = GHPoint(52.988304, -1.203265))
 
         assertEquals(12, points.size)
-        assertEquals( listOf(params.start) + List(params.points, {dummyPoint}) + params.finish, points)
+        assertEquals( listOf(params.start) + List(params.numControls, {dummyPoint}) + params.finish, points)
     }
 
     @Test
@@ -42,7 +41,7 @@ internal class CourseFinderTest {
         val dummyPoint = GHPoint(12.0, 12.0)
 
         every {csf.findControlSiteNear(any(), any())} returns dummyPoint
-        val params = CourseParameters(distance = 6000.0, points = 8,
+        val params = CourseParameters(distance = 6000.0, numControls = 8,
                 start = GHPoint(53.223482, -1.461064),
                 finish = GHPoint(51.511287, -0.113695))
         val finder = CourseFinder(csf, emptyList(), scorer, params)
