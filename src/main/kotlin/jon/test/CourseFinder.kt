@@ -1,7 +1,6 @@
 package jon.test
 
 import com.graphhopper.GHRequest
-import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import jon.test.constraints.CourseConstraint
@@ -42,17 +41,6 @@ class CourseFinder(
         }
     }
 
-
-    private tailrec fun findMappableControlSite(seed: List<GHPoint> ): GHPoint{
-        val possible = csf.findControlSiteNear(seed.last(), Random().nextDouble() * 500.0)
-        val pl = seed.fold(PointList(), {acc, pt -> acc.add(pt); acc})
-        pl.add(possible)
-        return if (csf.routeFitsBox(pl, params.allowedBoxes)) possible
-        else findMappableControlSite(seed)
-    }
-
-
-
     fun chooseInitialPoints(start: GHPoint, finish: GHPoint): List<GHPoint> {
 
         val env = Envelope()
@@ -77,9 +65,8 @@ class CourseFinder(
     private fun findMappableControlSiteIn(env: Envelope, radius: Double): GHPoint? {
         val locus = env.centre()
         val centre = GHPoint(locus.y, locus.x)
-        val possible = csf.findControlSiteNear(centre, Random().nextDouble() * radius)
 
-        return possible
+        return csf.findControlSiteNear(centre, (Random().nextGaussian() + 0.5) * radius)
     }
 
     private fun canBeMapped(env: Envelope) =
