@@ -65,7 +65,7 @@ class MapPrinter(val params: CourseParameters) {
 
         with(URL(url).openConnection() as HttpURLConnection) {
             val bis = BufferedInputStream(ByteArrayInputStream(inputStream.readBytes()))
-            decorator.decorate(bis, controls, orientation, File(filename))
+            decorator.decorate(bis, controls, File(filename))
         }
 
     }

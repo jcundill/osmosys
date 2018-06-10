@@ -1,8 +1,7 @@
-package jon.test
+package jon.test.gpx
 
 import com.graphhopper.PathWrapper
 import com.graphhopper.util.shapes.GHPoint
-import jon.test.scorers.FeatureScorer
 import org.alternativevision.gpx.GPXParser
 import org.alternativevision.gpx.beans.GPX
 import org.alternativevision.gpx.beans.Route
@@ -44,40 +43,37 @@ class GpxWriter {
         }
 
         controls.forEachIndexed { idx, pt ->
-            val wpt = Waypoint()
-            wpt.latitude = pt.lat
-            wpt.longitude = pt.lon
-            wpt.name = when {
-                idx == 0 || idx == controls.size - 1 -> "Start / Finish"
-                else -> "Control: $idx"
-            }
-            wpt.description = when {
-                idx == 0 || idx == controls.size - 1 -> ""
-                else -> "Score: ${df.format(100.0 - controlScores[idx - 1] * 100.0)}% \n${describeFeatures(idx - 1)}"
-            }
-
-            rte.addRoutePoint(wpt)
+            rte.addRoutePoint(Waypoint().apply {
+                latitude = pt.lat
+                longitude = pt.lon
+                name = when {
+                    idx == 0 || idx == controls.size - 1 -> "Start / Finish"
+                    else -> "Control: $idx"
+                }
+                description = when {
+                    idx == 0 || idx == controls.size - 1 -> ""
+                    else -> "Score: ${df.format(100.0 - controlScores[idx - 1] * 100.0)}% \n${describeFeatures(idx - 1)}"
+                }
+            })
         }
 
-        val track = Track()
-        track.name = "Calculated Route"
-        val s = df.format( (1000.0 - score) / 10.0)
-        track.description =
-                """Length: ${df.format(best.distance)}
+        gpx.addTrack((Track()).apply {
+            name = "Calculated Route"
+            val s = df.format( (1000.0 - score) / 10.0)
+            description =
+                    """Length: ${df.format(best.distance)}
                   |Ascend: ${best.ascend} Descend: ${best.descend}
                   |Goodness: $s%""".trimMargin()
-        gpx.addTrack(track)
 
-        //  now you can fetch the closest edge via:
-        val ctrls = best.instructions.createGPXList()
-        val wpts = ctrls.map { gpxEntry ->
-            val wpt = Waypoint()
-            wpt.latitude = gpxEntry.lat
-            wpt.longitude = gpxEntry.lon
-            wpt
-        }
-
-        track.trackPoints = ArrayList(wpts)
+            //  now you can fetch the closest edge via:
+            val wpts = best.instructions.createGPXList().map { gpxEntry ->
+                Waypoint().apply {
+                    latitude = gpxEntry.lat
+                    longitude = gpxEntry.lon
+                }
+            }
+            trackPoints = ArrayList(wpts)
+        })
 
         val parser = GPXParser()
 
