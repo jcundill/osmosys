@@ -48,12 +48,12 @@ class MapPrinter(val params: CourseParameters) {
 
         val controlsList = formatControlsList(coords)
         val mapKey = requestKey()
-        val orientation = getOrientation(controls)
-        val orientationString = if (orientation == params.landscape) "0.297,0.21" else "0.21,0.297"
+        val box = getOrientation(controls)
+        val orientationString = if (box.maxWidth < box.maxHeight) "0.297,0.21" else "0.21,0.297"
 
         val url = "http://tiler1.oobrien.com/pdf/?style=streeto|" +
                 "paper=$orientationString" +
-                "|scale=10000" +
+                "|scale=${box.scale}" +
                 "|centre=$centreLat,$centreLon" +
                 "|title=$title" +
                 "|club=" +
@@ -65,7 +65,7 @@ class MapPrinter(val params: CourseParameters) {
 
         with(URL(url).openConnection() as HttpURLConnection) {
             val bis = BufferedInputStream(ByteArrayInputStream(inputStream.readBytes()))
-            decorator.decorate(bis, controls, File(filename))
+            decorator.decorate(bis, controls, File(filename), box)
         }
 
     }
@@ -80,12 +80,18 @@ class MapPrinter(val params: CourseParameters) {
         val env = Envelope()
         points.forEach { env.expandToInclude(it.lon, it.lat) }
 
-        val orientation =
-                when {
-                    env.width < params.landscape.maxWidth && env.height < params.landscape.maxHeight -> params.landscape
-                    else -> params.portrait
-                }
-        return orientation
+        val box = params.allowedBoxes.find {
+            env.width < it.maxWidth && env.height < it.maxHeight
+        }
+
+
+
+//        val orientation =
+//                when {
+//                    env.width < params.landscape.maxWidth && env.height < params.landscape.maxHeight -> params.landscape
+//                    else -> params.portrait
+//                }
+        return box!!
     }
 
     private fun requestKey(): String {

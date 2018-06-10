@@ -5,11 +5,13 @@ import com.graphhopper.util.shapes.GHPoint
 import jon.test.constraints.CourseLengthConstraint
 import jon.test.constraints.IsRouteableConstraint
 import jon.test.constraints.PrintableOnMapConstraint
+import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapPrinter
 import jon.test.scorers.*
 import xyz.thepathfinder.simulatedannealing.ExponentialDecayScheduler
 import xyz.thepathfinder.simulatedannealing.InfeasibleProblemException
 import xyz.thepathfinder.simulatedannealing.Solver
+import java.io.File
 import java.util.*
 
 
@@ -18,13 +20,15 @@ object Main {
     fun main(args: Array<String>) {
 
 
-        val params = CourseParameters(distance = 8000.0, numControls = 8, start = GHPoint(52.988304, -1.203265))
-        //val params = CourseParameters(distance = 5000.0, points = 6, start = GHPoint(51.469109, -0.094237)) //venetian road
+        //val params = CourseParameters(distance = 7250.0, numControls = 8, start = GHPoint(52.989097, -1.199987), finish = GHPoint(52.991163, -1.214979))
+        //val params = CourseParameters(distance = 12500.0, numControls = 14, start =  GHPoint(53.234030, -1.436942)) //venetian road
+        //val params = CourseParameters(distance = 12000.0, numControls = 13, start =  GHPoint(53.223481, -1.461090)) //venetian road
         //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(53.233456, -1.433246))
         //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(51.511287, -0.113695))
-        //val params = CourseParameters(distance = 9000.0, points = 9, start = GHPoint(53.234060, -1.436845))  //york
+        val params = CourseParameters(distance = 9000.0, numControls = 9, start = GHPoint(53.234060, -1.436845))  //york
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.490507, -0.616562)) //whitby
-        //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(51.511287, -0.113695)) //london
+        //val params = CourseParameters(distance = 10000.0, numControls = 15, start = GHPoint(51.511287, -0.113695)) //london
+        //val params = CourseParameters(distance = 10000.0, numControls = 15, start = GHPoint(52.749057, -1.469301)) //ashby de la zouch
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.599451, -3.136601)) //keswick
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.422079, -2.9659541)) //ambleside
         //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(52.036697, -0.762663)) //milton keynes
@@ -41,15 +45,15 @@ object Main {
         )
 
         val constraints = listOf(
+                IsRouteableConstraint(params),
                 CourseLengthConstraint(params),
-                PrintableOnMapConstraint(params),
-                IsRouteableConstraint(params)
+                PrintableOnMapConstraint(params)
         )
 
-        //val csf = GhWrapper.initGH("NG86BA")
-        //val csf = GhWrapper.initGH("S403DF")
+        //val csf = GHWrapper.initGH("NG86BA")
+        //val csf = GHWrapper.initGH("S403DF")
         println("init")
-        val csf = GhWrapper.initGH("england-latest")
+        val csf = GHWrapper.initGH("england-latest")
         println("done")
         val scorer = CourseScorer(csf, featureScorers,params)
 
@@ -66,8 +70,9 @@ object Main {
                 it::class.java.simpleName
             }.zip(solution.featureScores!!)
 
-            GpxWriter().writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "jon.gpx")
-            MapPrinter(params).generatePDF(filename = "Map-${Date().time}.pdf", title = "Test+${(best.distance/1000).toInt()}K+${params.numControls}+Controls", controls = solution.controls)
+            val timestamp = Date().time
+            GpxWriter().writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "Map-$timestamp.gpx")
+            MapPrinter(params).generatePDF(filename = "Map-$timestamp.pdf", title = "Test+${(best.distance/1000).toInt()}K+${params.numControls}+Controls", controls = solution.controls)
             println()
             println("Hit: ${csf.hit}, Miss: ${csf.miss}, Bad: ${problem.bad}")
             println(best.distance)
@@ -78,10 +83,18 @@ object Main {
 
             detailedScores.forEach { println(it) }
 
+            val controlString = generateAppInput(solution.controls).joinToString(separator = "|")
+            println(controlString)
+            File("Map-$timestamp.txt").writeText(controlString)
+
         } catch (e: InfeasibleProblemException) {
             println(e.message ?: "All gone badly wrong")
         }
 
 
+    }
+
+    private fun generateAppInput(controls: List<GHPoint>): List<String> {
+        return controls.map { "${it.lat.toFloat()},${it.lon.toFloat()}" }
     }
 }
