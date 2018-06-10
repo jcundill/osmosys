@@ -21,7 +21,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
     private val rnd = Random(System.currentTimeMillis())
 
-    val env = Envelope()
+    private val env = Envelope()
 
     private val routedLegCache = HashMap<Pair<GHPoint, GHPoint>, GHResponse>()
     var hit = 0
@@ -29,9 +29,11 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
 
 
-    fun findControlSiteNear(point: GHPoint, distance: Double = 100.0): GHPoint {
+    fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): GHPoint {
         var node = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
-        while (node == null) node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
+        while (node == null){
+            node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
+        }
         return node
     }
     fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
@@ -85,16 +87,16 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     }
 
     private fun getCoords(loc: GHPoint, bearing: Double, dist: Double): GHPoint {
-        val R = 6378.1 * 1000//Radius of the Earth
+        val radiusOfEarth = 6378.1 * 1000//Radius of the Earth
 
         val lat1 = Math.toRadians(loc.lat)
         val lon1 = Math.toRadians(loc.lon)
 
-        val lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist / R) +
-                Math.cos(lat1) * Math.sin(dist / R) * Math.cos(bearing))
+        val lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist / radiusOfEarth) +
+                Math.cos(lat1) * Math.sin(dist / radiusOfEarth) * Math.cos(bearing))
 
-        val lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(dist / R) * Math.cos(lat1),
-                Math.cos(dist / R) - Math.sin(lat1) * Math.sin(lat2))
+        val lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(dist / radiusOfEarth) * Math.cos(lat1),
+                Math.cos(dist / radiusOfEarth) - Math.sin(lat1) * Math.sin(lat2))
 
         return GHPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
     }

@@ -17,9 +17,9 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     var featureScores: List<List<Double>>? = null
 
     override fun step(): CourseImprover {
-        val newControls = TSP(controls).run()!!
-        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, newControls.size / 3)
-        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, newControls)
+        val reorderedControls = TSP(controls).run()!!
+        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, reorderedControls.size / 3)
+        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, reorderedControls)
         return CourseImprover(csf, newCourse)
     }
 

@@ -2,11 +2,12 @@ package jon.test.pdf
 
 import com.graphhopper.util.shapes.GHPoint
 import jon.test.CourseParameters
-import jon.test.GpxWriter
+import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapDecorator
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.awt.Color
 import java.awt.Rectangle
@@ -19,15 +20,15 @@ class PdfBoxTest {
 
     //@Test
     fun decorator() {
-        val params = CourseParameters(numControls = 10, start = GHPoint(52.988304, -1.203265))
+        val params = CourseParameters(numControls = 15, start = GHPoint(52.988304, -1.203265))
 
-        val points = GpxWriter().readFromFile("/Users/jcundill/Documents/jon.gpx")
-        val original = File("/Users/jcundill/Documents/map.pdf")
+        val points = GpxWriter().readFromFile("/Users/jcundill/Documents/Map-1528636867397.gpx")
+        val original = File("/Users/jcundill/Documents/Map-1528636867397.pdf")
         val modified = "map-out.pdf"
 
         val d = MapDecorator(params)
 
-        d.decorate(pdfStream = original.inputStream(), controls = points, orientation = params.landscape,outFile = File(modified))
+        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait125)
     }
 
     //@Test

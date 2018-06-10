@@ -4,6 +4,7 @@ import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Envelope
 import jon.test.CourseParameters
+import jon.test.MapBox
 import jon.test.improvers.dist2d
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
@@ -19,7 +20,7 @@ class MapDecorator(val params: CourseParameters) {
 
     private val mm2pt = { num: Float -> num / 25.4f * 72}
 
-    fun decorate(pdfStream: InputStream, controls: List<GHPoint>, outFile: File) {
+    fun decorate(pdfStream: InputStream, controls: List<GHPoint>, outFile: File, box: MapBox) {
 
         val doc = PDDocument.load(pdfStream)
         val page: PDPage = doc.documentCatalog.pages.get(0)
@@ -46,8 +47,9 @@ class MapDecorator(val params: CourseParameters) {
 
 
         val offsetsInPts = offsetsInMetres.map {p ->
-            val xPt = mm2pt(p.first / 10.toFloat()) //lon
-            val yPt = mm2pt(p.second / 10.toFloat()) //lat
+            val ratio = box.scale.toFloat() / 1000.0f
+            val xPt = mm2pt(p.first / ratio) //lon
+            val yPt = mm2pt(p.second / ratio) //lat
             Pair(centre.first + xPt + 0.2f, centre.second + yPt - 1.3f)
         }
 
