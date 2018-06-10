@@ -89,7 +89,7 @@ class StreetOFlagEncoder @JvmOverloads constructor(speedBits: Int = 4, speedFact
         safeHighwayTags.add("living_street")
         safeHighwayTags.add("track")
         safeHighwayTags.add("residential")
-        safeHighwayTags.add("service")
+        //safeHighwayTags.add("service")
 
         avoidHighwayTags.add("trunk")
         avoidHighwayTags.add("trunk_link")
