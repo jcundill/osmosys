@@ -28,7 +28,6 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     var miss = 0
 
 
-
     fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): GHPoint {
         var node = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
         while (node == null){
@@ -81,7 +80,11 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
         return when {
             !qr.isValid -> null
-            qr.snappedPosition == QueryResult.Position.EDGE  -> null
+            qr.snappedPosition == QueryResult.Position.EDGE  -> {
+                val pl = qr.closestEdge.fetchWayGeometry(3)
+                val rnd = (pl.size * rnd.nextDouble()).toInt()
+                pl.toGHPoint(rnd)
+            }
             else -> qr.snappedPoint
         }
     }
