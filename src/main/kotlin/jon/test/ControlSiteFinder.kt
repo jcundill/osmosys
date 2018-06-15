@@ -89,7 +89,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         }
     }
 
-    private fun getCoords(loc: GHPoint, bearing: Double, dist: Double): GHPoint {
+    internal fun getCoords(loc: GHPoint, bearing: Double, dist: Double): GHPoint {
         val radiusOfEarth = 6378.1 * 1000//Radius of the Earth
 
         val lat1 = Math.toRadians(loc.lat)
@@ -104,7 +104,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         return GHPoint(Math.toDegrees(lat2), Math.toDegrees(lon2))
     }
 
-    private val randomBearing: Double
+    internal val randomBearing: Double
         get() = 2 * Math.PI * rnd.nextDouble()
 
     fun routeFitsBox(points: PointList, possibleBoxes: List<MapBox>): Boolean {

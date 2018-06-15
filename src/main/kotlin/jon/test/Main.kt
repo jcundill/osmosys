@@ -19,20 +19,12 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
 
+        val props = when {
+            args.isNotEmpty() -> args[0]
+            else -> "./streeto.properties"
+        }
 
-        //val params = CourseParameters(distance = 7250.0, numControls = 8, start = GHPoint(52.989097, -1.199987), finish = GHPoint(52.991163, -1.214979))
-        //val params = CourseParameters(distance = 12500.0, numControls = 14, start =  GHPoint(53.234030, -1.436942)) //venetian road
-        //val params = CourseParameters(distance = 12000.0, numControls = 13, start =  GHPoint(53.223481, -1.461090)) //venetian road
-        //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(53.233456, -1.433246))
-        //val params = CourseParameters(distance = 6000.0, points = 8, start = GHPoint(53.223482, -1.461064), finish = GHPoint(51.511287, -0.113695))
-        val params = CourseParameters(distance = 9000.0, numControls = 9, start = GHPoint(53.234060, -1.436845))  //york
-        //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.490507, -0.616562)) //whitby
-        //val params = CourseParameters(distance = 10000.0, numControls = 15, start = GHPoint(51.511287, -0.113695)) //london
-        //val params = CourseParameters(distance = 10000.0, numControls = 15, start = GHPoint(52.749057, -1.469301)) //ashby de la zouch
-        //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.599451, -3.136601)) //keswick
-        //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(54.422079, -2.9659541)) //ambleside
-        //val params = CourseParameters(distance = 10000.0, points = 15, start = GHPoint(52.036697, -0.762663)) //milton keynes
-        //val params = CourseParameters(distance = 5000.0, points = 7, start = GHPoint(52.906028, -1.380663)) //borrowash
+        val params = CourseParameters.buildFromProperties(props)
 
         val featureScorers = listOf(
                 LegLengthScorer(params),
@@ -50,10 +42,8 @@ object Main {
                 PrintableOnMapConstraint(params)
         )
 
-        //val csf = GHWrapper.initGH("NG86BA")
-        //val csf = GHWrapper.initGH("S403DF")
         println("init")
-        val csf = GHWrapper.initGH("england-latest")
+        val csf = GHWrapper.initGH(params.map)
         println("done")
         val scorer = CourseScorer(csf, featureScorers,params)
 

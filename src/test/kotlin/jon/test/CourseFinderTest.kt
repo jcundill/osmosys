@@ -27,11 +27,13 @@ internal class CourseFinderTest {
     fun chooseInitialPoints() {
         val dummyPoint = GHPoint(12.0, 12.0)
 
+        every {csf.randomBearing} returns 0.05
+        every {csf.getCoords(any(), any(), any())} returns dummyPoint
         every {csf.findControlSiteNear(any(), any())} returns dummyPoint
+
         val params = CourseParameters(numControls = 10, start = GHPoint(52.988304, -1.203265))
         val finder = CourseFinder(csf, emptyList(), scorer, params)
         val points = finder.chooseInitialPoints(start = GHPoint(52.988304, -1.203265), finish = GHPoint(52.988304, -1.203265))
-
         assertEquals(12, points.size)
         assertEquals( listOf(params.start) + List(params.numControls, {dummyPoint}) + params.finish, points)
     }

@@ -7,7 +7,6 @@ import jon.test.mapping.MapDecorator
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.awt.Color
 import java.awt.Rectangle
@@ -28,7 +27,7 @@ class PdfBoxTest {
 
         val d = MapDecorator(params)
 
-        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait125)
+        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait12500)
     }
 
     //@Test

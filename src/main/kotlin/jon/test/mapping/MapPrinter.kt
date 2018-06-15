@@ -48,8 +48,8 @@ class MapPrinter(val params: CourseParameters) {
 
         val controlsList = formatControlsList(coords)
         val mapKey = requestKey()
-        val box = getOrientation(controls)
-        val orientationString = if (box.maxWidth < box.maxHeight) "0.297,0.21" else "0.21,0.297"
+        val box = getBox(controls)
+        val orientationString = if (box.landscape) "0.297,0.21" else "0.21,0.297"
 
         val url = "http://tiler1.oobrien.com/pdf/?style=streeto|" +
                 "paper=$orientationString" +
@@ -76,21 +76,14 @@ class MapPrinter(val params: CourseParameters) {
         return env.centre()
     }
 
-    private fun getOrientation(points: List<GHPoint>): MapBox {
+    private fun getBox(points: List<GHPoint>): MapBox {
         val env = Envelope()
         points.forEach { env.expandToInclude(it.lon, it.lat) }
 
         val box = params.allowedBoxes.find {
-            env.width < it.maxWidth && env.height < it.maxHeight
+            (env.width < it.maxWidth) && (env.height < it.maxHeight)
         }
 
-
-
-//        val orientation =
-//                when {
-//                    env.width < params.landscape.maxWidth && env.height < params.landscape.maxHeight -> params.landscape
-//                    else -> params.portrait
-//                }
         return box!!
     }
 

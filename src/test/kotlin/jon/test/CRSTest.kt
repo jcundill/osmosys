@@ -54,11 +54,15 @@ class CRSTest {
     @Test
     fun landscapeBox() {
 
+        // 6983083,-138351
+        // 6980051,-138353
+        // 6980051,-133691
+        // 6983085,-133694
 
-        val a = Coordinate(-1.2315453387636581, 53.00505492801988)
-        val b = convert(-137095.0,6980908.0).coordinate
-        val c = convert(-132439.0,6983936.0).coordinate
-        val d = convert(-132433.0,6980905.0).coordinate
+        val a = convert(-138351.0,6983083.0 ).coordinate
+        val b = convert(-138353.0,6980051.0).coordinate
+        val c = convert(-133691.0,6980051.0).coordinate
+        val d = convert(-133694.0,6983085.0).coordinate
 
         val centre = convert(-134764.0,6982422.0).coordinate
 
