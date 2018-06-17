@@ -1,9 +1,24 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.util.Instruction
 import jon.test.CourseParameters
 
 data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
+
+
+    private val turnInstructions = listOf(
+            Instruction.TURN_LEFT,
+            Instruction.TURN_RIGHT,
+            Instruction.TURN_SHARP_LEFT,
+            Instruction.TURN_SHARP_RIGHT,
+            Instruction.TURN_SLIGHT_LEFT,
+            Instruction.TURN_SLIGHT_RIGHT,
+            Instruction.U_TURN_LEFT,
+            Instruction.U_TURN_RIGHT,
+            Instruction.U_TURN_UNKNOWN,
+            Instruction.LEAVE_ROUNDABOUT
+    )
 
     /**
      * scores each numbered control based on the complexity of the route to that control.
@@ -15,16 +30,11 @@ data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
 
 
     private fun evaluate(leg: GHResponse): Double {
-        val turns = leg.best.instructions.size
-        val length = leg.best.distance
+        val instructions = leg.best.instructions
 
-        // we want on average a turn for every 100m travelled
-        return when {
-            turns == 0 -> 1.0
-            length == 0.0 -> 1.0
-            else -> 1.0 - turns / length / 100.0
+        val num = instructions.size.toDouble()
+        val turns = instructions.filter { turnInstructions.contains(it.sign) }.size.toDouble()
 
-        }
+        return 1.0 - (turns / num)
     }
-
 }
