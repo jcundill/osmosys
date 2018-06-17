@@ -9,7 +9,6 @@ import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
-import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -19,7 +18,7 @@ import kotlin.collections.HashMap
 class ControlSiteFinder(private val gh: GraphHopper) {
 
     private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
-    private val rnd = Random(System.currentTimeMillis())
+    private val rnd: RandomStream = rnd()
 
     private val env = Envelope()
 
@@ -36,9 +35,9 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         return node
     }
     fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
-        var node = findNearestControlSiteTo(getCoords(point, randomBearing,  Math.random() * distance))
+        var node = findNearestControlSiteTo(getCoords(point, randomBearing,  rnd.nextDouble() * distance))
         while (node == null || node == point ) {
-            node = findNearestControlSiteTo(getCoords(point, randomBearing,  Math.random() * distance))
+            node = findNearestControlSiteTo(getCoords(point, randomBearing,  rnd.nextDouble() * distance))
 
         }
         return node

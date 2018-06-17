@@ -2,7 +2,11 @@ package jon.test.improvers
 
 import com.graphhopper.util.DistancePlaneProjection
 import com.graphhopper.util.shapes.GHPoint
-import xyz.thepathfinder.simulatedannealing.*
+import jon.test.annealing.LinearDecayScheduler
+import jon.test.annealing.Problem
+import jon.test.annealing.SearchState
+import jon.test.annealing.Solver
+import jon.test.rnd
 
 val dist2d = DistancePlaneProjection()
 fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, b.lon)
@@ -25,7 +29,7 @@ class TSP(val points: List<GHPoint>) {
     class TSProblem(val points: List<GHPoint>) : Problem<RouteImprover> {
 
 
-        override fun energy(searchState: RouteImprover?): Double {
+        override fun energy(searchState: RouteImprover): Double {
             return when (searchState) {
                 null -> 100000.0
                 else -> {
@@ -40,7 +44,7 @@ class TSP(val points: List<GHPoint>) {
     }
 
     class RouteImprover(val points: List<GHPoint>?) : SearchState<RouteImprover> {
-        private fun idxSeq()  = generateSequence { 1 + (Math.random() * (points!!.size - 3)).toInt() }.asSequence()
+        private fun idxSeq()  = generateSequence { 1 + (rnd().nextDouble() * (points!!.size - 3)).toInt() }.asSequence()
 
         override fun step(): RouteImprover {
             val pair = randomPair() // don't want start or finish

@@ -4,10 +4,10 @@ package jon.test
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
+import jon.test.annealing.InfeasibleProblemException
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import xyz.thepathfinder.simulatedannealing.InfeasibleProblemException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 

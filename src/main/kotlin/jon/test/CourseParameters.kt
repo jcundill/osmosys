@@ -3,7 +3,7 @@ package jon.test
 import com.graphhopper.util.DistancePlaneProjection
 import com.graphhopper.util.shapes.GHPoint
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
 
 data class MapBox(val maxWidth: Double, val maxHeight: Double, val scale: Int, val landscape: Boolean)
 

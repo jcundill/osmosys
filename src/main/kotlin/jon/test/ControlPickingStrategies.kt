@@ -1,6 +1,5 @@
 package jon.test
 
-import java.util.*
 
 
 /**
@@ -12,7 +11,7 @@ import java.util.*
  */
 object ControlPickingStrategies {
 
-    val rnd = Random()
+    private val rnd = rnd()
 
     fun pickRandomly(numberedControlScores: List<Double>, num: Int): List<Int> =
             pick(numberedControlScores, num, { _ -> true})

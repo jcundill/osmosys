@@ -1,8 +1,8 @@
 package jon.test
 
 import com.graphhopper.util.shapes.GHPoint
+import jon.test.annealing.SearchState
 import jon.test.improvers.TSP
-import xyz.thepathfinder.simulatedannealing.SearchState
 
 class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPoint>) : SearchState<CourseImprover> {
 

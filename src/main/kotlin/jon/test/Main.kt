@@ -2,18 +2,20 @@ package jon.test
 
 import com.graphhopper.GHRequest
 import com.graphhopper.util.shapes.GHPoint
+import jon.test.annealing.ExponentialDecayScheduler
+import jon.test.annealing.InfeasibleProblemException
+import jon.test.annealing.LinearDecayScheduler
+import jon.test.annealing.Solver
 import jon.test.constraints.CourseLengthConstraint
 import jon.test.constraints.IsRouteableConstraint
 import jon.test.constraints.PrintableOnMapConstraint
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapPrinter
 import jon.test.scorers.*
-import xyz.thepathfinder.simulatedannealing.ExponentialDecayScheduler
-import xyz.thepathfinder.simulatedannealing.InfeasibleProblemException
-import xyz.thepathfinder.simulatedannealing.Solver
 import java.io.File
-import java.util.*
+import java.util.Date
 
+fun rnd(): RandomStream = PseudoRandom//PredictableRandom
 
 object Main {
     @JvmStatic
@@ -50,7 +52,7 @@ object Main {
 
         try {
             val problem = CourseFinder(csf, constraints, scorer, params)
-            val solver = Solver(problem, ExponentialDecayScheduler(1000.0, 1000))
+            val solver = Solver(problem, LinearDecayScheduler(1000.0, 1000))
             val solution = solver.solve()
 
             val best = csf.routeRequest(GHRequest(solution.controls)).best

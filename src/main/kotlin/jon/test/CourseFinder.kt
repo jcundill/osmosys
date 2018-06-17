@@ -3,9 +3,9 @@ package jon.test
 import com.graphhopper.GHRequest
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
+import jon.test.annealing.InfeasibleProblemException
+import jon.test.annealing.Problem
 import jon.test.constraints.CourseConstraint
-import xyz.thepathfinder.simulatedannealing.InfeasibleProblemException
-import xyz.thepathfinder.simulatedannealing.Problem
 
 class CourseFinder(
         private val csf: ControlSiteFinder,
@@ -17,7 +17,7 @@ class CourseFinder(
 
     override fun initialState(): CourseImprover = CourseImprover(csf, chooseInitialPoints(params.start, params.finish))
 
-    override fun energy(step: CourseImprover?): Double {
+    override fun energy(step: CourseImprover): Double {
         val score = scoreStep(step)
         if (score > 1000.0) bad++
         return score
@@ -30,11 +30,7 @@ class CourseFinder(
                 val courseRoute = csf.routeRequest(GHRequest(step.controls))
                 when {
                     constraints.any { !it.valid(courseRoute) } -> 10000.0
-                    else -> {
-                        val ans = scorer.score(step, courseRoute) * 1000
-                        println(ans)
-                        ans
-                    }
+                    else -> scorer.score(step, courseRoute) * 1000
                 }
             }
         }
