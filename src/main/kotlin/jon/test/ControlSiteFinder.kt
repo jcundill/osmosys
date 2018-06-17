@@ -29,16 +29,16 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
 
     fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): GHPoint {
-        var node = findControlSiteNearInternal(getCoords(point, randomBearing, distance))
+        var node = findNearestControlSiteTo(getCoords(point, randomBearing, distance))
         while (node == null){
-            node = findControlSiteNearInternal(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
+            node = findNearestControlSiteTo(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
         }
         return node
     }
     fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
-        var node = findControlSiteNearInternal(getCoords(point, randomBearing,  Math.random() * distance))
+        var node = findNearestControlSiteTo(getCoords(point, randomBearing,  Math.random() * distance))
         while (node == null || node == point ) {
-            node = findControlSiteNearInternal(getCoords(point, randomBearing,  Math.random() * distance))
+            node = findNearestControlSiteTo(getCoords(point, randomBearing,  Math.random() * distance))
 
         }
         return node
@@ -76,7 +76,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     }
 
 
-    private fun findControlSiteNearInternal(p: GHPoint): GHPoint? {
+    fun findNearestControlSiteTo(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
         return when {
             !qr.isValid -> null
