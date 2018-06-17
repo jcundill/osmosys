@@ -28,7 +28,7 @@ object Main {
 
         val featureScorers = listOf(
                 LegLengthScorer(params),
-                LegStraightLineScorer(params),
+//                LegStraightLineScorer(params),
                 LegRouteChoiceScorer(params),
                 LegComplexityScorer(params),
                 BeenThisWayBeforeScorer(params),
