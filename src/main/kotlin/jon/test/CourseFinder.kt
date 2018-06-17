@@ -41,28 +41,35 @@ class CourseFinder(
     }
 
     fun chooseInitialPoints(start: GHPoint, finish: GHPoint): List<GHPoint> {
-        val env = Envelope()
-        env.expandToInclude(start.lon, start.lat)
-        env.expandToInclude(finish.lon, finish.lat)
-        val initialControls: List<GHPoint> = if (!canBeMapped(env)) {
-            throw InfeasibleProblemException("start is too far away from finish to be mapped")
-        } else {
-            val fudgeFactor = 5.0 / params.numControls
-            val radius = fudgeFactor * params.distance / (2 * Math.PI)
+        val startPoint = csf.findNearestControlSiteTo(start)
+        val finishPoint = csf.findNearestControlSiteTo(finish)
+        when {
+            startPoint == null -> throw InfeasibleProblemException("no control point near the start")
+            finishPoint == null -> throw InfeasibleProblemException("no control point near the finish")
+            else -> {
+                val env = Envelope()
+                env.expandToInclude(startPoint.lon, startPoint.lat)
+                env.expandToInclude(finishPoint.lon, finishPoint.lat)
+                val initialControls: List<GHPoint> = if (!canBeMapped(env)) {
+                    throw InfeasibleProblemException("start is too far away from finish to be mapped")
+                } else {
+                    val fudgeFactor = 5.0 / params.numControls
+                    val radius = fudgeFactor * params.distance / (2 * Math.PI)
 
-            val bearing = csf.randomBearing
-            val angle = (2 * Math.PI) / params.numControls
+                    val bearing = csf.randomBearing
+                    val angle = (2 * Math.PI) / params.numControls
 
-            val envCentre = GHPoint(env.centre().y, env.centre().x)
-            val circleCentre = csf.getCoords(envCentre,  Math.PI + bearing, radius)
+                    val envCentre = GHPoint(env.centre().y, env.centre().x)
+                    val circleCentre = csf.getCoords(envCentre,  Math.PI + bearing, radius)
 
-            val positions = (1 .. params.numControls).map { num ->
-                csf.getCoords(circleCentre, (num * angle) + bearing, radius)
+                    val positions = (1 .. params.numControls).map { num ->
+                        csf.getCoords(circleCentre, (num * angle) + bearing, radius)
+                    }
+                    positions.map{ csf.findControlSiteNear(it, radius / 5.0)}
+                }
+                return listOf(startPoint) + initialControls + finishPoint
             }
-            positions.map{ csf.findControlSiteNear(it, radius / 5.0)}
         }
-        return listOf(start) + initialControls + finish
-
     }
 
     private fun canBeMapped(env: Envelope) =
