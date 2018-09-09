@@ -20,7 +20,7 @@ fun courseDistance(points: List<GHPoint>): Double {
 class TSP(val points: List<GHPoint>) {
 
 
-    fun run():List<GHPoint>? {
+    fun run(): List<GHPoint>? {
         val solver = Solver(TSProblem(points), LinearDecayScheduler(courseDistance(points), 1000))
         val solution = solver.solve()
         return solution.points
@@ -29,22 +29,14 @@ class TSP(val points: List<GHPoint>) {
     class TSProblem(val points: List<GHPoint>) : Problem<RouteImprover> {
 
 
-        override fun energy(searchState: RouteImprover): Double {
-            return when (searchState) {
-                null -> 100000.0
-                else -> {
-                    val points = searchState.points!!
-                    courseDistance(points)
-                }
-            }
-        }
+        override fun energy(searchState: RouteImprover): Double = courseDistance(searchState.points!!)
 
 
         override fun initialState(): RouteImprover = RouteImprover(points)
     }
 
     class RouteImprover(val points: List<GHPoint>?) : SearchState<RouteImprover> {
-        private fun idxSeq()  = generateSequence { 1 + (rnd.nextDouble() * (points!!.size - 3)).toInt() }.asSequence()
+        private fun idxSeq() = generateSequence { 1 + (rnd.nextDouble() * (points!!.size - 3)).toInt() }.asSequence()
 
         override fun step(): RouteImprover {
             val pair = randomPair() // don't want start or finish

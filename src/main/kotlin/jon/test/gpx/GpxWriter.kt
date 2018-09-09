@@ -37,8 +37,8 @@ class GpxWriter {
         rte.name = "Course"
         gpx.addRoute(rte)
 
-        fun describeFeatures(idx:Int): String {
-            val descs =  detailedScores.map {"${it.first} ${df.format(100.0 - it.second[idx] * 100.0)}%"}
+        fun describeFeatures(idx: Int): String {
+            val descs = detailedScores.map { "${it.first} ${df.format(100.0 - it.second[idx] * 100.0)}%" }
             return descs.joinToString("\n")
         }
 
@@ -59,7 +59,7 @@ class GpxWriter {
 
         gpx.addTrack((Track()).apply {
             name = "Calculated Route"
-            val s = df.format( (1000.0 - score) / 10.0)
+            val s = df.format((1000.0 - score) / 10.0)
             description =
                     """Length: ${df.format(best.distance)}
                   |Ascend: ${best.ascend} Descend: ${best.descend}

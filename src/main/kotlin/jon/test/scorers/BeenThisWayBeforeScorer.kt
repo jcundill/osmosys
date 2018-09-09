@@ -13,13 +13,13 @@ data class BeenThisWayBeforeScorer(val params: CourseParameters) : FeatureScorer
      * Do not include previous leg - that is captured in the Dog Leg Scorer
      */
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
-            routedLegs.mapIndexed { idx, leg ->  evaluate(routedLegs.subList(0, idx), leg)}
+            routedLegs.mapIndexed { idx, leg -> evaluate(routedLegs.subList(0, idx), leg) }
 
     private fun evaluate(previousLegs: List<GHResponse>, thisLeg: GHResponse): Double {
         return when {
             previousLegs.size < 2 -> 0.0 // no legs other than the previous
             else -> {
-                previousLegs.dropLast(1).map{ l -> compareLegs(l, thisLeg)}.max()!!
+                previousLegs.dropLast(1).map { l -> compareLegs(l, thisLeg) }.max()!!
             }
         }
     }

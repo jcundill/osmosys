@@ -24,7 +24,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     }
 
     fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
-            selected.filter {it != 0 || it != existing.size - 1}.fold(existing) { current, ctrl ->
+            selected.filter { it != 0 || it != existing.size - 1 }.fold(existing) { current, ctrl ->
                 current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
                         current.subList(ctrl + 1, current.size)
@@ -37,7 +37,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
      *
      * @return a list in the range 1 .. last numbered control of size num, or less if there aren't num to select
      */
-    fun findIndexesOfWorst(scores: List<Double>, num:Int): List<Int> {
+    fun findIndexesOfWorst(scores: List<Double>, num: Int): List<Int> {
         return when {
             allTheSameScore(scores) -> noChoicePicker(scores, num)
             else -> hasChoicePicker(scores, num)
@@ -53,7 +53,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     }
 
     override fun equals(other: Any?): Boolean {
-        return when(other) {
+        return when (other) {
             is CourseImprover -> other.controls == this.controls
             else -> false
         }

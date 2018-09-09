@@ -1,7 +1,6 @@
 package jon.test
 
 
-
 /**
  * here we are dealing with the numbered controls so should answer in the range 1 to the last control.
  * i.e. if there are 10 point on the course - start and finish and 8 controls
@@ -12,11 +11,11 @@ package jon.test
 object ControlPickingStrategies {
 
     fun pickRandomly(numberedControlScores: List<Double>, num: Int): List<Int> =
-            pick(numberedControlScores, num) { _ -> true}
+            pick(numberedControlScores, num) { _ -> true }
 
     fun pickWeightedRandom(numberedControlScores: List<Double>, num: Int): List<Int> {
         val prob = rnd.nextDouble() / numberedControlScores.size
-        return pick(numberedControlScores, 100) { x -> x.second > prob}
+        return pick(numberedControlScores, 100) { x -> x.second > prob }
     }
 
     fun pickAboveAverage(numberedControlScores: List<Double>, num: Int): List<Int> =

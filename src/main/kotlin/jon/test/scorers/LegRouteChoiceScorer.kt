@@ -14,8 +14,8 @@ data class LegRouteChoiceScorer(val params: CourseParameters) : FeatureScorer {
     }
 
     fun evaluate(leg: GHResponse): Double = when {
-                leg.hasAlternatives() -> 0.0 //TODO: maybe work out how good the alternatives are
-                else -> 1.0
-            }
+        leg.hasAlternatives() -> 0.0 //TODO: maybe work out how good the alternatives are
+        else -> 1.0
+    }
 
 }

@@ -23,7 +23,7 @@ data class ComingBackHereLaterScorer(val params: CourseParameters) : FeatureScor
         return when {
             futureLegs.isEmpty() -> 0.0 // no further legs
             else -> {
-                val remainingControls = futureLegs.map{it.best.points.last()} + start + finish // don't go back through the start
+                val remainingControls = futureLegs.map { it.best.points.last() } + start + finish // don't go back through the start
                 when {
                     thisLeg.best.points.any { goesTooCloseToAFutureControl(remainingControls, it) } -> 1.0
                     else -> 0.0

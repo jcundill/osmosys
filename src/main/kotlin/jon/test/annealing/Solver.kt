@@ -30,7 +30,7 @@ class Solver<T : SearchState<T>>(private val problem: Problem<T>, private val sc
             }
         }
     }
-    
+
     /** Always accept changes that decrease energy. Otherwise, use the simulated annealing.  */
     private fun acceptChange(temperature: Double, energyChange: Double): Boolean {
         return when {

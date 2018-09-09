@@ -23,8 +23,8 @@ class RepeatableRandom(seed: Long) : RandomStream {
 
 object PredictableRandom : RandomStream {
     private val doubles = arrayOf(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
-    private val seq  = generateSequence(0) { (it + 1) % doubles.size }
+    private val seq = generateSequence(0) { (it + 1) % doubles.size }
             .map { doubles[it] }.iterator()
 
-    override fun nextDouble(): Double =  seq.next()
+    override fun nextDouble(): Double = seq.next()
 }

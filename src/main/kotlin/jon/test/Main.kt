@@ -65,7 +65,7 @@ object Main {
 
             val timestamp = Date().time
             GpxWriter().writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "Map-$timestamp.gpx")
-            MapPrinter(params).generatePDF(filename = "Map-$timestamp.pdf", title = "Test+${(best.distance/1000).toInt()}K+${params.numControls}+Controls", controls = solution.controls)
+            MapPrinter(params).generatePDF(filename = "Map-$timestamp.pdf", title = "Test+${(best.distance / 1000).toInt()}K+${params.numControls}+Controls", controls = solution.controls)
             println()
             println("Hit: ${csf.hit}, Miss: ${csf.miss}, Bad: ${problem.bad}")
             println(best.distance)

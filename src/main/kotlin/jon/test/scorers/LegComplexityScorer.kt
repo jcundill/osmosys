@@ -25,8 +25,7 @@ data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too direct
      */
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
-        // the finish can't be in the wrong place
-        routedLegs.dropLast(1).map{ evaluate(it) }
+            routedLegs.dropLast(1).map { evaluate(it) } // the finish can't be in the wrong place
 
 
     private fun evaluate(leg: GHResponse): Double {

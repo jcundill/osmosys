@@ -9,7 +9,6 @@ import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
-import kotlin.collections.HashMap
 
 
 /**
@@ -28,15 +27,16 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
     fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): GHPoint {
         var node = findNearestControlSiteTo(getCoords(point, randomBearing, distance))
-        while (node == null){
+        while (node == null) {
             node = findNearestControlSiteTo(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
         }
         return node
     }
+
     fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
-        var node = findNearestControlSiteTo(getCoords(point, randomBearing,  rnd.nextDouble() * distance))
-        while (node == null || node == point ) {
-            node = findNearestControlSiteTo(getCoords(point, randomBearing,  rnd.nextDouble() * distance))
+        var node = findNearestControlSiteTo(getCoords(point, randomBearing, rnd.nextDouble() * distance))
+        while (node == null || node == point) {
+            node = findNearestControlSiteTo(getCoords(point, randomBearing, rnd.nextDouble() * distance))
 
         }
         return node
@@ -78,7 +78,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
         return when {
             !qr.isValid -> null
-            qr.snappedPosition == QueryResult.Position.EDGE  -> {
+            qr.snappedPosition == QueryResult.Position.EDGE -> {
                 val pl = qr.closestEdge.fetchWayGeometry(3)
                 val rnd = (pl.size * rnd.nextDouble()).toInt()
                 pl.toGHPoint(rnd)
@@ -108,9 +108,8 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     fun routeFitsBox(points: PointList, possibleBoxes: List<MapBox>): Boolean {
         env.setToNull()
         points.forEach { env.expandToInclude(it.lon, it.lat) }
-        return possibleBoxes.any {env.width < it.maxWidth && env.height < it.maxHeight}
+        return possibleBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
     }
-
 
 
 }

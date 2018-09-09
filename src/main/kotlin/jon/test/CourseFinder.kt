@@ -10,7 +10,7 @@ import jon.test.constraints.CourseConstraint
 class CourseFinder(
         private val csf: ControlSiteFinder,
         private val constraints: List<CourseConstraint>,
-        private val scorer:CourseScorer,
+        private val scorer: CourseScorer,
         private val params: CourseParameters) : Problem<CourseImprover> {
 
     var bad = 0
@@ -56,12 +56,12 @@ class CourseFinder(
                     val angle = (2 * Math.PI) / params.numControls
 
                     val envCentre = GHPoint(env.centre().y, env.centre().x)
-                    val circleCentre = csf.getCoords(envCentre,  Math.PI + bearing, radius)
+                    val circleCentre = csf.getCoords(envCentre, Math.PI + bearing, radius)
 
-                    val positions = (1 .. params.numControls).map { num ->
+                    val positions = (1..params.numControls).map { num ->
                         csf.getCoords(circleCentre, (num * angle) + bearing, radius)
                     }
-                    positions.map{ csf.findControlSiteNear(it, radius / 5.0)}
+                    positions.map { csf.findControlSiteNear(it, radius / 5.0) }
                 }
                 return listOf(startPoint) + initialControls + finishPoint
             }

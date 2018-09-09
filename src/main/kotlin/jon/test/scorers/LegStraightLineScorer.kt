@@ -3,10 +3,9 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import jon.test.CourseParameters
 
-class LegStraightLineScorer(val params: CourseParameters) : FeatureScorer  {
+class LegStraightLineScorer(val params: CourseParameters) : FeatureScorer {
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
-        // the finish can't be in the wrong place
-        routedLegs.dropLast(1).map{ evaluate(it) }
+            routedLegs.dropLast(1).map { evaluate(it) }     // the finish can't be in the wrong place
 
     private fun evaluate(leg: GHResponse): Double {
         val first = leg.best.points.first()

@@ -3,24 +3,24 @@ package jon.test
 import com.graphhopper.util.DistancePlaneProjection
 import com.graphhopper.util.shapes.GHPoint
 import java.io.FileInputStream
-import java.util.Properties
+import java.util.*
 
 data class MapBox(val maxWidth: Double, val maxHeight: Double, val scale: Int, val landscape: Boolean)
 
 
 data class CourseParameters(
         val distance: Double = 6000.0,
-        private val allowedLengthDelta:Double = 0.2,
+        private val allowedLengthDelta: Double = 0.2,
         val numControls: Int = 6,
         val minControlSeparation: Double = 50.0,
         val start: GHPoint,
         val finish: GHPoint = start,
-        val map:String = "england-latest") {
+        val map: String = "england-latest") {
 
     companion object {
         private fun String.toGHPoint(): GHPoint? {
             val arr = this.split(',')
-            return when(arr.size) {
+            return when (arr.size) {
                 2 -> GHPoint(arr[0].toDouble(), arr[1].toDouble())
                 else -> null
             }

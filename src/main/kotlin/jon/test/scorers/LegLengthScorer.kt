@@ -3,7 +3,7 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import jon.test.CourseParameters
 
-data class LegLengthScorer(val params: CourseParameters): FeatureScorer {
+data class LegLengthScorer(val params: CourseParameters) : FeatureScorer {
 
 
     /**
