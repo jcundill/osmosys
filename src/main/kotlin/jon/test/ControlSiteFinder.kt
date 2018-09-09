@@ -18,7 +18,6 @@ import kotlin.collections.HashMap
 class ControlSiteFinder(private val gh: GraphHopper) {
 
     private val filter = DefaultEdgeFilter(gh.encodingManager.getEncoder("streeto"))
-    private val rnd: RandomStream = rnd()
 
     private val env = Envelope()
 

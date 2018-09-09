@@ -8,7 +8,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
 
     private val noChoicePicker = ControlPickingStrategies::pickRandomly
     private val hasChoicePicker = ControlPickingStrategies::pickAboveAverage
-    private val dummyScores get() = List(controls.size - 2, { 0.5 })
+    private val dummyScores get() = List(controls.size - 2) { 0.5 }
 
     /**
      * the improver is given the leg scores for the numbered controls only
@@ -24,11 +24,11 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     }
 
     fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
-            selected.filter {it != 0 || it != existing.size - 1}.fold(existing, { current, ctrl ->
+            selected.filter {it != 0 || it != existing.size - 1}.fold(existing) { current, ctrl ->
                 current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +
                         current.subList(ctrl + 1, current.size)
-           })
+            }
 
     /**
      * find some of the numbered controls that we would like to reposition

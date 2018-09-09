@@ -7,8 +7,15 @@ interface RandomStream {
     fun nextDouble(): Double
 }
 
-object PseudoRandom : RandomStream {
+class PseudoRandom : RandomStream {
     private val rnd = Random(System.currentTimeMillis())
+    private val doubleStream = rnd.doubles().iterator()
+
+    override fun nextDouble(): Double = doubleStream.next()
+}
+
+class RepeatableRandom(seed: Long) : RandomStream {
+    private val rnd = Random(seed)
     private val doubleStream = rnd.doubles().iterator()
 
     override fun nextDouble(): Double = doubleStream.next()

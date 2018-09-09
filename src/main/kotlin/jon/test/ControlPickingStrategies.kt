@@ -11,19 +11,16 @@ package jon.test
  */
 object ControlPickingStrategies {
 
-    private val rnd = rnd()
-
     fun pickRandomly(numberedControlScores: List<Double>, num: Int): List<Int> =
-            pick(numberedControlScores, num, { _ -> true})
+            pick(numberedControlScores, num) { _ -> true}
 
     fun pickWeightedRandom(numberedControlScores: List<Double>, num: Int): List<Int> {
         val prob = rnd.nextDouble() / numberedControlScores.size
-        val selector =  {pair:Pair<Int, Double> -> pair.second > prob}
-        return pick(numberedControlScores, 100, selector)
-   }
+        return pick(numberedControlScores, 100) { x -> x.second > prob}
+    }
 
     fun pickAboveAverage(numberedControlScores: List<Double>, num: Int): List<Int> =
-            pick(numberedControlScores, 100, { x -> x.second > numberedControlScores.average() })
+            pick(numberedControlScores, 100) { x -> x.second > numberedControlScores.average() }
 
     fun pick(numberedControlScores: List<Double>, num: Int, selector: (Pair<Int, Double>) -> Boolean): List<Int> {
         val indexedControlScores = (1..(numberedControlScores.size)).zip(numberedControlScores)

@@ -12,9 +12,9 @@ val dist2d = DistancePlaneProjection()
 fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, b.lon)
 
 fun courseDistance(points: List<GHPoint>): Double {
-    return points.windowed(2, 1, false).fold(0.0, { acc, curr ->
+    return points.windowed(2, 1, false).fold(0.0) { acc, curr ->
         acc + dist(curr[0], curr[1])
-    })
+    }
 }
 
 class TSP(val points: List<GHPoint>) {
@@ -44,7 +44,7 @@ class TSP(val points: List<GHPoint>) {
     }
 
     class RouteImprover(val points: List<GHPoint>?) : SearchState<RouteImprover> {
-        private fun idxSeq()  = generateSequence { 1 + (rnd().nextDouble() * (points!!.size - 3)).toInt() }.asSequence()
+        private fun idxSeq()  = generateSequence { 1 + (rnd.nextDouble() * (points!!.size - 3)).toInt() }.asSequence()
 
         override fun step(): RouteImprover {
             val pair = randomPair() // don't want start or finish
@@ -58,7 +58,7 @@ class TSP(val points: List<GHPoint>) {
             return Pair(a, b)
         }
 
-        fun swap(list: List<GHPoint>, pair: Pair<Int, Int>): List<GHPoint> {
+        private fun swap(list: List<GHPoint>, pair: Pair<Int, Int>): List<GHPoint> {
             val first = list[pair.first]
             val second = list[pair.second]
             val array = list.toTypedArray()

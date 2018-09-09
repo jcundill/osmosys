@@ -3,7 +3,7 @@ package jon.test.annealing
 import jon.test.rnd
 
 class Solver<T : SearchState<T>>(private val problem: Problem<T>, private val scheduler: Scheduler) {
-    private val random = rnd()
+    private val random = rnd
 
     @Throws(InfeasibleProblemException::class)
     fun solve(): T {
