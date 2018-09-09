@@ -10,6 +10,7 @@ data class CourseParameters(
         val numControls: Int = 6,
         val start: GHPoint,
         val finish: GHPoint = start) {
+        val initialPoints: List<GHPoint> = emptyList(),
 
     companion object {
         private fun String.toGHPoint(): GHPoint? {
@@ -25,9 +26,17 @@ data class CourseParameters(
             props.load(FileInputStream(filename))
             val start = props.getProperty("start").toGHPoint()
             val finish = props.getProperty("finish", props.getProperty("start")).toGHPoint()
+            val waypoints = props.getProperty("waypoints")
             val distance = props.getProperty("distance", "6000").toDouble()
             val numControls = props.getProperty("numControls", "10").toInt()
-            return CourseParameters(start = start!!, finish = finish!!, distance = distance, numControls = numControls)
+            val initials = when (waypoints) {
+                null -> emptyList()
+                else -> waypoints.split("|").map {
+                    it.toGHPoint()!!
+                }
+            }
+
+            return CourseParameters(start = start!!, finish = finish!!, initialPoints = initials, distance = distance, numControls = numControls, map = map)
         }
     }
 }

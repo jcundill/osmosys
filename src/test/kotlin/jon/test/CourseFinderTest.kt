@@ -35,7 +35,7 @@ internal class CourseFinderTest {
 
         val params = CourseParameters(numControls = 10, start = start)
         val finder = CourseFinder(csf, emptyList(), scorer, params)
-        val points = finder.chooseInitialPoints(start = start, finish = start)
+        val points = finder.chooseInitialPoints(start = start, finish = start, initialPoints = emptyList())
         assertEquals(12, points.size)
         assertEquals( listOf(params.start) + List(params.numControls, {dummyPoint}) + params.finish, points)
     }
@@ -54,6 +54,6 @@ internal class CourseFinderTest {
                 finish = finish)
         val finder = CourseFinder(csf, emptyList(), scorer, params)
         assertFailsWith( InfeasibleProblemException::class, "start is too far away from finish to be mapped"
-        ) {finder.chooseInitialPoints(start = params.start, finish = params.finish)}
+        ) {finder.chooseInitialPoints(start = params.start, finish = params.finish, initialPoints = emptyList())}
     }
 }
