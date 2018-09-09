@@ -2,7 +2,6 @@ package jon.test
 
 import com.graphhopper.GHRequest
 import com.graphhopper.util.shapes.GHPoint
-import jon.test.annealing.ExponentialDecayScheduler
 import jon.test.annealing.InfeasibleProblemException
 import jon.test.annealing.LinearDecayScheduler
 import jon.test.annealing.Solver
@@ -13,9 +12,9 @@ import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapPrinter
 import jon.test.scorers.*
 import java.io.File
-import java.util.Date
+import java.util.*
 
-fun rnd(): RandomStream = PseudoRandom//PredictableRandom
+val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
 
 object Main {
     @JvmStatic
@@ -34,6 +33,7 @@ object Main {
                 LegRouteChoiceScorer(params),
                 LegComplexityScorer(params),
                 BeenThisWayBeforeScorer(params),
+                ComingBackHereLaterScorer(params),
                 DidntMoveScorer(params),
                 LastControlNearTheFinishScorer(params),
                 DogLegScorer(params)
@@ -48,7 +48,7 @@ object Main {
         println("init")
         val csf = GHWrapper.initGH(params.map)
         println("done")
-        val scorer = CourseScorer(csf, featureScorers,params)
+        val scorer = CourseScorer(csf, featureScorers, params)
 
         try {
             val problem = CourseFinder(csf, constraints, scorer, params)
