@@ -17,8 +17,8 @@ class CourseFinder(
 
     override fun initialState(): CourseImprover = CourseImprover(csf, chooseInitialPoints(params.start, params.finish))
 
-    override fun energy(step: CourseImprover): Double {
-        val score = scoreStep(step)
+    override fun energy(searchState: CourseImprover): Double {
+        val score = scoreStep(searchState)
         if (score > 1000.0) bad++
         return score
     }
