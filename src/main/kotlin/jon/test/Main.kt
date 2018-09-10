@@ -2,6 +2,7 @@ package jon.test
 
 import com.graphhopper.GHRequest
 import com.graphhopper.util.shapes.GHPoint
+import com.vividsolutions.jts.geom.Envelope
 import jon.test.annealing.InfeasibleProblemException
 import jon.test.annealing.LinearDecayScheduler
 import jon.test.annealing.Solver
@@ -17,6 +18,9 @@ import java.util.*
 val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
 
 object Main {
+    private val gpxWriter = GpxWriter()
+    private val mapPrinter = MapPrinter()
+
     @JvmStatic
     fun main(args: Array<String>) {
 
@@ -26,6 +30,7 @@ object Main {
         }
 
         val params = CourseParameters.buildFromProperties(props)
+        val fitter = MapFitter(params.allowedBoxes)
 
         val featureScorers = listOf(
                 LegLengthScorer(params),
@@ -55,17 +60,23 @@ object Main {
             val solver = Solver(problem, LinearDecayScheduler(1000.0, 1000))
             val solution = solver.solve()
 
-            val best = csf.routeRequest(GHRequest(solution.controls)).best
-
-
             val courseScore = problem.energy(solution)
             val detailedScores = featureScorers.map {
                 it::class.java.simpleName
             }.zip(solution.featureScores!!)
 
+            val best = csf.routeRequest(GHRequest(solution.controls)).best
+            val envelopeToMap = getEnvelopeForProbableRoutes(solution, csf)
+
             val timestamp = Date().time
-            GpxWriter().writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "Map-$timestamp.gpx")
-            MapPrinter(params).generatePDF(filename = "Map-$timestamp.pdf", title = "Test+${(best.distance / 1000).toInt()}K+${params.numControls}+Controls", controls = solution.controls)
+            gpxWriter.writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "Map-$timestamp.gpx")
+
+            mapPrinter.generatePDF(filename = "Map-$timestamp.pdf",
+                    title = "Test+${(best.distance / 1000).toInt()}K+${params.numControls}+Controls",
+                    controls = solution.controls,
+                    centre = envelopeToMap.centre(),
+                    box = fitter.getForEnvelope(envelopeToMap)!!)
+
             println()
             println("Hit: ${csf.hit}, Miss: ${csf.miss}, Bad: ${problem.bad}")
             println(best.distance)
@@ -85,6 +96,17 @@ object Main {
         }
 
 
+    }
+
+    private fun getEnvelopeForProbableRoutes(solution: CourseImprover, csf: ControlSiteFinder): Envelope {
+        val routes = solution.controls.windowed(2).flatMap {
+            val req = GHRequest(it.first(), it.last())
+            csf.routeRequest(req, 3).all
+        }
+
+        val env = Envelope()
+        routes.forEach { it.points.forEach { p -> env.expandToInclude(p.lon, p.lat) } }
+        return env
     }
 
     private fun generateAppInput(controls: List<GHPoint>): List<String> {

@@ -4,19 +4,20 @@ import com.graphhopper.GHResponse
 import com.graphhopper.PathWrapper
 import com.vividsolutions.jts.geom.Envelope
 import jon.test.CourseParameters
-import jon.test.MapBox
+import jon.test.MapFitter
 
 class PrintableOnMapConstraint(val params: CourseParameters) : CourseConstraint {
     val env = Envelope()
+    val fitter = MapFitter(params.allowedBoxes)
 
     override fun valid(routedCourse: GHResponse): Boolean {
-        return routeFitsBox(routedCourse.all, params.allowedBoxes)
+        return routeFitsBox(routedCourse.all)
     }
 
-    fun routeFitsBox(routes: List<PathWrapper>, possibleBoxes: List<MapBox>): Boolean {
+    fun routeFitsBox(routes: List<PathWrapper>): Boolean {
         env.setToNull()
         routes.forEach { pw -> pw.points.forEach { env.expandToInclude(it.lon, it.lat) } }
-        return possibleBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
+        return fitter.getForEnvelope(env) != null
     }
 
 

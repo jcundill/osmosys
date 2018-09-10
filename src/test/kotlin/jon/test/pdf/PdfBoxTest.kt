@@ -1,6 +1,8 @@
 package jon.test.pdf
 
 import com.graphhopper.util.shapes.GHPoint
+import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.Envelope
 import jon.test.CourseParameters
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapDecorator
@@ -25,9 +27,12 @@ class PdfBoxTest {
         val original = File("/Users/jcundill/Documents/Map-1528636867397.pdf")
         val modified = "map-out.pdf"
 
-        val d = MapDecorator(params)
+        val env = Envelope()
+        points.forEach { env.expandToInclude(Coordinate(it.lon, it.lat)) }
 
-        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait12500)
+        val d = MapDecorator()
+
+        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait12500, centre = env.centre())
     }
 
     //@Test

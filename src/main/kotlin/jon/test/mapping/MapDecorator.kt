@@ -2,8 +2,6 @@ package jon.test.mapping
 
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
-import com.vividsolutions.jts.geom.Envelope
-import jon.test.CourseParameters
 import jon.test.MapBox
 import jon.test.improvers.dist2d
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -16,11 +14,11 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-class MapDecorator(val params: CourseParameters) {
+class MapDecorator {
 
     private val mm2pt = { num: Float -> num / 25.4f * 72 }
 
-    fun decorate(pdfStream: InputStream, controls: List<GHPoint>, outFile: File, box: MapBox) {
+    fun decorate(pdfStream: InputStream, controls: List<GHPoint>, outFile: File, box: MapBox, centre: Coordinate) {
 
         val doc = PDDocument.load(pdfStream)
         val page: PDPage = doc.documentCatalog.pages.get(0)
@@ -28,16 +26,10 @@ class MapDecorator(val params: CourseParameters) {
         val height = page.mediaBox.height
 
         val contentStream = PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true)
-        val centre = Pair(width / 2, height / 2)
+        val centrePage = Pair(width / 2, height / 2)
 
         // the centre is the thing in the middle
-        val coords: List<Coordinate> = controls.map { Coordinate(it.lon, it.lat) }
-
-        val env = Envelope()
-        coords.forEach { env.expandToInclude(it.x, it.y) }
-
-
-        val mapCentre = GHPoint(env.centre().y, env.centre().x) // this is what we told the tiler
+        val mapCentre = GHPoint(centre.y, centre.x) // this is what we told the tiler
 
         val offsetsInMetres = controls.map { control ->
             val distLat = dist2d.calcDist(control.lat, mapCentre.lon, mapCentre.lat, mapCentre.lon) * if (control.lat < mapCentre.lat) -1.0 else 1.0
@@ -50,7 +42,7 @@ class MapDecorator(val params: CourseParameters) {
             val ratio = box.scale.toFloat() / 1000.0f
             val xPt = mm2pt(p.first / ratio) //lon
             val yPt = mm2pt(p.second / ratio) //lat
-            Pair(centre.first + xPt + 0.2f, centre.second + yPt - 1.3f)
+            Pair(centrePage.first + xPt + 0.2f, centrePage.second + yPt - 1.3f)
         }
 
 

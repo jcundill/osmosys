@@ -2,9 +2,7 @@ package jon.test.mapping
 
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
-import com.vividsolutions.jts.geom.Envelope
 import com.vividsolutions.jts.geom.Geometry
-import jon.test.CourseParameters
 import jon.test.MapBox
 import org.geotools.geometry.jts.JTS
 import org.geotools.geometry.jts.JTSFactoryFinder
@@ -15,7 +13,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class MapPrinter(val params: CourseParameters) {
+class MapPrinter {
 
     //create reference system WGS84 Web Mercator
     private val wgs84Web: CoordinateReferenceSystem = CRS.decode("EPSG:3857", true)
@@ -23,7 +21,7 @@ class MapPrinter(val params: CourseParameters) {
     private val wgs84: CoordinateReferenceSystem = CRS.decode("EPSG:4326", true)
     //Create transformation from WS84 to WGS84 Web Mercator
     private val wgs84ToWgs84Web = CRS.findMathTransform(wgs84, wgs84Web)
-    private val decorator = MapDecorator(params)
+    private val decorator = MapDecorator()
 
 
     private fun convertBack(lon: Double, lat: Double): Geometry {
@@ -33,19 +31,19 @@ class MapPrinter(val params: CourseParameters) {
         return JTS.transform(pointInWgs84Web, wgs84ToWgs84Web)
     }
 
-    fun generatePDF(filename: String, title: String, controls: List<GHPoint>) {
+    fun generatePDF(filename: String, title: String, controls: List<GHPoint>, centre: Coordinate, box: MapBox) {
         val coords: List<Coordinate> = controls.map { convertBack(it.lon, it.lat).coordinate }
 
-        val centre = getMapCentre(coords)
-        val centreLat = centre.y.toInt()
-        val centreLon = centre.x.toInt()
+        val mapCentre = convertBack(centre.x, centre.y).coordinate
+
+        val centreLat = mapCentre.y.toInt()
+        val centreLon = mapCentre.x.toInt()
 
         val startLat = coords[0].y.toInt()
         val startLon = coords[0].x.toInt()
 
         val controlsList = formatControlsList(coords)
         val mapKey = requestKey()
-        val box = getBox(controls)
         val orientationString = if (box.landscape) "0.297,0.21" else "0.21,0.297"
 
         val url = "http://tiler1.oobrien.com/pdf/?style=streeto|" +
@@ -62,26 +60,9 @@ class MapPrinter(val params: CourseParameters) {
 
         with(URL(url).openConnection() as HttpURLConnection) {
             val bis = BufferedInputStream(ByteArrayInputStream(inputStream.readBytes()))
-            decorator.decorate(bis, controls, File(filename), box)
+            decorator.decorate(bis, controls, File(filename), box, centre)
         }
 
-    }
-
-    private fun getMapCentre(controls: List<Coordinate>): Coordinate {
-        val env = Envelope()
-        controls.forEach { env.expandToInclude(it.x, it.y) }
-        return env.centre()
-    }
-
-    private fun getBox(points: List<GHPoint>): MapBox {
-        val env = Envelope()
-        points.forEach { env.expandToInclude(it.lon, it.lat) }
-
-        val box = params.allowedBoxes.find {
-            (env.width < it.maxWidth) && (env.height < it.maxHeight)
-        }
-
-        return box!!
     }
 
     private fun requestKey(): String {
