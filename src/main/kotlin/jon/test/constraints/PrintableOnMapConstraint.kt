@@ -3,12 +3,10 @@ package jon.test.constraints
 import com.graphhopper.GHResponse
 import com.graphhopper.PathWrapper
 import com.vividsolutions.jts.geom.Envelope
-import jon.test.CourseParameters
-import jon.test.MapFitter
+import jon.test.mapping.MapFitter
 
-class PrintableOnMapConstraint(val params: CourseParameters) : CourseConstraint {
+class PrintableOnMapConstraint(val fitter: MapFitter) : CourseConstraint {
     val env = Envelope()
-    val fitter = MapFitter(params.allowedBoxes)
 
     override fun valid(routedCourse: GHResponse): Boolean {
         return routeFitsBox(routedCourse.all)

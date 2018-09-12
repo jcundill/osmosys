@@ -1,10 +1,8 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
 
-data class LegLengthScorer(val params: CourseParameters) : FeatureScorer {
-
+class LegLengthScorer(private val minLegLength: Double, private val maxLegLength: Double) : FeatureScorer {
 
     /**
      * scores each numbered control based on the length of the previous leg.
@@ -18,8 +16,8 @@ data class LegLengthScorer(val params: CourseParameters) : FeatureScorer {
     private fun evaluate(leg: GHResponse): Double {
         val best = leg.best.distance
         return when {
-            best < params.minLegLength -> 1.0
-            best > params.maxLegLength -> 1.0
+            best < minLegLength -> 1.0
+            best > maxLegLength -> 1.0
             else -> 0.0
         }
     }

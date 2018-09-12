@@ -1,13 +1,10 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.CourseParameters
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
-
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -29,7 +26,7 @@ internal class DidntMoveScorerTest {
 
     @Test
     fun scoreMoved() {
-        val scorer = DidntMoveScorer(CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2)))
+        val scorer = DidntMoveScorer(50.0)
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0
@@ -48,7 +45,7 @@ internal class DidntMoveScorerTest {
     }
     @Test
     fun scoreDidntMove() {
-        val scorer = DidntMoveScorer(CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2)))
+        val scorer = DidntMoveScorer(50.0)
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0
@@ -66,7 +63,7 @@ internal class DidntMoveScorerTest {
 
     @Test
     fun scoreDidntMoveAtAll() {
-        val scorer = DidntMoveScorer(CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2)))
+        val scorer = DidntMoveScorer(50.0)
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0

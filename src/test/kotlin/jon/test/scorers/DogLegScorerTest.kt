@@ -1,7 +1,5 @@
 package jon.test.scorers
 
-import com.graphhopper.util.shapes.GHPoint
-import jon.test.CourseParameters
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -9,7 +7,7 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DogLegScorerTest {
 
-    private val scorer = DogLegScorer(CourseParameters(distance = 3000.0, start = GHPoint(1.0, 33.2)))
+    private val scorer = DogLegScorer()
 
 
     @Test

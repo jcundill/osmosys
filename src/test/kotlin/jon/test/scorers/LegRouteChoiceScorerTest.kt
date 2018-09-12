@@ -1,13 +1,10 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.CourseParameters
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
-
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -31,7 +28,7 @@ internal class LegRouteChoiceScorerTest {
 
     @Test
     fun scoreNoChoice() {
-        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+        val scorer = LegRouteChoiceScorer()
 
         every { rsStartTo1.hasAlternatives() } returns false
         every { rs1To2.hasAlternatives() } returns false
@@ -46,7 +43,7 @@ internal class LegRouteChoiceScorerTest {
 
     @Test
     fun scoreSomeWithChoice() {
-        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+        val scorer = LegRouteChoiceScorer()
 
         every { rsStartTo1.hasAlternatives() } returns true
         every { rs1To2.hasAlternatives() } returns false
@@ -62,7 +59,7 @@ internal class LegRouteChoiceScorerTest {
 
     @Test
     fun score() {
-        val scorer = LegRouteChoiceScorer(CourseParameters(start= GHPoint(1.0, 33.2)))
+        val scorer = LegRouteChoiceScorer()
 
         every { rsStartTo1.hasAlternatives() } returns true
         every { rs3ToFinish.hasAlternatives() } returns false

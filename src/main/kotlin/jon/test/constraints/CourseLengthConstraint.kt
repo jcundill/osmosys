@@ -1,9 +1,8 @@
 package jon.test.constraints
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
 
-data class CourseLengthConstraint(val params: CourseParameters) : CourseConstraint {
+data class CourseLengthConstraint(val minAllowedDistance: Double, val maxAllowedDistance: Double) : CourseConstraint {
 
     /**
      * Here
@@ -11,7 +10,7 @@ data class CourseLengthConstraint(val params: CourseParameters) : CourseConstrai
     override fun valid(routedCourse: GHResponse): Boolean {
         val distance = routedCourse.best.distance
 
-        return distance >= params.minAllowedDistance && distance <= params.maxAllowedDistance
+        return distance in minAllowedDistance..maxAllowedDistance
     }
 
 

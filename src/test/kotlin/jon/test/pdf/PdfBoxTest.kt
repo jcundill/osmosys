@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Envelope
 import jon.test.CourseParameters
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapDecorator
+import jon.test.mapping.MapFitter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
@@ -21,8 +22,6 @@ class PdfBoxTest {
 
     //@Test
     fun decorator() {
-        val params = CourseParameters(numControls = 15, start = GHPoint(52.988304, -1.203265))
-
         val points = GpxWriter().readFromFile("/Users/jcundill/Documents/Map-1528636867397.gpx")
         val original = File("/Users/jcundill/Documents/Map-1528636867397.pdf")
         val modified = "map-out.pdf"
@@ -31,8 +30,9 @@ class PdfBoxTest {
         points.forEach { env.expandToInclude(Coordinate(it.lon, it.lat)) }
 
         val d = MapDecorator()
+        val f = MapFitter()
 
-        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = params.portrait12500, centre = env.centre())
+        d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = f.portrait12500, centre = env.centre())
     }
 
     //@Test

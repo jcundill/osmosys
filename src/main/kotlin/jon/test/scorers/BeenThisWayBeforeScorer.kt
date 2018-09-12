@@ -1,10 +1,9 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
 import kotlin.math.min
 
-data class BeenThisWayBeforeScorer(val params: CourseParameters) : FeatureScorer {
+class BeenThisWayBeforeScorer : FeatureScorer {
 
     /**
      * works out how much of the leg to this numbered control has been travelled along

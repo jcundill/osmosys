@@ -53,7 +53,7 @@ internal class CourseFinderTest {
                 start = start,
                 finish = finish)
         val finder = CourseFinder(csf, emptyList(), scorer, params)
-        assertFailsWith( InfeasibleProblemException::class, "start is too far away from finish to be mapped",
-                {finder.chooseInitialPoints(start = params.start, finish = params.finish)})
+        assertFailsWith( InfeasibleProblemException::class, "start is too far away from finish to be mapped"
+        ) {finder.chooseInitialPoints(start = params.start, finish = params.finish)}
     }
 }

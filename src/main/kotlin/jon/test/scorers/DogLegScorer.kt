@@ -1,9 +1,8 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
 
-class DogLegScorer(val params: CourseParameters) : FeatureScorer {
+class DogLegScorer : FeatureScorer {
 
     /**
      * scores each numbered control based on the repetition of the route to it and the route from the previous control.
@@ -23,8 +22,6 @@ class DogLegScorer(val params: CourseParameters) : FeatureScorer {
     fun <T> dogLegScore(a2b: List<T>, b2c: List<T>): Double {
         if (a2b.size < 2 || b2c.size < 2) return 1.0 //controls are in the same place
         val numInAandB = a2b.dropLast(1).filter { b2c.drop(1).contains(it) }.size
-        //val ratioAtoB =  numInAandB.toDouble() / (a2b.size.toDouble() - 1.0) // we dropped one
-        val ratioBtoC = numInAandB.toDouble() / (b2c.size.toDouble() - 1.0)
-        return ratioBtoC
+        return numInAandB.toDouble() / (b2c.size.toDouble() - 1.0)
     }
 }

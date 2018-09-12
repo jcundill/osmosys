@@ -3,7 +3,6 @@ package jon.test.mapping
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Geometry
-import jon.test.MapBox
 import org.geotools.geometry.jts.JTS
 import org.geotools.geometry.jts.JTSFactoryFinder
 import org.geotools.referencing.CRS

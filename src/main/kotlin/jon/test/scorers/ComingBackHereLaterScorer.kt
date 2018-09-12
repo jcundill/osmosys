@@ -3,10 +3,9 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import com.graphhopper.util.shapes.GHPoint3D
-import jon.test.CourseParameters
 import jon.test.improvers.dist
 
-data class ComingBackHereLaterScorer(val params: CourseParameters) : FeatureScorer {
+class ComingBackHereLaterScorer : FeatureScorer {
 
     /**
      * works out if we run through a future control on this leg

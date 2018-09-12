@@ -1,9 +1,8 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
 
-data class LegRouteChoiceScorer(val params: CourseParameters) : FeatureScorer {
+class LegRouteChoiceScorer : FeatureScorer {
 
     /**
      * scores each numbered control based on the route choice available in the previous leg.
@@ -13,7 +12,7 @@ data class LegRouteChoiceScorer(val params: CourseParameters) : FeatureScorer {
         return routedLegs.dropLast(1).map { evaluate(it) }
     }
 
-    fun evaluate(leg: GHResponse): Double = when {
+    private fun evaluate(leg: GHResponse): Double = when {
         leg.hasAlternatives() -> 0.0 //TODO: maybe work out how good the alternatives are
         else -> 1.0
     }

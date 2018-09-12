@@ -2,7 +2,6 @@ package jon.test.mapping
 
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
-import jon.test.MapBox
 import jon.test.improvers.dist2d
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage

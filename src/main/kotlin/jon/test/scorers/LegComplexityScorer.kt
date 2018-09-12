@@ -2,9 +2,8 @@ package jon.test.scorers
 
 import com.graphhopper.GHResponse
 import com.graphhopper.util.Instruction
-import jon.test.CourseParameters
 
-data class LegComplexityScorer(val params: CourseParameters) : FeatureScorer {
+class LegComplexityScorer : FeatureScorer {
 
 
     private val turnInstructions = listOf(

@@ -2,9 +2,8 @@ package jon.test.scorers
 
 import com.graphhopper.GHResponse
 import com.graphhopper.util.DistancePlaneProjection
-import jon.test.CourseParameters
 
-data class DidntMoveScorer(val params: CourseParameters) : FeatureScorer {
+class DidntMoveScorer(val minMoveDistance: Double) : FeatureScorer {
     private val dist2d = DistancePlaneProjection()
 
     /**
@@ -20,7 +19,7 @@ data class DidntMoveScorer(val params: CourseParameters) : FeatureScorer {
         val xs = first.best.points
         val ys = second.best.points
         val dist = dist2d.calcDist(xs.getLat(0), xs.getLon(0), ys.getLat(0), ys.getLon(0))
-        return dist < params.minControlSeparation
+        return dist < minMoveDistance
     }
 
 }

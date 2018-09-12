@@ -1,16 +1,16 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import jon.test.CourseParameters
+import jon.test.improvers.dist2d
 
-class LegStraightLineScorer(val params: CourseParameters) : FeatureScorer {
+class LegStraightLineScorer : FeatureScorer {
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
             routedLegs.dropLast(1).map { evaluate(it) }     // the finish can't be in the wrong place
 
     private fun evaluate(leg: GHResponse): Double {
         val first = leg.best.points.first()
         val last = leg.best.points.last()
-        val crowFlies = params.dist2d.calcDist(first.lat, first.lon, last.lat, last.lon)
+        val crowFlies = dist2d.calcDist(first.lat, first.lon, last.lat, last.lon)
         val ratio = (leg.best.distance - crowFlies) / leg.best.distance
 
         return when {

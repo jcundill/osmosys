@@ -9,6 +9,7 @@ import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
+import jon.test.mapping.MapBox
 
 
 /**

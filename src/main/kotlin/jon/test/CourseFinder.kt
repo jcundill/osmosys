@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Envelope
 import jon.test.annealing.InfeasibleProblemException
 import jon.test.annealing.Problem
 import jon.test.constraints.CourseConstraint
+import jon.test.mapping.MapFitter
 
 class CourseFinder(
         private val csf: ControlSiteFinder,
@@ -69,7 +70,7 @@ class CourseFinder(
     }
 
     private fun canBeMapped(env: Envelope) =
-            params.allowedBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
+            MapFitter().getForEnvelope(env) != null
 
 
 }

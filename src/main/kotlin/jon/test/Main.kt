@@ -10,6 +10,7 @@ import jon.test.constraints.CourseLengthConstraint
 import jon.test.constraints.IsRouteableConstraint
 import jon.test.constraints.PrintableOnMapConstraint
 import jon.test.gpx.GpxWriter
+import jon.test.mapping.MapFitter
 import jon.test.mapping.MapPrinter
 import jon.test.scorers.*
 import java.io.File
@@ -20,6 +21,7 @@ val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
 object Main {
     private val gpxWriter = GpxWriter()
     private val mapPrinter = MapPrinter()
+    private val fitter = MapFitter()
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -30,24 +32,22 @@ object Main {
         }
 
         val params = CourseParameters.buildFromProperties(props)
-        val fitter = MapFitter(params.allowedBoxes)
 
         val featureScorers = listOf(
-                LegLengthScorer(params),
-//                LegStraightLineScorer(params),
-                LegRouteChoiceScorer(params),
-                LegComplexityScorer(params),
-                BeenThisWayBeforeScorer(params),
-                ComingBackHereLaterScorer(params),
-                DidntMoveScorer(params),
-                LastControlNearTheFinishScorer(params),
-                DogLegScorer(params)
+                LegLengthScorer(params.minLegLength, params.maxLegLength),
+                LegRouteChoiceScorer(),
+                LegComplexityScorer(),
+                BeenThisWayBeforeScorer(),
+                ComingBackHereLaterScorer(),
+                DidntMoveScorer(params.minControlSeparation),
+                LastControlNearTheFinishScorer(),
+                DogLegScorer()
         )
 
         val constraints = listOf(
-                IsRouteableConstraint(params),
-                CourseLengthConstraint(params),
-                PrintableOnMapConstraint(params)
+                IsRouteableConstraint(),
+                CourseLengthConstraint(params.minAllowedDistance, params.maxAllowedDistance),
+                PrintableOnMapConstraint(fitter)
         )
 
         println("init")
