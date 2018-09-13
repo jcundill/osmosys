@@ -7,12 +7,9 @@ import java.util.*
 
 data class CourseParameters(
         val distance: Double = 6000.0,
-        private val allowedLengthDelta: Double = 0.2,
         val numControls: Int = 6,
-        val minControlSeparation: Double = 50.0,
         val start: GHPoint,
-        val finish: GHPoint = start,
-        val map: String = "england-latest") {
+        val finish: GHPoint = start) {
 
     companion object {
         private fun String.toGHPoint(): GHPoint? {
@@ -31,15 +28,7 @@ data class CourseParameters(
             val distance = props.getProperty("distance", "6000").toDouble()
             val numControls = props.getProperty("numControls", "10").toInt()
             val map = props.getProperty("map", "england-latest")
-            return CourseParameters(start = start!!, finish = finish!!, distance = distance, numControls = numControls, map = map)
+            return CourseParameters(start = start!!, finish = finish!!, distance = distance, numControls = numControls)
         }
     }
-
-
-    val minAllowedDistance = distance - distance * allowedLengthDelta
-    val maxAllowedDistance = distance + distance * allowedLengthDelta
-
-    val minLegLength = 20.0
-    val maxLegLength = 2.0 * distance / numControls
-
 }

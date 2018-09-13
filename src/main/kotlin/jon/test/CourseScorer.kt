@@ -1,18 +1,19 @@
 package jon.test
 
 import com.graphhopper.GHResponse
-import jon.test.scorers.FeatureScorer
+import com.graphhopper.util.shapes.GHPoint
+import jon.test.scorers.*
 
 typealias ControlScoreList = List<Double>
 typealias FeatureScoreList = List<Double>
 
-class CourseScorer(private val csf: ControlSiteFinder, private val featureScorers: List<FeatureScorer>, private val params: CourseParameters) {
+class CourseScorer(private val featureScorers: List<FeatureScorer>, private val findRoutes: (GHPoint, GHPoint) -> GHResponse) {
 
     fun score(step: CourseImprover, courseRoute: GHResponse): Double {
         // score all the legs individually
         // needed currently for alternative routes
         val legs = step.controls.windowed(2, 1, false)
-        val legRoutes = legs.map { ab -> csf.findRoutes(ab.first(), ab.last()) }
+        val legRoutes = legs.map { ab -> findRoutes(ab.first(), ab.last()) }
         val featureScores: List<ControlScoreList> = featureScorers.map {
             it.score(legRoutes, courseRoute)
         }

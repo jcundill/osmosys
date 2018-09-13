@@ -1,10 +1,8 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
-import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.CourseParameters
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -19,9 +17,7 @@ internal class LegLengthScorerTest {
     lateinit var rs3ToFinish: GHResponse
     lateinit var cr: GHResponse
 
-    val params = CourseParameters(distance = 3000.0, start = GHPoint(1.0, 33.2))
-
-    val scorer = LegLengthScorer(params.minLegLength, params.maxLegLength)
+    val scorer = LegLengthScorer()
     lateinit var legScores: List<GHResponse>
 
     @BeforeAll
@@ -32,6 +28,7 @@ internal class LegLengthScorerTest {
         rs3ToFinish = classMockk(GHResponse::class)
         cr = classMockk(GHResponse::class)
         legScores = listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish)
+        every { cr.best.distance } returns 600.0
     }
 
     @Test

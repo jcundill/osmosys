@@ -3,8 +3,9 @@ package jon.test.scorers
 import com.graphhopper.GHResponse
 import com.graphhopper.util.DistancePlaneProjection
 
-class DidntMoveScorer(val minMoveDistance: Double) : FeatureScorer {
+class DidntMoveScorer : FeatureScorer {
     private val dist2d = DistancePlaneProjection()
+    private val minMoveDistance: Double = 50.0
 
     /**
      * scores each numbered control based on the length of the previous leg.

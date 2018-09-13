@@ -5,7 +5,6 @@ import com.graphhopper.util.Instruction
 
 class LegComplexityScorer : FeatureScorer {
 
-
     private val turnInstructions = listOf(
             Instruction.TURN_LEFT,
             Instruction.TURN_RIGHT,

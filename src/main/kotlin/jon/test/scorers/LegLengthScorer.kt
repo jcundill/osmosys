@@ -2,18 +2,22 @@ package jon.test.scorers
 
 import com.graphhopper.GHResponse
 
-class LegLengthScorer(private val minLegLength: Double, private val maxLegLength: Double) : FeatureScorer {
+class LegLengthScorer() : FeatureScorer {
+
+    private val minLegLength = 20.0
 
     /**
      * scores each numbered control based on the length of the previous leg.
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too long
      */
     override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
-        return routedLegs.dropLast(1).map { evaluate(it) }//.zip(scoreFollowing(routedLegs)).map { (it.first + it.second) / 2.0 }
+        val maxLegLength = 2.0 * routedCourse.best.distance / routedLegs.size
+
+        return routedLegs.dropLast(1).map { evaluate(it, maxLegLength) }//.zip(scoreFollowing(routedLegs)).map { (it.first + it.second) / 2.0 }
     }
 
 
-    private fun evaluate(leg: GHResponse): Double {
+    private fun evaluate(leg: GHResponse, maxLegLength: Double): Double {
         val best = leg.best.distance
         return when {
             best < minLegLength -> 1.0

@@ -33,27 +33,28 @@ object Main {
 
         val params = CourseParameters.buildFromProperties(props)
 
+        val constraints = listOf(
+                IsRouteableConstraint(),
+                CourseLengthConstraint(params.distance),
+                PrintableOnMapConstraint(MapFitter())
+        )
+
         val featureScorers = listOf(
-                LegLengthScorer(params.minLegLength, params.maxLegLength),
+                LegLengthScorer(),
                 LegRouteChoiceScorer(),
                 LegComplexityScorer(),
                 BeenThisWayBeforeScorer(),
                 ComingBackHereLaterScorer(),
-                DidntMoveScorer(params.minControlSeparation),
+                DidntMoveScorer(),
                 LastControlNearTheFinishScorer(),
                 DogLegScorer()
         )
 
-        val constraints = listOf(
-                IsRouteableConstraint(),
-                CourseLengthConstraint(params.minAllowedDistance, params.maxAllowedDistance),
-                PrintableOnMapConstraint(fitter)
-        )
 
         println("init")
-        val csf = GHWrapper.initGH(params.map)
+        val csf = GHWrapper.initGH("england-latest")
         println("done")
-        val scorer = CourseScorer(csf, featureScorers, params)
+        val scorer = CourseScorer(featureScorers, csf::findRoutes)
 
         try {
             val problem = CourseFinder(csf, constraints, scorer, params)

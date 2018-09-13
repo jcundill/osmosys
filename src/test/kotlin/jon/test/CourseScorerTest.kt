@@ -16,7 +16,6 @@ internal class CourseScorerTest {
 
     lateinit var scorer: CourseScorer
     lateinit var csf: ControlSiteFinder
-    val params = CourseParameters(distance=3000.0, start= GHPoint(1.0, 33.2))
     lateinit var mockResponse: GHResponse
     lateinit var step: CourseImprover
     lateinit var controls: List<GHPoint>
@@ -34,6 +33,8 @@ internal class CourseScorerTest {
         mockFS2 = classMockk(FeatureScorer::class)
         mockFS3 = classMockk(FeatureScorer::class)
         mockRoute = classMockk(GHResponse::class)
+        every { mockRoute.best.distance } returns 1000.0
+        every { mockResponse.hasAlternatives() } returns true
 
     }
 
@@ -41,7 +42,7 @@ internal class CourseScorerTest {
     fun setUp() {
         controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
         step = CourseImprover(csf, controls)
-        scorer = CourseScorer(csf, listOf(mockFS1, mockFS2, mockFS3), params)
+        scorer = CourseScorer(listOf(mockFS1, mockFS2, mockFS3), csf::findRoutes)
     }
 
     @AfterEach

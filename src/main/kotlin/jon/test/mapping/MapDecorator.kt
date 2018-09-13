@@ -12,6 +12,9 @@ import java.io.InputStream
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState
+
+
 
 class MapDecorator {
 
@@ -44,6 +47,11 @@ class MapDecorator {
             Pair(centrePage.first + xPt + 0.2f, centrePage.second + yPt - 1.3f)
         }
 
+        // fade the lines a bit so that you can see the map through them
+        val alpha = 0.6f
+        val graphicsState = PDExtendedGraphicsState()
+        graphicsState.strokingAlphaConstant = alpha
+        contentStream.setGraphicsStateParameters(graphicsState)
 
         offsetsInPts.windowed(2).forEach { drawLine(contentStream, it) }
         drawFinish(contentStream, offsetsInPts.last())

@@ -26,7 +26,7 @@ internal class DidntMoveScorerTest {
 
     @Test
     fun scoreMoved() {
-        val scorer = DidntMoveScorer(50.0)
+        val scorer = DidntMoveScorer()
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0
@@ -45,7 +45,7 @@ internal class DidntMoveScorerTest {
     }
     @Test
     fun scoreDidntMove() {
-        val scorer = DidntMoveScorer(50.0)
+        val scorer = DidntMoveScorer()
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0
@@ -63,7 +63,7 @@ internal class DidntMoveScorerTest {
 
     @Test
     fun scoreDidntMoveAtAll() {
-        val scorer = DidntMoveScorer(50.0)
+        val scorer = DidntMoveScorer()
 
         every { rsStartTo1.best.points.getLat(0) } returns 53.0
         every { rsStartTo1.best.points.getLon(0) } returns -1.0
