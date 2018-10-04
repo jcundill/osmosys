@@ -10,6 +10,7 @@ import jon.test.mapping.MapFitter
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.awt.Color
 import java.awt.Rectangle

@@ -32,6 +32,6 @@ class LegComplexityScorer : FeatureScorer {
         val num = instructions.size.toDouble()
         val turns = instructions.filter { turnInstructions.contains(it.sign) }.size.toDouble()
 
-        return 1.0 - (turns / num)
+        return (1.0 - (turns / num)) / 2.0
     }
 }

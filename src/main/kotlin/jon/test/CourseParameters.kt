@@ -27,7 +27,6 @@ data class CourseParameters(
             val finish = props.getProperty("finish", props.getProperty("start")).toGHPoint()
             val distance = props.getProperty("distance", "6000").toDouble()
             val numControls = props.getProperty("numControls", "10").toInt()
-            val map = props.getProperty("map", "england-latest")
             return CourseParameters(start = start!!, finish = finish!!, distance = distance, numControls = numControls)
         }
     }

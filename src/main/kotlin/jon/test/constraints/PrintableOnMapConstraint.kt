@@ -12,7 +12,7 @@ class PrintableOnMapConstraint(val fitter: MapFitter) : CourseConstraint {
         return routeFitsBox(routedCourse.all)
     }
 
-    fun routeFitsBox(routes: List<PathWrapper>): Boolean {
+    private fun routeFitsBox(routes: List<PathWrapper>): Boolean {
         env.setToNull()
         routes.forEach { pw -> pw.points.forEach { env.expandToInclude(it.lon, it.lat) } }
         return fitter.getForEnvelope(env) != null

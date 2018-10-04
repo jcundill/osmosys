@@ -31,31 +31,23 @@ class MapPrinter {
     }
 
     fun generatePDF(filename: String, title: String, controls: List<GHPoint>, centre: Coordinate, box: MapBox) {
-        val coords: List<Coordinate> = controls.map { convertBack(it.lon, it.lat).coordinate }
-
+        val orientationString = if (box.landscape) "0.297,0.21" else "0.21,0.297"
         val mapCentre = convertBack(centre.x, centre.y).coordinate
 
         val centreLat = mapCentre.y.toInt()
         val centreLon = mapCentre.x.toInt()
-
-        val startLat = coords[0].y.toInt()
-        val startLon = coords[0].x.toInt()
-
-        val controlsList = formatControlsList(coords)
-        val mapKey = requestKey()
-        val orientationString = if (box.landscape) "0.297,0.21" else "0.21,0.297"
 
         val url = "http://tiler1.oobrien.com/pdf/?style=streeto|" +
                 "paper=$orientationString" +
                 "|scale=${box.scale}" +
                 "|centre=$centreLat,$centreLon" +
                 "|title=$title" +
-                "|club=" +
-                "|id=$mapKey" +
-                "|start=$startLat,$startLon" +
+                "|club=StreetO" +
+                "|id=${requestKey()}" +
+                "|start=" +
                 "|crosses=" +
                 "|cps=" +
-                "|controls=$controlsList"
+                "|controls="
 
         with(URL(url).openConnection() as HttpURLConnection) {
             val bis = BufferedInputStream(ByteArrayInputStream(inputStream.readBytes()))

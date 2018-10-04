@@ -125,8 +125,8 @@ class StreetOFlagEncoder @JvmOverloads constructor(speedBits: Int = 4, speedFact
         return 4
     }
 
-    override fun defineWayBits(index: Int, shift: Int): Int {
-        var shift = shift
+    override fun defineWayBits(index: Int, shift1: Int): Int {
+        var shift = shift1
         // first two bits are reserved for route handling in superclass
         shift = super.defineWayBits(index, shift)
         // larger value required - ferries are faster than pedestrians

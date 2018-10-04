@@ -1,10 +1,8 @@
 package jon.test
 
-import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Envelope
 import com.vividsolutions.jts.geom.Geometry
-import jdk.nashorn.internal.ir.annotations.Ignore
 import org.geotools.geometry.jts.JTS
 import org.geotools.geometry.jts.JTSFactoryFinder
 import org.geotools.referencing.CRS
