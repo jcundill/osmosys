@@ -7,6 +7,7 @@ import jon.test.annealing.Problem
 import jon.test.annealing.SearchState
 import jon.test.annealing.Solver
 import jon.test.rnd
+import kotlin.math.roundToInt
 
 val dist2d = DistancePlaneProjection()
 fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, b.lon)
@@ -19,9 +20,11 @@ fun courseDistance(points: List<GHPoint>): Double {
 
 class TSP(val points: List<GHPoint>) {
 
+    private fun sensitivity(numControls: Int) : Int = (2000 * numControls / 10.0).roundToInt()
 
     fun run(): List<GHPoint>? {
-        val solver = Solver(TSProblem(points), LinearDecayScheduler(courseDistance(points), 1000))
+        val steps =  sensitivity(points.size)
+        val solver = Solver(TSProblem(points), LinearDecayScheduler(courseDistance(points), steps))
         val solution = solver.solve()
         return solution.points
     }

@@ -21,9 +21,9 @@ class Solver<T : SearchState<T>>(private val problem: Problem<T>, private val sc
             val nextEnergy = problem.energy(nextState)
             if (acceptChange(temperature, nextEnergy - currEnergy)) {
                 currentState = nextState
-                currEnergy = problem.energy(currentState)
+                currEnergy = nextEnergy
                 if (currEnergy < minEnergy) {
-                    minEnergy = problem.energy(minState)
+                    minEnergy = currEnergy
                     minState = currentState
                     println("step: $steps, min: $minEnergy")
                 }
