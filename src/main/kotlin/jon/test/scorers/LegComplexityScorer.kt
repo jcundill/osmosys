@@ -29,9 +29,9 @@ class LegComplexityScorer : FeatureScorer {
     private fun evaluate(leg: GHResponse): Double {
         val instructions = leg.best.instructions
 
-        val num = instructions.size.toDouble()
-        val turns = instructions.filter { turnInstructions.contains(it.sign) }.size.toDouble()
+        val num = instructions.size
+        val turns = instructions.filter { turnInstructions.contains(it.sign) }.size
 
-        return (1.0 - (turns / num)) / 2.0
+        return 1.0 - (turns.toDouble() / num.toDouble())
     }
 }
