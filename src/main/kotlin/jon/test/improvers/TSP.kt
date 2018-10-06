@@ -18,15 +18,18 @@ fun courseDistance(points: List<GHPoint>): Double {
     }
 }
 
-class TSP(val points: List<GHPoint>) {
+class TSP {
 
     private fun sensitivity(numControls: Int) : Int = (2000 * numControls / 10.0).roundToInt()
 
-    fun run(): List<GHPoint>? {
+    fun run(points: List<GHPoint>): List<GHPoint> {
         val steps =  sensitivity(points.size)
         val solver = Solver(TSProblem(points), LinearDecayScheduler(courseDistance(points), steps))
         val solution = solver.solve()
-        return solution.points
+        return when (solution.points) {
+            null -> points
+            else -> solution.points
+        }
     }
 
     class TSProblem(val points: List<GHPoint>) : Problem<RouteImprover> {

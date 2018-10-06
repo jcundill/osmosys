@@ -9,6 +9,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     private val noChoicePicker = ControlPickingStrategies::pickRandomly
     private val hasChoicePicker = ControlPickingStrategies::pickAboveAverage
     private val dummyScores get() = List(controls.size - 2) { 0.5 }
+    private val tsp = TSP()
 
     /**
      * the improver is given the leg scores for the numbered controls only
@@ -19,7 +20,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
     override fun step(): CourseImprover {
         val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, controls.size / 3)
         val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, controls)
-        val reorderedControls = TSP(newCourse).run()!!
+        val reorderedControls = tsp.run(newCourse)
         return CourseImprover(csf, reorderedControls)
     }
 
