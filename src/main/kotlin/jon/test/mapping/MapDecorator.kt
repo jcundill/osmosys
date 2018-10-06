@@ -46,12 +46,20 @@ class MapDecorator {
 
         val content = PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true)
 
-        content.setLineWidth(1.5.toFloat())
-        content.setLineCapStyle(1)
-        content.setStrokingColor(Color.MAGENTA)
-        content.setFont(font, 20.0F)
+        content.setFont(font, 20.0f)
         content.setNonStrokingColor(Color.MAGENTA)
         content.setGraphicsStateParameters(graphicsState)
+        content.setLineCapStyle(0)
+
+        content.setLineWidth(2.0f)
+        content.setStrokingColor(Color.WHITE)
+
+        drawStart(content, offsetsInPts.take(2))
+        drawFinish(content, offsetsInPts.last())
+        drawCourse(content, offsetsInPts)
+
+        content.setLineWidth(1.5f)
+        content.setStrokingColor(Color.MAGENTA)
 
         drawStart(content, offsetsInPts.take(2))
         drawFinish(content, offsetsInPts.last())
