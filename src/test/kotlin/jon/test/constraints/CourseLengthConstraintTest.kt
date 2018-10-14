@@ -25,7 +25,7 @@ internal class CourseLengthConstraintTest {
     @Test
     fun valid() {
         val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance)
+        val constraint = CourseLengthConstraint(params.distance!!)
 
         every { cr.best.distance } returns 20.0
         assertTrue(constraint.valid(cr) )
@@ -35,7 +35,7 @@ internal class CourseLengthConstraintTest {
     @Test
     fun tooShort() {
         val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 2000.0)
-        val constraint = CourseLengthConstraint(params.distance)
+        val constraint = CourseLengthConstraint(params.distance!!)
 
         every { cr.best.distance } returns 20.0
         assertFalse(constraint.valid(cr) )
@@ -45,7 +45,7 @@ internal class CourseLengthConstraintTest {
     @Test
     fun tooLong() {
         val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance)
+        val constraint = CourseLengthConstraint(params.distance!!)
 
         every { cr.best.distance } returns 2000.0
         assertFalse(constraint.valid(cr) )
@@ -55,9 +55,9 @@ internal class CourseLengthConstraintTest {
     @Test
     fun inTolerance() {
         val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance)
+        val constraint = CourseLengthConstraint(params.distance!!)
 
-        every { cr.best.distance } returns params.distance + 0.2 * params.distance
+        every { cr.best.distance } returns params.distance!! + 0.2 * params.distance!!
         assertTrue(constraint.valid(cr) )
 
     }
@@ -65,9 +65,9 @@ internal class CourseLengthConstraintTest {
     @Test
     fun inTolerance2() {
         val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance)
+        val constraint = CourseLengthConstraint(params.distance!!)
 
-        every { cr.best.distance } returns  params.distance - 0.2 * params.distance
+        every { cr.best.distance } returns params.distance!! - 0.2 * params.distance!!
         assertTrue(constraint.valid(cr) )
 
     }
