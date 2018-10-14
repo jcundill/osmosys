@@ -5,29 +5,34 @@ import com.graphhopper.util.shapes.GHPoint
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapFitter
 import jon.test.mapping.MapPrinter
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.io.File
 import java.util.*
 
-val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
-
-object Main {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MainIT {
     private val gpxWriter = GpxWriter()
     private val mapPrinter = MapPrinter()
     private val fitter = MapFitter()
 
-    @JvmStatic
-    fun main(args: Array<String>) {
+    private lateinit var streetO: StreetO
 
-        val streetO = StreetO("england-latest")
+    @BeforeAll
+    fun beforeTests() {
+        streetO = StreetO("england-latest")
+    }
 
-        val props = when {
-            args.isNotEmpty() -> args[0]
-            else -> "./streeto.properties"
-        }
+    @Test
+    fun main() {
+
+        val props =  "./streeto.properties"
+
         val params = CourseParameters.buildFromProperties(props)
         //val params = CourseParameters.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
         val problem = streetO.makeProblem(params)
-        val solution = streetO.findCourse(problem, 3000)
+        val solution = streetO.findCourse(problem, 1000)
 
         if (solution != null) {
 
