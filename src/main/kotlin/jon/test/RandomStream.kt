@@ -2,6 +2,9 @@ package jon.test
 
 import java.util.*
 
+val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
+
+
 interface RandomStream {
 
     fun nextDouble(): Double

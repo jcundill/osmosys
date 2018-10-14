@@ -19,7 +19,7 @@ import java.io.IOException
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PdfBoxTest {
+class PdfBoxIT {
 
     //@Test
     fun decorator() {
@@ -36,7 +36,7 @@ class PdfBoxTest {
         d.decorate(pdfStream = original.inputStream(), controls = points, outFile = File(modified), box = f.portrait12500, centre = env.centre())
     }
 
-    //@Test
+    @Test
     fun draw() {
         val original = File("/Users/jcundill/Documents/map.pdf")
         val modified = "map-out.pdf"
