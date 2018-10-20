@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import com.graphhopper.util.DistancePlaneProjection
 
 class DidntMoveScorer : FeatureScorer {
@@ -11,7 +12,7 @@ class DidntMoveScorer : FeatureScorer {
      * scores each numbered control based on the length of the previous leg.
      * i.e. control 2 is in a bad place as it in the same place as 1
      */
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> =
             routedLegs.windowed(2, 1, false).map { ls ->
                 if (isSameStartPoint(ls.first(), ls.last())) 1.0 else 0.0
             }

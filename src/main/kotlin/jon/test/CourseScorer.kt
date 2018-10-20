@@ -9,13 +9,13 @@ typealias FeatureScoreList = List<Double>
 
 class CourseScorer(private val featureScorers: List<FeatureScorer>, private val findRoutes: (GHPoint, GHPoint) -> GHResponse) {
 
-    fun score(step: CourseImprover, courseRoute: GHResponse): Double {
+    fun score(step: Course): Double {
         // score all the legs individually
         // needed currently for alternative routes
         val legs = step.controls.windowed(2, 1, false)
         val legRoutes = legs.map { ab -> findRoutes(ab.first(), ab.last()) }
         val featureScores: List<ControlScoreList> = featureScorers.map {
-            it.score(legRoutes, courseRoute)
+            it.score(legRoutes, step.route)
         }
 
         /*
@@ -31,10 +31,15 @@ class CourseScorer(private val featureScorers: List<FeatureScorer>, private val 
         val numberedControlScores: List<FeatureScoreList> = transpose(featureScores)
 
         step.numberedControlScores = numberedControlScores.map { it.sum() / featureScorers.size }
-        step.featureScores = featureScores
+        step.featureScores = getDetailedScores(featureScores)
         return step.numberedControlScores.average()
     }
 
+    private fun getDetailedScores(featureScores: List<List<Double>>): Map<String, List<Double>> {
+        return featureScorers.map {
+            it::class.java.simpleName
+        }.zip(featureScores).toMap()
+    }
     /**
      * Returns a list of lists, each built from elements of all lists with the same indexes.
      * Output has length of shortest input list.

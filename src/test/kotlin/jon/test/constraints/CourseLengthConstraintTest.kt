@@ -4,7 +4,7 @@ import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
 import io.mockk.classMockk
 import io.mockk.every
-import jon.test.CourseParameters
+import jon.test.Course
 import org.junit.jupiter.api.BeforeAll
 
 import org.junit.jupiter.api.Test
@@ -24,8 +24,8 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun valid() {
-        val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance!!)
+        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val constraint = CourseLengthConstraint(params.requestedDistance)
 
         every { cr.best.distance } returns 20.0
         assertTrue(constraint.valid(cr) )
@@ -34,8 +34,8 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun tooShort() {
-        val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 2000.0)
-        val constraint = CourseLengthConstraint(params.distance!!)
+        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 2000.0)
+        val constraint = CourseLengthConstraint(params.requestedDistance)
 
         every { cr.best.distance } returns 20.0
         assertFalse(constraint.valid(cr) )
@@ -44,8 +44,8 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun tooLong() {
-        val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance!!)
+        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val constraint = CourseLengthConstraint(params.requestedDistance)
 
         every { cr.best.distance } returns 2000.0
         assertFalse(constraint.valid(cr) )
@@ -54,20 +54,20 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun inTolerance() {
-        val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance!!)
+        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val constraint = CourseLengthConstraint(params.requestedDistance)
 
-        every { cr.best.distance } returns params.distance!! + 0.2 * params.distance!!
+        every { cr.best.distance } returns params.requestedDistance + 0.2 * params.requestedDistance
         assertTrue(constraint.valid(cr) )
 
     }
 
     @Test
     fun inTolerance2() {
-        val params = CourseParameters(start = GHPoint(1.0, 7.0), distance = 20.0)
-        val constraint = CourseLengthConstraint(params.distance!!)
+        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val constraint = CourseLengthConstraint(params.requestedDistance)
 
-        every { cr.best.distance } returns params.distance!! - 0.2 * params.distance!!
+        every { cr.best.distance } returns params.requestedDistance - 0.2 * params.requestedDistance
         assertTrue(constraint.valid(cr) )
 
     }

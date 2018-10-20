@@ -1,10 +1,11 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import jon.test.improvers.dist2d
 
 class LegStraightLineScorer : FeatureScorer {
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> =
             routedLegs.dropLast(1).map { evaluate(it) }     // the finish can't be in the wrong place
 
     private fun evaluate(leg: GHResponse): Double {

@@ -1,6 +1,5 @@
 package jon.test
 
-import com.graphhopper.PathWrapper
 import com.graphhopper.util.shapes.GHPoint
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapFitter
@@ -29,28 +28,20 @@ class MainIT {
 
         val props =  "./streeto.properties"
 
-        val params = CourseParameters.buildFromProperties(props)
-        //val params = CourseParameters.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
+        val params = Course.buildFromProperties(props)
+        //val params = Course.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
         val problem = streetO.makeProblem(params)
         val solution = streetO.findCourse(problem, 1000)
 
         if (solution != null) {
 
-            val courseScore = problem.energy(solution)
-            val detailedScores = streetO.getDetailedScores(solution.featureScores!!)
-            val best = streetO.findBestRoute(solution.controls)
 
             val timestamp = Date().time
-            gpxWriter.writeToFile(solution.controls, best, courseScore, solution.numberedControlScores, detailedScores, "Map-$timestamp.gpx")
+            gpxWriter.writeToFile(solution, "Map-$timestamp.gpx")
 
-            val envelopeToMap = streetO.getEnvelopeForProbableRoutes(solution.controls)
-            mapPrinter.generatePDF(filename = "Map-$timestamp.pdf",
-                    title = "Test+${(best.distance / 1000).toInt()}K+${solution.controls.size - 2}+Controls",
-                    controls = solution.controls,
-                    centre = envelopeToMap.centre(),
-                    box = fitter.getForEnvelope(envelopeToMap)!!)
+            printMap(solution, timestamp)
 
-            printStats(best, solution, courseScore, detailedScores)
+            printStats(solution)
 
             val controlString = generateAppInput(solution.controls).joinToString(separator = "|")
             println(controlString)
@@ -58,13 +49,26 @@ class MainIT {
         }
     }
 
-    private fun printStats(best: PathWrapper, solution: CourseImprover, courseScore: Double, detailedScores: List<Pair<String, List<Double>>>) {
-        println()
-        println(best.distance)
-        println(solution.controls.size)
-        println("Energy: $courseScore")
-        println("Scores: ${solution.numberedControlScores.joinToString(", ")}")
-        detailedScores.forEach { println(it) }
+    private fun printMap(solution: Course, timestamp: Long) {
+        with(solution) {
+            val envelopeToMap = streetO.getEnvelopeForProbableRoutes(controls)
+            mapPrinter.generatePDF(filename = "Map-$timestamp.pdf",
+                    title = "Test+${(route.distance / 1000).toInt()}K+${controls.size - 2}+Controls",
+                    controls = controls,
+                    centre = envelopeToMap.centre(),
+                    box = fitter.getForEnvelope(envelopeToMap)!!)
+        }
+    }
+
+    private fun printStats(course: Course) {
+        with(course) {
+            println()
+            println(route.distance)
+            println(controls.size)
+            println("Energy: $energy")
+            println("Scores: ${numberedControlScores.joinToString(", ")}")
+            featureScores.forEach { println("${it.key} = ${it.value}") }
+        }
     }
 
     private fun generateAppInput(controls: List<GHPoint>): List<String> {

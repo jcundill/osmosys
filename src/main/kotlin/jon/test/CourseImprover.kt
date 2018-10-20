@@ -4,24 +4,17 @@ import com.graphhopper.util.shapes.GHPoint
 import jon.test.annealing.SearchState
 import jon.test.improvers.TSP
 
-class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPoint>) : SearchState<CourseImprover> {
+class CourseImprover(private val csf: ControlSiteFinder, val course: Course) : SearchState<CourseImprover> {
 
     private val noChoicePicker = ControlPickingStrategies::pickRandomly
     private val hasChoicePicker = ControlPickingStrategies::pickAboveAverage
-    private val dummyScores get() = List(controls.size - 2) { 0.5 }
     private val tsp = TSP()
 
-    /**
-     * the improver is given the leg scores for the numbered controls only
-     */
-    var numberedControlScores: List<Double> = dummyScores
-    var featureScores: List<List<Double>>? = null
-
     override fun step(): CourseImprover {
-        val numberedControlsToChange = findIndexesOfWorst(numberedControlScores, controls.size / 3)
-        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, controls)
+        val numberedControlsToChange = findIndexesOfWorst(course.numberedControlScores, course.controls.size / 3)
+        val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, course.controls)
         val reorderedControls = tsp.run(newCourse)
-        return CourseImprover(csf, reorderedControls)
+        return CourseImprover(csf, course.copy(controls = reorderedControls))
     }
 
     fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
@@ -55,13 +48,13 @@ class CourseImprover(private val csf: ControlSiteFinder, val controls: List<GHPo
 
     override fun equals(other: Any?): Boolean {
         return when (other) {
-            is CourseImprover -> other.controls == this.controls
+            is CourseImprover -> other.course.controls == this.course.controls
             else -> false
         }
     }
 
     override fun hashCode(): Int {
-        return 31 * controls.hashCode()
+        return 31 * course.controls.hashCode()
     }
 }
 

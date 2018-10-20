@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import com.graphhopper.util.Instruction
 
 class LegComplexityScorer : FeatureScorer {
@@ -22,7 +23,7 @@ class LegComplexityScorer : FeatureScorer {
      * scores each numbered control based on the complexity of the route to that control.
      * i.e. control 2 is in a bad place as the route from 1 to 2 was too direct
      */
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> =
             routedLegs.dropLast(1).map { evaluate(it) } // the finish can't be in the wrong place
 
 

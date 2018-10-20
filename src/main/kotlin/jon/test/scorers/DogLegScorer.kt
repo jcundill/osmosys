@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 
 class DogLegScorer : FeatureScorer {
 
@@ -8,7 +9,7 @@ class DogLegScorer : FeatureScorer {
      * scores each numbered control based on the repetition of the route to it and the route from the previous control.
      * i.e. control 3 is in a bad place as the route from 1 to 2 is pretty much the same as the route from 2 to 3
      */
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> {
         return dogLegs(routedLegs.map { it.best.points })
     }
 

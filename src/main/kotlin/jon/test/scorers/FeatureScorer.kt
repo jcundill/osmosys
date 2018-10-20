@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 
 interface FeatureScorer {
     /**
@@ -9,5 +10,5 @@ interface FeatureScorer {
      * so the returned list is 2 less than the number of controls
      * and score[0] refers to control numbered 1
      */
-    fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double>
+    fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double>
 }

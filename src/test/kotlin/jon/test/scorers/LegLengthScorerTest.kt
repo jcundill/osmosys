@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import io.mockk.classMockk
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,7 +16,7 @@ internal class LegLengthScorerTest {
     lateinit var rs2To3: GHResponse
     lateinit var rsStartTo1: GHResponse
     lateinit var rs3ToFinish: GHResponse
-    lateinit var cr: GHResponse
+    lateinit var cr: PathWrapper
 
     val scorer = LegLengthScorer()
     lateinit var legScores: List<GHResponse>
@@ -26,9 +27,9 @@ internal class LegLengthScorerTest {
         rs2To3 = classMockk(GHResponse::class)
         rsStartTo1 = classMockk(GHResponse::class)
         rs3ToFinish = classMockk(GHResponse::class)
-        cr = classMockk(GHResponse::class)
+        cr = classMockk(PathWrapper::class)
         legScores = listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish)
-        every { cr.best.distance } returns 600.0
+        every { cr.distance } returns 600.0
     }
 
     @Test

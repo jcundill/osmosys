@@ -1,9 +1,7 @@
 package jon.test.pdf
 
-import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Envelope
-import jon.test.CourseParameters
 import jon.test.gpx.GpxWriter
 import jon.test.mapping.MapDecorator
 import jon.test.mapping.MapFitter

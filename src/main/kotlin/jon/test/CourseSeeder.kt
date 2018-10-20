@@ -40,12 +40,18 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
 
         // ok, so everything we have been given can be mapped, so add in a number of generated controls and return that
         val numToGenerate = requestedNumControls - chosenControls.size
-        return listOf(startPoint) + when (numToGenerate) {
-            0 -> emptyList()
+        return listOf(startPoint) + when {
+            numToGenerate < 0 -> removeControls(-numToGenerate, chosenControls)
+            numToGenerate == 0 -> emptyList()
             else -> generateControls(numToGenerate, requestedCourseLength!!, env)
         } + chosenControls + finishPoint
 
 
+    }
+
+    private fun removeControls(numToRemove: Int, chosenControls: List<GHPoint>): List<GHPoint> {
+        //TODO: fix this
+        return chosenControls.drop(numToRemove)
     }
 
     private fun canBeMapped(env: Envelope) =
@@ -61,7 +67,7 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
 
         // if the env is really small (only a start perhaps)
         // treat it as being on the radius of the circle
-        // otherwise build an initial circle around its centre
+        // otherwise buildFrom an initial circle around its centre
         val w = dist2d.calcDist(env.minY, env.minX, env.maxY, env.maxX)
 
         val fudgeFactor = 5.0 / numControls

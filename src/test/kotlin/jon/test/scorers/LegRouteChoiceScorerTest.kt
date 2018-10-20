@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import io.mockk.classMockk
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,7 +16,7 @@ internal class LegRouteChoiceScorerTest {
     lateinit var rs1To2: GHResponse
     lateinit var rs2To3: GHResponse
     lateinit var rs3ToFinish: GHResponse
-    lateinit var cr: GHResponse
+    lateinit var cr: PathWrapper
 
     @BeforeAll
     fun beforeTests() {
@@ -23,7 +24,7 @@ internal class LegRouteChoiceScorerTest {
         rs1To2 = classMockk(GHResponse::class)
         rs2To3 = classMockk(GHResponse::class)
         rs3ToFinish = classMockk(GHResponse::class)
-        cr = classMockk(GHResponse::class)
+        cr = classMockk(PathWrapper::class)
     }
 
     @Test

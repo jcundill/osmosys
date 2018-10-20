@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import com.graphhopper.util.shapes.GHPoint
 import com.graphhopper.util.shapes.GHPoint3D
 import jon.test.improvers.dist
@@ -11,10 +12,9 @@ class ComingBackHereLaterScorer : FeatureScorer {
      * works out if we run through a future control on this leg
      * and scores it badly if we do
      */
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> {
-        val points = routedCourse.best.points
-        val start = points.first()
-        val finish = points.last()
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> {
+        val start = routedCourse.points.first()
+        val finish = routedCourse.points.last()
         return listOf(0.0) + routedLegs.drop(1).mapIndexed { idx, leg -> evaluate(routedLegs.subList(idx + 2, routedLegs.size), leg, start, finish) }
     }
 

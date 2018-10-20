@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import io.mockk.classMockk
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,14 +15,14 @@ internal class DidntMoveScorerTest {
     lateinit var rsStartTo1: GHResponse
     lateinit var rs1To2: GHResponse
     lateinit var rs2ToFinish: GHResponse
-    lateinit var cr: GHResponse
+    lateinit var cr: PathWrapper
 
     @BeforeAll
     fun beforeTests() {
         rsStartTo1 = classMockk(GHResponse::class)
         rs1To2 = classMockk(GHResponse::class)
         rs2ToFinish = classMockk(GHResponse::class)
-        cr = classMockk(GHResponse::class)
+        cr = classMockk(PathWrapper::class)
     }
 
     @Test

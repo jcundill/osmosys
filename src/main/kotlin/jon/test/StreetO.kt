@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom.Envelope
 import jon.test.annealing.InfeasibleProblemException
 import jon.test.annealing.LinearDecayScheduler
 import jon.test.annealing.Solver
+import jon.test.annealing.UpInMiddleScheduler
 import jon.test.constraints.CourseLengthConstraint
 import jon.test.constraints.IsRouteableConstraint
 import jon.test.constraints.PrintableOnMapConstraint
@@ -31,12 +32,17 @@ class StreetO(db: String) {
     private val seeder = CourseSeeder(csf)
     private val fitter = MapFitter()
 
-    fun makeProblem(params: CourseParameters): CourseFinder {
-        val seedCourse = seeder.chooseInitialPoints(params.givenCourse, params.numControls, params.distance)
+    fun makeProblem(initialCourse: Course): CourseFinder {
+        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.requestedDistance))
+
+        /**
+         * the improver is given the leg scores for the numbered controls only
+         */
+         seededCourse.numberedControlScores = List(seededCourse.controls.size - 2) { 0.5 }
 
         val distance = when {
-            params.distance == null -> findBestRoute(seedCourse).distance * 0.8 // no desired distance given, make it about as long as it is now
-            else -> params.distance
+            initialCourse.requestedDistance == null -> findBestRoute(seededCourse.controls).distance * 0.8 // no desired distance given, make it about as long as it is now
+            else -> initialCourse.requestedDistance
         }
         val constraints = listOf(
                 IsRouteableConstraint(),
@@ -44,14 +50,14 @@ class StreetO(db: String) {
                 PrintableOnMapConstraint(fitter)
         )
 
-        return CourseFinder(csf, constraints, scorer, seedCourse)
+        return CourseFinder(csf, constraints, scorer, seededCourse)
     }
 
-    fun findCourse(problem: CourseFinder, iterations: Int = 1000): CourseImprover? {
+    fun findCourse(problem: CourseFinder, iterations: Int = 1000): Course? {
 
         val solver = Solver(problem, LinearDecayScheduler(1000.0, iterations))
         return try {
-            solver.solve()
+            solver.solve().course
         } catch (e: InfeasibleProblemException) {
             println(e.message ?: "All gone badly wrong")
             null
@@ -70,11 +76,5 @@ class StreetO(db: String) {
         val env = Envelope()
         routes.forEach { it.points.forEach { p -> env.expandToInclude(p.lon, p.lat) } }
         return env
-    }
-
-    fun getDetailedScores(featureScores: List<List<Double>>): List<Pair<String, List<Double>>> {
-        return featureScorers.map {
-            it::class.java.simpleName
-        }.zip(featureScores)
     }
 }

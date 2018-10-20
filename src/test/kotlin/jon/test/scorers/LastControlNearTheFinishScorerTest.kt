@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import io.mockk.classMockk
 import io.mockk.every
 import org.junit.jupiter.api.BeforeAll
@@ -14,14 +15,14 @@ internal class LastControlNearTheFinishScorerTest {
     lateinit var rsStartTo1: GHResponse
     lateinit var rs1To2: GHResponse
     lateinit var rs2ToFinish: GHResponse
-    lateinit var cr: GHResponse
+    lateinit var cr: PathWrapper
 
     @BeforeAll
     fun beforeTests() {
         rsStartTo1 = classMockk(GHResponse::class)
         rs1To2 = classMockk(GHResponse::class)
         rs2ToFinish = classMockk(GHResponse::class)
-        cr = classMockk(GHResponse::class)
+        cr = classMockk(PathWrapper::class)
     }
 
 
@@ -30,7 +31,7 @@ internal class LastControlNearTheFinishScorerTest {
         every { rsStartTo1.best.distance } returns 100.0
         every { rs1To2.best.distance } returns 100.0
         every { rs2ToFinish.best.distance } returns 200.0
-        every { cr.best.distance } returns 400.0
+        every { cr.distance } returns 400.0
 
         val scorer = LastControlNearTheFinishScorer()
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
@@ -43,7 +44,7 @@ internal class LastControlNearTheFinishScorerTest {
         every { rsStartTo1.best.distance } returns 200.0
         every { rs1To2.best.distance } returns 200.0
         every { rs2ToFinish.best.distance } returns 10.0
-        every { cr.best.distance } returns 410.0
+        every { cr.distance } returns 410.0
 
         val scorer = LastControlNearTheFinishScorer()
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)
@@ -56,7 +57,7 @@ internal class LastControlNearTheFinishScorerTest {
         every { rsStartTo1.best.distance } returns 200.0
         every { rs1To2.best.distance } returns 200.0
         every { rs2ToFinish.best.distance } returns 60.0
-        every { cr.best.distance } returns 460.0
+        every { cr.distance } returns 460.0
 
         val scorer = LastControlNearTheFinishScorer()
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2ToFinish), cr)

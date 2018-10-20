@@ -1,6 +1,7 @@
 package jon.test.annealing
 
 import jon.test.rnd
+import kotlin.math.exp
 
 class Solver<T : SearchState<T>>(private val problem: Problem<T>, private val scheduler: Scheduler) {
     private val random = rnd
@@ -35,7 +36,7 @@ class Solver<T : SearchState<T>>(private val problem: Problem<T>, private val sc
     private fun acceptChange(temperature: Double, energyChange: Double): Boolean {
         return when {
             energyChange < 0.0 -> true
-            else -> random.nextDouble() <= Math.exp(-1.0 * energyChange / temperature)
+            else -> random.nextDouble() <= exp(-1.0 * energyChange / temperature)
         }
     }
 }

@@ -20,6 +20,7 @@ internal class CourseImproverTest {
 
     val replacedPoint = GHPoint(100.0, 100.0)
     val controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
+    val course = Course(controls = controls)
 
 
     @BeforeAll
@@ -34,32 +35,32 @@ internal class CourseImproverTest {
 
     @BeforeEach
     fun setUp() {
-        improver = CourseImprover(csf, controls)
+        improver = CourseImprover(csf, course)
     }
 
     @Test
     fun hashCodeWorksSame() {
-        val improver2 = CourseImprover(csf, controls)
+        val improver2 = CourseImprover(csf, course)
         assertEquals(improver.hashCode(), improver2.hashCode())
     }
 
     @Test
     fun hashCodeWorksDifferent() {
-        val controls2 = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
-        val improver2 = CourseImprover(csf, controls2)
+        val course2 = Course(controls = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5)))
+        val improver2 = CourseImprover(csf, course2)
         assertNotEquals(improver.hashCode(), improver2.hashCode())
     }
 
     @Test
     fun equalsWorksSame() {
-        val improver2 = CourseImprover(csf, controls)
+        val improver2 = CourseImprover(csf, course)
         assertEquals(improver, improver2)
     }
 
     @Test
     fun equalsWorksDifferent() {
-        val controls2 = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
-        val improver2 = CourseImprover(csf, controls2)
+        val course2 = Course(controls = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5)))
+        val improver2 = CourseImprover(csf, course2)
         assertNotEquals(improver, improver2)
     }
 

@@ -1,6 +1,7 @@
 package jon.test.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.PathWrapper
 import kotlin.math.min
 
 class BeenThisWayBeforeScorer : FeatureScorer {
@@ -11,7 +12,7 @@ class BeenThisWayBeforeScorer : FeatureScorer {
      * Find the worst duplication in any of the proceeding legs and return that as the score
      * Do not include previous leg - that is captured in the Dog Leg Scorer
      */
-    override fun score(routedLegs: List<GHResponse>, routedCourse: GHResponse): List<Double> =
+    override fun score(routedLegs: List<GHResponse>, routedCourse: PathWrapper): List<Double> =
             routedLegs.mapIndexed { idx, leg -> evaluate(routedLegs.subList(0, idx), leg) }
 
     private fun evaluate(previousLegs: List<GHResponse>, thisLeg: GHResponse): Double {
