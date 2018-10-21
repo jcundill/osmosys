@@ -50,6 +50,10 @@ internal class LegRouteChoiceScorerTest {
         every { rs1To2.hasAlternatives() } returns false
         every { rs2To3.hasAlternatives() } returns true
         every { rs3ToFinish.hasAlternatives() } returns true
+        every { rsStartTo1.all } returns  listOf(cr, cr)
+        every { rs2To3.all } returns  listOf(cr, cr)
+        every { rs3ToFinish.all } returns  listOf(cr, cr)
+        every {cr.distance } returns 1000.0
 
         val scores = scorer.score(listOf(rsStartTo1, rs1To2, rs2To3, rs3ToFinish), cr)
 
@@ -63,6 +67,7 @@ internal class LegRouteChoiceScorerTest {
         val scorer = LegRouteChoiceScorer()
 
         every { rsStartTo1.hasAlternatives() } returns true
+        every { rsStartTo1.all } returns  listOf(cr, cr)
         every { rs3ToFinish.hasAlternatives() } returns false
 
         val scores = scorer.score(listOf(rsStartTo1, rs3ToFinish), cr)
