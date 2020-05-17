@@ -13,4 +13,4 @@ pipelines:
           - maven
         script: # Modify the commands below to buildFrom your repository.
           - mvn install:install-file -Dfile=lib/gpxparser-20130603.jar -DgroupId=jon.gpx -DartifactId=jon.gpx.gpxparser -Dversion=1.0 -Dpackaging=jar
-          - mvn -B verify # -B batch mode makes Maven less verbose
+          - mvn -B clean verify # -B batch mode makes Maven less verbose
