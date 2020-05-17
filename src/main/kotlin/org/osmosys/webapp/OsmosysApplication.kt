@@ -30,8 +30,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class StreetOApplication
+class OsmosysApplication
 
 fun main(args: Array<String>) {
-    runApplication<StreetOApplication>(*args)
+    runApplication<OsmosysApplication>(*args)
 }
