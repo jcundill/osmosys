@@ -1,0 +1,58 @@
+/*
+ *
+ *     Copyright (c) 2017-2020 Jon Cundill.
+ *
+ *     Permission is hereby granted, free of charge, to any person obtaining
+ *     a copy of this software and associated documentation files (the "Software"),
+ *     to deal in the Software without restriction, including without limitation
+ *     the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *     and/or sell copies of the Software, and to permit persons to whom the Software
+ *     is furnished to do so, subject to the following conditions:
+ *
+ *     The above copyright notice and this permission notice shall be included in
+ *     all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *     IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ *     CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ *     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ *     OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
+ */
+
+package org.osmosys
+
+import java.util.*
+
+val rnd: RandomStream = PseudoRandom()//RepeatableRandom(112143432234L)
+
+
+interface RandomStream {
+
+    fun nextDouble(): Double
+}
+
+class PseudoRandom : RandomStream {
+    private val rnd = Random(System.currentTimeMillis())
+    private val doubleStream = rnd.doubles().iterator()
+
+    override fun nextDouble(): Double = doubleStream.next()
+}
+
+class RepeatableRandom(seed: Long) : RandomStream {
+    private val rnd = Random(seed)
+    private val doubleStream = rnd.doubles().iterator()
+
+    override fun nextDouble(): Double = doubleStream.next()
+}
+
+object PredictableRandom : RandomStream {
+    private val doubles = arrayOf(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
+    private val seq = generateSequence(0) { (it + 1) % doubles.size }
+            .map { doubles[it] }.iterator()
+
+    override fun nextDouble(): Double = seq.next()
+}
