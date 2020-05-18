@@ -2,7 +2,7 @@
 ## Osmosys - OpenStreetMap Orienteering system
 Use goal based searching to generate passable Urban Orienteering Courses.
 
-Uses routing algorithms on top of OSM data to find challenging course legs. The start location can be anywhere in the world as long as an OSM protobuf file covering that location has been loaded into the system. So start you run just ourside your front door if you like.
+Uses routing algorithms on top of OSM data to find challenging course legs. The start location can be anywhere in the world as long as an OSM protobuf file covering that location has been loaded into the system. So start your run just outside your front door if you like.
 
 Helper functions are provided to:
 +  Generate a printable PDF A4 open orienteering map of the generated course overlaid with the controls as a line course.
