@@ -176,7 +176,7 @@ controls = 51.223650, -1.361135
 
  In the example test shown above - if the Solver generated a runnable course after 1000 iterations then write out the map elements - kmz, kml and pdf and display some stats as to how the Solver scored the generated course - see the relevant functions in `MainIT.kt` for details of these.
 
-#### Running the Slover against an existing KML file
+#### Running the Solver against an existing KML file
 
 Maybe one initially created in Google Earth
 
