@@ -34,6 +34,8 @@ import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
+import org.osmosys.furniture.StreetFurniture
+import org.osmosys.improvers.dist
 import org.osmosys.mapping.MapBox
 import java.lang.Math.toDegrees
 import java.lang.Math.toRadians
@@ -45,6 +47,7 @@ import kotlin.math.*
  */
 class ControlSiteFinder(private val gh: GraphHopper) {
 
+    var furniture: List<StreetFurniture> = emptyList()
     private val filter =  DefaultEdgeFilter.allEdges(gh.encodingManager.getEncoder("orienteering"))
 
     private val env = Envelope()
@@ -105,18 +108,30 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
     fun findNearestControlSiteTo(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
-        val ret =  when {
+        val ret = when {
             !qr.isValid -> null
             qr.snappedPosition == QueryResult.Position.EDGE -> {
                 val pl = qr.closestEdge.fetchWayGeometry(3)
                 pl.find { pt ->
                     val loc = gh.locationIndex.findClosest(pt.lat, pt.lon, filter).snappedPosition
-                     loc == QueryResult.Position.TOWER || loc == QueryResult.Position.PILLAR
+                    loc == QueryResult.Position.TOWER || loc == QueryResult.Position.PILLAR
                 }
             }
             else -> qr.snappedPoint
         }
-        return when {
+        if(furniture.isNotEmpty()) {
+            val f = furniture.find { dist(GHPoint(it.lat, it.lon), p) < 100.0 }
+        }
+            return when {
+                ret != null -> {
+                    val loc = GHPoint(ret.lat, ret.lon)
+                    val f = furniture.find { dist(GHPoint(it.lat, it.lon), loc) < 50.0 }
+                    return if( f != null ) GHPoint(f.lat, f.lon) else loc
+                }
+                else -> null
+            }
+
+            return when {
             ret != null -> GHPoint(ret.lat, ret.lon)
             else -> null
         }
@@ -144,6 +159,10 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         env.setToNull()
         points.forEach { env.expandToInclude(it.lon, it.lat) }
         return possibleBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
+    }
+
+    fun findDescriptionFor(point: GHPoint): String? {
+        return furniture.find { it.lat == point.lat && it.lon == point.lon}?.description
     }
 
 

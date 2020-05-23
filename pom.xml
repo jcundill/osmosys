@@ -164,6 +164,13 @@
             <artifactId>gt-epsg-hsql</artifactId>
             <version>19.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/de.westnordost/osmapi-overpass -->
+        <dependency>
+            <groupId>de.westnordost</groupId>
+            <artifactId>osmapi-overpass</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/hu.supercluster/overpasser-retrofit-adapter -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>

@@ -27,6 +27,7 @@ package org.osmosys
 
 import com.graphhopper.GHRequest
 import com.graphhopper.PathWrapper
+import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.annealing.ExponentialDecayScheduler
@@ -36,6 +37,8 @@ import org.osmosys.annealing.Solver
 import org.osmosys.constraints.CourseLengthConstraint
 import org.osmosys.constraints.IsRouteableConstraint
 import org.osmosys.constraints.PrintableOnMapConstraint
+import org.osmosys.furniture.StreetFurniture
+import org.osmosys.furniture.StreetFurnitureFinder
 import org.osmosys.mapping.MapFitter
 import org.osmosys.scorers.*
 
@@ -43,11 +46,11 @@ import org.osmosys.scorers.*
 class Osmosys(db: String) {
     private val featureScorers = listOf(
             LegLengthScorer(),
-            LegRouteChoiceScorer(1.0),
+            LegRouteChoiceScorer(),
             LegComplexityScorer(),
             BeenThisWayBeforeScorer(),
             ComingBackHereLaterScorer(),
-            OnlyGoToTheFinishAtTheEndScorer(3.0),
+            OnlyGoToTheFinishAtTheEndScorer(),
             DidntMoveScorer(),
             LastControlNearTheFinishScorer(),
             DogLegScorer()
@@ -109,4 +112,16 @@ class Osmosys(db: String) {
         val leg = csf.routeRequest(GHRequest(from, to), 3)
         return leg.all.map{  Pair(it.distance, it.points.toList()) }
     }
+
+    fun findFurniture(start: GHPoint) {
+        val scaleFactor = 5000.0
+        val max = csf.getCoords(start, Math.PI * 0.25, scaleFactor)
+        val min = csf.getCoords(start, Math.PI * 1.25, scaleFactor)
+        val bbox = BBox(min.lon, max.lon, min.lat, max.lat)
+        val finder = StreetFurnitureFinder()
+        val sf = finder.findForBoundingBox(bbox)
+        csf.furniture = sf
+    }
+
+    fun describe(point: GHPoint): String? = csf.findDescriptionFor(point)
 }

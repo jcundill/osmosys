@@ -26,17 +26,18 @@
 package org.osmosys
 
 import com.graphhopper.util.shapes.GHPoint
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.osmosys.gpx.GpxWriter
 import org.osmosys.mapping.MapFitter
 import org.osmosys.mapping.MapPrinter
 import org.osmosys.maprun.KmlWriter
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MainIT {
@@ -50,6 +51,13 @@ class MainIT {
     @BeforeAll
     fun beforeTests() {
         osmosys = Osmosys("derbyshire-latest")
+    }
+
+
+
+    @Test
+    fun overpasserTest() {
+        osmosys.findFurniture(GHPoint(53.222600, -1.449538))
     }
 
     @Test
@@ -80,6 +88,7 @@ class MainIT {
 
         val initialCourse = Course.buildFromProperties(props)
         //val params = Course.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
+        osmosys.findFurniture(initialCourse.controls[0])
         val problem = osmosys.makeProblem(initialCourse)
         val solution = osmosys.findCourse(problem, 1000)
 
@@ -89,6 +98,7 @@ class MainIT {
 
             printMap(solution, timestamp)
             printStats(solution)
+            printControls(solution)
         }
     }
 
@@ -101,6 +111,19 @@ class MainIT {
                     centre = envelopeToMap.centre(),
                     box = fitter.getForEnvelope(envelopeToMap)!!)
             File("Map-$timestamp.kml").writeText(kmlWriter.generate(controls, "Map-$timestamp"))
+        }
+    }
+
+    private fun printControls(course: Course) {
+      course.controls.forEachIndexed {idx, it ->
+            val fd = osmosys.describe(it)
+          if(fd == null) {
+              val ctrl = course.controls[idx]
+            val instruction = course.route.instructions.find(ctrl.lat, ctrl.lon, 10.0)
+              if( instruction != null) {
+                  println("$idx = ${instruction.name}")
+              } else println("$idx = ???????")
+          } else println("$idx = $fd")
         }
     }
 

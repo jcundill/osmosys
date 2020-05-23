@@ -5,7 +5,7 @@ Use goal based searching to generate passable Urban Orienteering Courses.
 Uses routing algorithms on top of OSM data to find challenging course legs. The start location can be anywhere in the world as long as an OSM protobuf file covering that location has been loaded into the system. So start your run just outside your front door if you like.
 
 Helper functions are provided to:
-+  Generate a printable PDF A4 open orienteering map of the generated course overlaid with the controls as a line course.
++  Generate a printable PDF A4 open orienteering map <https://oomap.co.uk/gb> of the generated course overlaid with the controls as a line course.
 +  Generate the KML and KMZ files needed for uploading to MapRunF <https://play.google.com/store/apps/details?id=au.com.fne.maprunf&hl=en_GB> 
 
 This allows you to immediately run the generated course yourself by printing out the map and importing the maprun files into CheckSites <http://www.p.fne.com.au/#/checksitesupload>
@@ -19,6 +19,13 @@ Where those potential routes are limited to those that you could legally and saf
 
 System is given a starting location, an approximate length to make the
 generated course and the number of controls to place on the course.
+
+Control site locations are selected from:
+ +  Node type street furniture available on OSM - post boxes, bus stops, bollards, trees, etc
+ +  Ends of linear features available on OSM - hedges, steps, bridges
+ +  Path junctions and bends
+ 
+Preference is given to the first two types - if available near to the selected control location. 
 
 Then an initial course is seeded from these inputs, and the algorithm iteratively tries
 to improve the placement of the controls on the course to make the legs between them
