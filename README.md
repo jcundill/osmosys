@@ -20,6 +20,11 @@ Where those potential routes are limited to those that you could legally and saf
 System is given a starting location, an approximate length to make the
 generated course and the number of controls to place on the course.
 
+The algorithm currently seems to perform best with the number of controls set to around 1.5 times the requested distance in K - so 8 or 9 on a 6K route, maybe 14 to 16 on a 10K route. 
+However, the control density that would allow the generation of a reasonable route is largely a function of the complexity of the OSM data in the area around the start location.
+But, unlike properly planned courses, don't expect to let the system manage 30 controls on a 10K run.
+Trying to increase the density of the controls whilst still maintaining a decent overall course route is one of the things I'd like to improve in the algorithm.
+
 Control site locations are selected from:
  +  Node type street furniture available on OSM - post boxes, bus stops, bollards, trees, etc
  +  Ends of linear features available on OSM - hedges, steps, bridges
@@ -68,9 +73,9 @@ If accepted the Solver moves on to look at the worst scoring legs in this new co
 
 Annealing continues for 1000 iterations by default.
 
-Each time the course is improved we defensively run a Travelling Salesman solver over it to makes sure that control ordering remains fairly sensible - we don't just keep running from one side of the map to the other but try and generate a course showing some kind of 'round-trip' behaviour.
+Each time the course is improved we defensively run a Travelling Salesman solver over it to makes sure control ordering remains fairly sensible - we don't just keep running from one side of the map to the other but try and generate a course showing some kind of 'round-trip' behaviour.
 
-In addition to the improvers, there are an number of hard constraints that the course must always satisfy:
+In addition to the improvers, there are a number of hard constraints that the course must always satisfy:
 + Course Length - must be reasonably similar to the requested course length
 + Is Routeable - there must exist at least one safely runnable route around the whole course
 + Printable On Map - Is it possible to fit the course onto either a Landscape or Portrait A4 map at 5000, 7500, 10000, 12500 or 15000 scale
@@ -128,7 +133,7 @@ Please note that currently there are just a bunch of Integration Tests that give
 
 I've started some basic work to wrap this as a webapp with a REST api, but to date I've mostly been more interested in playing around with the algorithm itself than providing REST access to it.
 
-Examples of how to run the Solver are in are in `MainIT.kt`.
+Examples of how to run the Solver are in `MainIT.kt`.
 
 
 
