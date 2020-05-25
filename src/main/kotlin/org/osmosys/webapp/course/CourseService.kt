@@ -26,7 +26,9 @@
 package org.osmosys.webapp.course
 
 import com.graphhopper.util.shapes.GHPoint
-import org.osmosys.*
+import org.osmosys.ControlSite
+import org.osmosys.Course
+import org.osmosys.Osmosys
 import org.osmosys.mapping.MapFitter
 import org.osmosys.mapping.MapPrinter
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,7 +60,7 @@ class CourseService : ApplicationEventPublisherAware {
         return osmosys.findCourse(problem = problem)!!
     }
 
-    fun printMap(ctrls: List<GHPoint>): ByteArray? {
+    fun printMap(ctrls: List<ControlSite>): ByteArray? {
         val best = osmosys.findBestRoute(ctrls)
 
         val envelopeToMap = osmosys.getEnvelopeForProbableRoutes(ctrls)
@@ -71,7 +73,7 @@ class CourseService : ApplicationEventPublisherAware {
         return File("Map.pdf").readBytes()
     }
 
-    fun score(ctrls: List<GHPoint>): Course {
+    fun score(ctrls: List<ControlSite>): Course {
         val course = Course(controls = ctrls)
         osmosys.score(course)
         return course

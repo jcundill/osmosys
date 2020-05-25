@@ -27,7 +27,7 @@ package org.osmosys
 
 import com.graphhopper.GHResponse
 import com.graphhopper.util.shapes.GHPoint
-import org.osmosys.scorers.*
+import org.osmosys.scorers.LegScorer
 
 typealias LegScoreList = List<Double>
 typealias FeatureScoreList = List<Double>
@@ -38,7 +38,7 @@ class CourseScorer(private val legScorers: List<LegScorer>, private val findRout
         // score all the legs individually
         // needed currently for alternative routes
         val legs = step.controls.windowed(2)
-        val legRoutes = legs.map { ab -> findRoutes(ab.first(), ab.last()) }
+        val legRoutes = legs.map { ab -> findRoutes(ab.first().position, ab.last().position) }
         val featureScores: List<LegScoreList> = legScorers.map { raw ->
             raw.score(legRoutes).map {s -> s * raw.weighting}
         }

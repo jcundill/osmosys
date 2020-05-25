@@ -32,6 +32,7 @@ import io.mockk.mockkClass
 import org.osmosys.Course
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.osmosys.ControlSite
 import kotlin.test.BeforeTest
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -48,7 +49,7 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun valid() {
-        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val params = Course(controls = listOf(ControlSite(1.0, 7.0)), requestedDistance = 20.0)
         val constraint = CourseLengthConstraint(params.distance())
 
         every { cr.best.distance } returns 20.0
@@ -58,7 +59,7 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun tooShort() {
-        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 2000.0)
+        val params = Course(controls = listOf(ControlSite(1.0, 7.0)), requestedDistance = 2000.0)
         val constraint = CourseLengthConstraint(params.distance())
 
         every { cr.best.distance } returns 20.0
@@ -68,7 +69,7 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun tooLong() {
-        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val params = Course(controls = listOf(ControlSite(1.0, 7.0)), requestedDistance = 20.0)
         val constraint = CourseLengthConstraint(params.distance())
 
         every { cr.best.distance } returns 2000.0
@@ -78,7 +79,7 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun inTolerance() {
-        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val params = Course(controls = listOf(ControlSite(1.0, 7.0)), requestedDistance = 20.0)
         val constraint = CourseLengthConstraint(params.distance())
 
         every { cr.best.distance } returns params.distance() + 0.2 * params.distance()
@@ -88,7 +89,7 @@ internal class CourseLengthConstraintTest {
 
     @Test
     fun inTolerance2() {
-        val params = Course(controls = listOf(GHPoint(1.0, 7.0)), requestedDistance = 20.0)
+        val params = Course(controls = listOf(ControlSite(1.0, 7.0)), requestedDistance = 20.0)
         val constraint = CourseLengthConstraint(params.distance())
 
         every { cr.best.distance } returns params.distance() - 0.2 * params.distance()

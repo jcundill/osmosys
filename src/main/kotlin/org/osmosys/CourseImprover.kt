@@ -25,9 +25,7 @@
 
 package org.osmosys
 
-import com.graphhopper.util.shapes.GHPoint
 import org.osmosys.annealing.SearchState
-import org.osmosys.improvers.JSpritTSP
 import org.osmosys.improvers.TSP
 
 class CourseImprover(private val csf: ControlSiteFinder, val course: Course) : SearchState<CourseImprover> {
@@ -43,7 +41,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val course: Course) : S
         return CourseImprover(csf, course.copy(controls = reorderedControls))
     }
 
-    fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<GHPoint>): List<GHPoint> =
+    fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<ControlSite>): List<ControlSite> =
             selected.fold(existing) { current, ctrl ->
                 current.subList(0, ctrl) +
                         listOf(csf.findAlternativeControlSiteFor(current[ctrl])) +

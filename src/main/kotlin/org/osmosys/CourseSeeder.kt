@@ -25,39 +25,36 @@
 
 package org.osmosys
 
-import com.graphhopper.GHRequest
-import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.annealing.InfeasibleProblemException
 import org.osmosys.improvers.TSP
-import org.osmosys.improvers.dist2d
 import org.osmosys.mapping.MapFitter
 
 class CourseSeeder(private val csf: ControlSiteFinder) {
 
     private val fitter = MapFitter()
 
-    fun chooseInitialPoints(initialPoints: List<GHPoint>, requestedNumControls: Int, requestedCourseLength: Double): List<GHPoint> {
+    fun chooseInitialPoints(initialPoints: List<ControlSite>, requestedNumControls: Int, requestedCourseLength: Double): List<ControlSite> {
 
         val env = Envelope()
 
         // check that everything we have been given is mappable
-        val startPoint = csf.findNearestControlSiteTo(initialPoints.first())
+        val startPoint = csf.findNearestControlSiteTo(initialPoints.first().position)
                 ?: throw InfeasibleProblemException("no control point near the start")
 
-        val finishPoint = csf.findNearestControlSiteTo(initialPoints.last())
+        val finishPoint = csf.findNearestControlSiteTo(initialPoints.last().position)
                 ?: throw InfeasibleProblemException("no control point near the finish")
 
         val chosenControls = initialPoints.drop(1).dropLast(1).map {
-            csf.findNearestControlSiteTo(it)
+            csf.findNearestControlSiteTo(it.position)
                     ?: throw InfeasibleProblemException("no control point near the waypoint $it")
         }
 
         with(env) {
-            expandToInclude(startPoint.lon, startPoint.lat)
-            expandToInclude(finishPoint.lon, finishPoint.lat)
+            expandToInclude(startPoint.position.lon, startPoint.position.lat)
+            expandToInclude(finishPoint.position.lon, finishPoint.position.lat)
             chosenControls.forEach {
-                expandToInclude(it.lon, it.lat)
+                expandToInclude(it.position.lon, it.position.lat)
             }
         }
 
@@ -65,18 +62,11 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
             throw InfeasibleProblemException("initial course cannot be mapped")
         }
 
-        // ok, so everything we have been given can be mapped, so add in a number of generated controls and return that
-//        val numToGenerate = requestedNumControls - chosenControls.size
-//        return listOf(startPoint) + when {
-//            numToGenerate < 0 -> removeControls(-numToGenerate, chosenControls)
-//            numToGenerate == 0 -> emptyList()
-//            else -> generateControls(numToGenerate, requestedCourseLength!!, env)
-//        } + chosenControls + finishPoint
-
-        return doGen(initialPoints, requestedNumControls, requestedCourseLength)
+        val initialControls = listOf(startPoint) + chosenControls + finishPoint
+        return doGen(initialControls, requestedNumControls, requestedCourseLength)
     }
 
-    private fun doGen(initialPoints: List<GHPoint>, requestedNumControls: Int, requestedCourseLength: Double): List<GHPoint> {
+    private fun doGen(initialPoints: List<ControlSite>, requestedNumControls: Int, requestedCourseLength: Double): List<ControlSite> {
         val twistFactor = 0.67
         val circLength = 3.5
         val angle = 1.5658238
@@ -85,16 +75,19 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
         val bearing = csf.randomBearing
 
         val first = initialPoints.first()
-        val second = csf.getCoords(first, Math.PI + bearing, scaleFactor)
-        val third = csf.getCoords(first, Math.PI + bearing + angle, scaleFactor)
+        val second = csf.getCoords(first.position, Math.PI + bearing, scaleFactor)
+        val third = csf.getCoords(first.position, Math.PI + bearing + angle, scaleFactor)
 
-        val points = listOf(first, second, third, first).map{csf.findControlSiteNear(it, 50.0)}
-        val resp = csf.routeRequest(GHRequest( points ))
+        val points = listOf(first.position, second, third, first.position).map{csf.findControlSiteNear(it, 50.0)}
+        val resp = csf.routeRequest(points)
 
         val pointList = resp.best.points
         val numPoints = pointList.size
 
-        val controls = (1..requestedNumControls).map{ pointList.get( it * (numPoints/requestedNumControls - 1)) }
+        val controls = (1..requestedNumControls).map{
+            val position = pointList.get( it * (numPoints/requestedNumControls - 1))
+            ControlSite(position, "")
+        }
 
         return TSP(csf).run(listOf(first) + controls + first)
     }
@@ -103,29 +96,29 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
             fitter.getForEnvelope(env) != null
 
 
-    private fun generateControls(numControls: Int, distance: Double, env: Envelope): List<GHPoint> {
-
-        val bearing = csf.randomBearing
-        val angle = (2 * Math.PI) / numControls
-
-        val envCentre = GHPoint(env.centre().y, env.centre().x)
-
-        // if the env is really small (only a start perhaps)
-        // treat it as being on the radius of the circle
-        // otherwise buildFrom an initial circle around its centre
-        val w = dist2d.calcDist(env.minY, env.minX, env.maxY, env.maxX)
-
-        val fudgeFactor = 5.0 / numControls
-        val radius = fudgeFactor * distance / (2 * Math.PI)
-        val circleCentre = when {
-            w < 1000 -> csf.getCoords(envCentre, Math.PI + bearing, radius)
-            else -> envCentre
-        }
-
-        val positions = (1..numControls).map { num ->
-            csf.getCoords(circleCentre, (num * angle) + bearing, radius)
-        }
-        return positions.map { csf.findControlSiteNear(it, radius / 5.0) }
-    }
-
+//    private fun generateControls(numControls: Int, distance: Double, env: Envelope): List<GHPoint> {
+//
+//        val bearing = csf.randomBearing
+//        val angle = (2 * Math.PI) / numControls
+//
+//        val envCentre = GHPoint(env.centre().y, env.centre().x)
+//
+//        // if the env is really small (only a start perhaps)
+//        // treat it as being on the radius of the circle
+//        // otherwise buildFrom an initial circle around its centre
+//        val w = dist2d.calcDist(env.minY, env.minX, env.maxY, env.maxX)
+//
+//        val fudgeFactor = 5.0 / numControls
+//        val radius = fudgeFactor * distance / (2 * Math.PI)
+//        val circleCentre = when {
+//            w < 1000 -> csf.getCoords(envCentre, Math.PI + bearing, radius)
+//            else -> envCentre
+//        }
+//
+//        val positions = (1..numControls).map { num ->
+//            csf.getCoords(circleCentre, (num * angle) + bearing, radius)
+//        }
+//        return positions.map { csf.findControlSiteNear(it, radius / 5.0) }
+//    }
+//
 }

@@ -27,17 +27,27 @@ package org.osmosys.mapping
 
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
-import org.osmosys.improvers.dist2d
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.font.PDFont
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState
+import org.osmosys.ControlSite
+import org.osmosys.improvers.dist2d
+import org.vandeseer.easytable.TableDrawer
+import org.vandeseer.easytable.settings.HorizontalAlignment
+import org.vandeseer.easytable.structure.Row
+import org.vandeseer.easytable.structure.Table
+import org.vandeseer.easytable.structure.cell.CellText
 import java.awt.Color
 import java.io.File
 import java.io.InputStream
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class MapDecorator {
@@ -47,7 +57,7 @@ class MapDecorator {
     private val font: PDFont = PDType1Font.HELVETICA_BOLD
 
 
-    fun decorate(pdfStream: InputStream, controls: List<GHPoint>, outFile: File, box: MapBox, centre: Coordinate) {
+    fun decorate(pdfStream: InputStream, controls: List<ControlSite>, outFile: File, box: MapBox, centre: Coordinate) {
 
         val doc = PDDocument.load(pdfStream)
         val page: PDPage = doc.documentCatalog.pages.get(0)
@@ -92,6 +102,38 @@ class MapDecorator {
 
         content.close()
 
+        val page2 = PDPage(PDRectangle.A4)
+        doc.addPage(page2)
+
+            val content2 = PDPageContentStream(doc, page2, PDPageContentStream.AppendMode.APPEND, true, true)
+            val tableBuilder = Table.builder()
+                    .addColumnsOfWidth(60.0f, 100.0f)
+                    .addRow(Row.builder()
+                            .add(CellText.builder().text("Control").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
+                            .add(CellText.builder().text("Description").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
+                            .build())
+            controls.forEachIndexed { idx, control ->
+                val ctrl = when (idx) {
+                    0 -> "Start"
+                    controls.size - 1 -> "Finish"
+                    else -> idx.toString()
+                }
+
+                tableBuilder.addRow(Row.builder()
+                        .add(CellText.builder().text(ctrl).borderWidth(1.0f).horizontalAlignment(HorizontalAlignment.RIGHT).build())
+                        .add(CellText.builder().text(control.description).borderWidth(1.0f).build())
+                        .build())
+            }
+            val table = tableBuilder.build()
+            val tableDrawer = TableDrawer.builder()
+                    .contentStream(content2)
+                    .startX(20f)
+                    .startY(page2.mediaBox.upperRightY - 20f)
+                    .table(table)
+                    .build();
+            tableDrawer.draw()
+            content2.close()
+
         return doc.save(outFile)
 
     }
@@ -101,10 +143,10 @@ class MapDecorator {
         offsetsInPts.windowed(2).forEach { drawLine(content, it) }
     }
 
-    private fun getControlOffsets(controls: List<GHPoint>, mapCentre: GHPoint, box: MapBox, centrePage: Pair<Float, Float>): List<Pair<Float, Float>> {
+    private fun getControlOffsets(controls: List<ControlSite>, mapCentre: GHPoint, box: MapBox, centrePage: Pair<Float, Float>): List<Pair<Float, Float>> {
         val offsetsInMetres = controls.map { control ->
-            val distLat = dist2d.calcDist(control.lat, mapCentre.lon, mapCentre.lat, mapCentre.lon) * if (control.lat < mapCentre.lat) -1.0 else 1.0
-            val distLon = dist2d.calcDist(mapCentre.lat, control.lon, mapCentre.lat, mapCentre.lon) * if (control.lon < mapCentre.lon) -1.0 else 1.0
+            val distLat = dist2d.calcDist(control.position.lat, mapCentre.lon, mapCentre.lat, mapCentre.lon) * if (control.position.lat < mapCentre.lat) -1.0 else 1.0
+            val distLon = dist2d.calcDist(mapCentre.lat, control.position.lon, mapCentre.lat, mapCentre.lon) * if (control.position.lon < mapCentre.lon) -1.0 else 1.0
             Pair(distLon.toFloat(), distLat.toFloat()) //dists in m from the centre
         }
 

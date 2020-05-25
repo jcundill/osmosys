@@ -57,7 +57,7 @@ class MainIT {
 
     @Test
     fun overpasserTest() {
-        osmosys.findFurniture(GHPoint(53.222600, -1.449538))
+        osmosys.findFurniture(ControlSite(53.222600, -1.449538))
     }
 
     @Test
@@ -116,14 +116,7 @@ class MainIT {
 
     private fun printControls(course: Course) {
       course.controls.forEachIndexed {idx, it ->
-            val fd = osmosys.describe(it)
-          if(fd == null) {
-              val ctrl = course.controls[idx]
-            val instruction = course.route.instructions.find(ctrl.lat, ctrl.lon, 10.0)
-              if( instruction != null) {
-                  println("$idx = ${instruction.name}")
-              } else println("$idx = ???????")
-          } else println("$idx = $fd")
+            println("$idx = ${it.description}")
         }
     }
 

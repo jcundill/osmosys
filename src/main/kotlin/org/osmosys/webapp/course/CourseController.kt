@@ -26,9 +26,12 @@
 package org.osmosys.webapp.course
 
 import com.graphhopper.util.shapes.GHPoint
+import org.osmosys.ControlSite
 import org.osmosys.Course
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 typealias LatLon = Array<Double>
 
@@ -46,7 +49,7 @@ class CourseController {
 
         val initialControls = latlons.split("|")
                 .map { it.split(",")}
-                .map{ s -> GHPoint(s.first().toDouble(), s.last().toDouble())}
+                .map{ s -> ControlSite(s.first().toDouble(), s.last().toDouble()) }
 
         val initialCourse = Course(
                 requestedDistance = distance?.toDouble(),
