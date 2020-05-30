@@ -23,40 +23,34 @@
  *
  */
 
-package org.osmosys.furniture
+package org.osmosys.csv
 
-import de.westnordost.osmapi.map.data.LatLon
-import de.westnordost.osmapi.map.data.Node
-import de.westnordost.osmapi.map.data.Way
+import org.osmosys.Course
+import java.io.File
+import java.math.BigDecimal
+import java.math.RoundingMode
 
-class StreetFurniture {
-
-    val lat: Double
-    val lon: Double
-    val description: String
-
-    constructor(node: Node) {
-        lat = node.position.latitude
-        lon = node.position.longitude
-        description = when {
-            node.tags["tourism"] != null -> node.tags["tourism"]
-            node.tags["highway"] != null -> node.tags["highway"]
-            node.tags["amenity"] != null -> node.tags["amenity"]
-            node.tags["natural"] != null -> node.tags["natural"]
-            node.tags["barrier"] != null -> node.tags["barrier"]
-            else -> "unknown"
-        }!!
-    }
-    constructor(way: Way, loc: LatLon)  {
-        lat = loc.latitude
-        lon = loc.longitude
-        description = when {
-            way.tags["highway"] == "steps" -> "steps"
-            way.tags["bridge"] == "yes" -> "bridge"
-            way.tags["barrier"] == "hedge" -> "hedge"
-            else -> "unknown"
+class ScoreWriter {
+    fun writeScores(course: Course, filename: String) {
+        with(File(filename)) {
+            with(course) {
+                val featureList = featureScores.keys.toList()
+                val titles = getTitles(featureList) + "\n"
+                val legs = (1 until controls.size).map{
+                    getLegDetails(it, legScores[it-1], featureList, featureScores)
+                }
+                writeText( titles + legs.joinToString("\n"))
+            }
         }
-
     }
+    private fun getLegDetails(leg: Int, score: Double, featureList: List<String>, featureScores: Map<String, List<Double>>): String {
+        return (listOf("$leg", "${scoreFormatter(score)}") + featureList.map { f -> scoreFormatter((featureScores[f] ?: error(""))[leg-1])}).joinToString()
+    }
+
+    private fun getTitles(features: List<String>): String {
+        return (listOf("Leg","Score") + features).joinToString()
+    }
+
+    private fun scoreFormatter(it: Double) = BigDecimal(1.0 - it).setScale(2, RoundingMode.HALF_EVEN)
 
 }

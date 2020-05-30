@@ -25,7 +25,6 @@
 
 package org.osmosys
 
-import com.graphhopper.GHRequest
 import org.osmosys.annealing.Problem
 import org.osmosys.constraints.CourseConstraint
 
@@ -39,7 +38,7 @@ class CourseFinder(
 
     override fun energy(searchState: CourseImprover): Double {
         with(searchState) {
-            val courseRoute = csf.routeRequest(GHRequest(course.controls))
+            val courseRoute = csf.routeRequest(course.controls)
             course.route = courseRoute.best
             val score =
                     if (constraints.any { !it.valid(courseRoute) }) 10000.0

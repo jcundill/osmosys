@@ -27,35 +27,18 @@ package org.osmosys.furniture
 
 import com.graphhopper.util.shapes.BBox
 import de.westnordost.osmapi.OsmConnection
-import de.westnordost.osmapi.map.data.*
-import de.westnordost.osmapi.overpass.MapDataWithGeometryHandler
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
+import org.osmosys.ControlSite
 
 class StreetFurnitureFinder {
-    fun findForBoundingBox(box: BBox): List<StreetFurniture> {
-        val locations = mutableListOf<StreetFurniture>()
 
-        class MyMapDataHandler: MapDataWithGeometryHandler {
-            override fun handle(bounds: BoundingBox) {}
 
-            override fun handle(node: Node) {
-                if( !node.isDeleted) {
-                    val sf = StreetFurniture(node)
-                    locations.add(sf)
-                }
-            }
+    fun findForBoundingBox(box: BBox): List<ControlSite> {
+        val locations = mutableListOf<ControlSite>()
 
-            override fun handle(way: Way, bounds: BoundingBox, geometry: MutableList<LatLon>) {
-                locations.add(StreetFurniture(way, geometry.first()))
-                locations.add(StreetFurniture(way, geometry.last()))
-            }
-
-            override fun handle(relation: Relation, bounds: BoundingBox, nodeGeometries: MutableMap<Long, LatLon>, wayGeometries: MutableMap<Long, MutableList<LatLon>>) {}
-
-        }
-        val connection = OsmConnection("https://overpass-api.de/api/", "my user agent")
+        val connection = OsmConnection("https://overpass-api.de/api/", "osmosys")
         val overpass = OverpassMapDataDao(connection)
-        val handler = MyMapDataHandler()
+        val handler = StreetFurnitureMapDataHandler(locations)
         val bbox = "${box.minLat},${box.minLon},${box.maxLat},${box.maxLon}"
         val q = """
             (
@@ -93,10 +76,7 @@ class StreetFurnitureFinder {
                 <;); out body geom;
 """.trimIndent()
 
-
-        overpass.queryElementsWithGeometry(q,
-                handler
-        );
-    return locations
+        overpass.queryElementsWithGeometry(q, handler)
+        return locations
     }
 }

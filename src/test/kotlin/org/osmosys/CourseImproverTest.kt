@@ -45,8 +45,8 @@ internal class CourseImproverTest {
     lateinit var improver: CourseImprover
     lateinit var mockRoutingResponse: GHResponse
 
-    val replacedPoint = GHPoint(100.0, 100.0)
-    val controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5))
+    val replacedPoint = ControlSite(100.0, 100.0)
+    val controls = listOf(ControlSite(1.0, 2.0), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5))
     val course = Course(controls = controls)
 
 
@@ -55,7 +55,7 @@ internal class CourseImproverTest {
         csf = mockkClass(ControlSiteFinder::class)
         mockRoutingResponse = mockkClass(GHResponse::class)
 
-        every { csf.routeRequest(any(), any()) } returns mockRoutingResponse
+        every { csf.routeRequest(controls = any()) } returns mockRoutingResponse
         every { csf.findAlternativeControlSiteFor(any()) } returns replacedPoint
 
     }
@@ -73,7 +73,7 @@ internal class CourseImproverTest {
 
     @Test
     fun hashCodeWorksDifferent() {
-        val course2 = Course(controls = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5)))
+        val course2 = Course(controls = listOf(ControlSite(1.0, 2.0), ControlSite(2.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5)))
         val improver2 = CourseImprover(csf, course2)
         assertNotEquals(improver.hashCode(), improver2.hashCode())
     }
@@ -86,7 +86,7 @@ internal class CourseImproverTest {
 
     @Test
     fun equalsWorksDifferent() {
-        val course2 = Course(controls = listOf(GHPoint(1.0, 2.0), GHPoint(2.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5)))
+        val course2 = Course(controls = listOf(ControlSite(1.0, 2.0), ControlSite(2.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5)))
         val improver2 = CourseImprover(csf, course2)
         assertNotEquals(improver, improver2)
     }

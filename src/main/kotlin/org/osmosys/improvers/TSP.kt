@@ -25,9 +25,9 @@
 
 package org.osmosys.improvers
 
-import com.graphhopper.GHRequest
 import com.graphhopper.util.DistancePlaneProjection
 import com.graphhopper.util.shapes.GHPoint
+import org.osmosys.ControlSite
 import org.osmosys.ControlSiteFinder
 import org.osmosys.annealing.LinearDecayScheduler
 import org.osmosys.annealing.Problem
@@ -48,21 +48,21 @@ fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, 
 
 class TSP(private val csf: ControlSiteFinder) {
 
-    private fun sensitivity(numControls: Int) : Int = (4000 * numControls / 10.0).roundToInt()
-    fun courseDistance(points: List<GHPoint>): Double {
+    private fun sensitivity(numControls: Int) : Int = (10000 * numControls / 10.0).roundToInt()
+    private fun courseDistance(points: List<ControlSite>): Double {
         return points.windowed(2, 1, false).fold(0.0) { acc, curr ->
-            acc + dist(curr[0], curr[1])
+            acc + dist(curr[0].position, curr[1].position)
         }
     }
 
-    fun run(points: List<GHPoint>): List<GHPoint> {
+    fun run(points: List<ControlSite>): List<ControlSite> {
         val steps =  sensitivity(points.size)
         val solver = Solver(TSProblem(this::courseDistance, points), LinearDecayScheduler(courseDistance(points), steps))
         val solution = solver.solve()
         return solution.points
     }
 
-    class TSProblem(val courseDistance :(List<GHPoint>)->Double, val points: List<GHPoint>) : Problem<RouteImprover> {
+    class TSProblem(val courseDistance :(List<ControlSite>)->Double, val points: List<ControlSite>) : Problem<RouteImprover> {
 
 
         override fun energy(searchState: RouteImprover): Double = courseDistance(searchState.points)
@@ -71,7 +71,7 @@ class TSP(private val csf: ControlSiteFinder) {
         override fun initialState(): RouteImprover = RouteImprover(points)
     }
 
-    class RouteImprover(val points: List<GHPoint>) : SearchState<RouteImprover> {
+    class RouteImprover(val points: List<ControlSite>) : SearchState<RouteImprover> {
         private fun idxSeq() = generateSequence { 1 + (rnd.nextDouble() * (points.size - 3)).toInt() }.asSequence()
 
         override fun step(): RouteImprover {
@@ -86,7 +86,7 @@ class TSP(private val csf: ControlSiteFinder) {
             return Pair(a, b)
         }
 
-        private fun swap(list: List<GHPoint>, pair: Pair<Int, Int>): List<GHPoint> {
+        private fun swap(list: List<ControlSite>, pair: Pair<Int, Int>): List<ControlSite> {
             val first = list[pair.first]
             val second = list[pair.second]
             val array = list.toTypedArray()

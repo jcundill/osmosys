@@ -32,12 +32,10 @@ import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.annealing.ExponentialDecayScheduler
 import org.osmosys.annealing.InfeasibleProblemException
-import org.osmosys.annealing.LinearDecayScheduler
 import org.osmosys.annealing.Solver
 import org.osmosys.constraints.CourseLengthConstraint
 import org.osmosys.constraints.IsRouteableConstraint
 import org.osmosys.constraints.PrintableOnMapConstraint
-import org.osmosys.furniture.StreetFurniture
 import org.osmosys.furniture.StreetFurnitureFinder
 import org.osmosys.mapping.MapFitter
 import org.osmosys.scorers.*
@@ -60,23 +58,23 @@ class Osmosys(db: String) {
     private val scorer = CourseScorer(featureScorers, csf::findRoutes)
     private val seeder = CourseSeeder(csf)
     private val fitter = MapFitter()
+    private val finder = StreetFurnitureFinder()
 
     fun makeProblem(initialCourse: Course): CourseFinder {
-        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
+        findFurniture(initialCourse.controls[0])
 
-         seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
+        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
+        seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
 
         val constraints = listOf(
                 IsRouteableConstraint(),
                 CourseLengthConstraint(initialCourse.distance()),
                 PrintableOnMapConstraint(fitter)
         )
-
         return CourseFinder(csf, constraints, scorer, seededCourse)
     }
 
     fun findCourse(problem: CourseFinder, iterations: Int = 1000): Course? {
-
         val solver = Solver(problem, ExponentialDecayScheduler(1000.0, iterations))
         return try {
             solver.solve().course
@@ -86,13 +84,12 @@ class Osmosys(db: String) {
         }
     }
 
-    fun findBestRoute(controls: List<GHPoint>): PathWrapper = csf.routeRequest(GHRequest(controls)).best
+    fun findBestRoute(controls: List<ControlSite>): PathWrapper = csf.routeRequest(controls).best
 
 
-    fun getEnvelopeForProbableRoutes(controls: List<GHPoint>): Envelope {
+    fun getEnvelopeForProbableRoutes(controls: List<ControlSite>): Envelope {
         val routes = controls.windowed(2).flatMap {
-            val req = GHRequest(it.first(), it.last())
-            csf.routeRequest(req, 3).all
+            csf.routeRequest(it, 3).all
         }
 
         val env = Envelope()
@@ -101,7 +98,7 @@ class Osmosys(db: String) {
     }
 
     fun score(course: Course): Course {
-        val route = csf.routeRequest(GHRequest(course.controls))
+        val route = csf.routeRequest(course.controls)
         course.route = route.best
         scorer.score(course)
         return course
@@ -113,15 +110,11 @@ class Osmosys(db: String) {
         return leg.all.map{  Pair(it.distance, it.points.toList()) }
     }
 
-    fun findFurniture(start: GHPoint) {
+    fun findFurniture(start: ControlSite) {
         val scaleFactor = 5000.0
-        val max = csf.getCoords(start, Math.PI * 0.25, scaleFactor)
-        val min = csf.getCoords(start, Math.PI * 1.25, scaleFactor)
+        val max = csf.getCoords(start.position, Math.PI * 0.25, scaleFactor)
+        val min = csf.getCoords(start.position, Math.PI * 1.25, scaleFactor)
         val bbox = BBox(min.lon, max.lon, min.lat, max.lat)
-        val finder = StreetFurnitureFinder()
-        val sf = finder.findForBoundingBox(bbox)
-        csf.furniture = sf
+        csf.furniture = finder.findForBoundingBox(bbox)
     }
-
-    fun describe(point: GHPoint): String? = csf.findDescriptionFor(point)
 }

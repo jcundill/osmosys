@@ -27,7 +27,6 @@ package org.osmosys
 
 import com.graphhopper.GHResponse
 import com.graphhopper.util.PointList
-import com.graphhopper.util.shapes.GHPoint
 import io.mockk.every
 import io.mockk.mockkClass
 import org.osmosys.scorers.LegScorer
@@ -52,7 +51,7 @@ internal class CourseScorerTest {
     fun beforeAll() {
         csf = mockkClass(ControlSiteFinder::class)
         mockResponse = mockkClass(GHResponse::class)
-        every { csf.routeRequest(any(), any()) } returns mockResponse
+        every { csf.routeRequest(controls = any()) } returns mockResponse
         mockFS1 = mockkClass(LegScorer::class)
         mockFS2 = mockkClass(LegScorer::class)
         mockFS3 = mockkClass(LegScorer::class)
@@ -67,7 +66,7 @@ internal class CourseScorerTest {
 
     @BeforeEach
     fun setUp() {
-        course = Course(controls = listOf(GHPoint(1.0, 2.0), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5), GHPoint(1.5, 2.5)))
+        course = Course(controls = listOf(ControlSite(1.0, 2.0), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5)))
         course.route = mockRoute.best
         step = CourseImprover(csf, course)
         scorer = CourseScorer(listOf(mockFS1, mockFS2, mockFS3), csf::findRoutes)

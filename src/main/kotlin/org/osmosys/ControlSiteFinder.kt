@@ -34,7 +34,6 @@ import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
-import org.osmosys.furniture.StreetFurniture
 import org.osmosys.improvers.dist
 import org.osmosys.mapping.MapBox
 import java.lang.Math.toDegrees
@@ -47,7 +46,7 @@ import kotlin.math.*
  */
 class ControlSiteFinder(private val gh: GraphHopper) {
 
-    var furniture: List<StreetFurniture> = emptyList()
+    var furniture: List<ControlSite> = emptyList()
     private val filter =  DefaultEdgeFilter.allEdges(gh.encodingManager.getEncoder("orienteering"))
 
     private val env = Envelope()
@@ -57,7 +56,7 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     var miss = 0
 
 
-    fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): GHPoint {
+    fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): ControlSite {
         var node = findNearestControlSiteTo(getCoords(point, randomBearing, distance))
         while (node == null) {
             node = findNearestControlSiteTo(getCoords(point, randomBearing, distance + ((rnd.nextDouble() - 0.5) * distance)))
@@ -65,13 +64,18 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         return node
     }
 
-    fun findAlternativeControlSiteFor(point: GHPoint, distance: Double = 500.0): GHPoint {
-        var node = findNearestControlSiteTo(getCoords(point, randomBearing, rnd.nextDouble() * distance))
+    fun findAlternativeControlSiteFor(point: ControlSite, distance: Double = 500.0): ControlSite {
+        var node = findNearestControlSiteTo(getCoords(point.position, randomBearing, rnd.nextDouble() * distance))
         while (node == null || node == point) {
-            node = findNearestControlSiteTo(getCoords(point, randomBearing, rnd.nextDouble() * distance))
+            node = findNearestControlSiteTo(getCoords(point.position, randomBearing, rnd.nextDouble() * distance))
 
         }
         return node
+    }
+
+    fun routeRequest(controls: List<ControlSite>, numAlternatives: Int = 0): GHResponse {
+        val req = GHRequest(controls.map { it.position })
+        return routeRequest(req, numAlternatives)
     }
 
     fun routeRequest(req: GHRequest, numAlternatives: Int = 0): GHResponse {
@@ -106,9 +110,28 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     }
 
 
-    fun findNearestControlSiteTo(p: GHPoint): GHPoint? {
+    fun findNearestControlSiteTo(p: GHPoint): ControlSite? {
+        return when (val loc = findClosestStreetLocation(p)) {
+            null -> null
+            else -> {
+                // have we got nearby furniture - if so always use that
+                val f = findLocalStreetFurniture(loc, 50.0)
+                if (f != null) f
+                else {
+                    val isTower = gh.locationIndex.findClosest(loc.lat, loc.lon, filter).snappedPosition == QueryResult.Position.TOWER
+                    val desc = if (isTower) "junction" else "bend"
+                    ControlSite(loc.lat, loc.lon, desc)
+                }
+            }
+        }
+    }
+
+    private fun findLocalStreetFurniture(p: GHPoint, distance: Double = 20.0) =
+            furniture.find { dist(it.position, p) < distance }
+
+    private fun findClosestStreetLocation(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)
-        val ret = when {
+        return when {
             !qr.isValid -> null
             qr.snappedPosition == QueryResult.Position.EDGE -> {
                 val pl = qr.closestEdge.fetchWayGeometry(3)
@@ -118,22 +141,6 @@ class ControlSiteFinder(private val gh: GraphHopper) {
                 }
             }
             else -> qr.snappedPoint
-        }
-        if(furniture.isNotEmpty()) {
-            val f = furniture.find { dist(GHPoint(it.lat, it.lon), p) < 100.0 }
-        }
-            return when {
-                ret != null -> {
-                    val loc = GHPoint(ret.lat, ret.lon)
-                    val f = furniture.find { dist(GHPoint(it.lat, it.lon), loc) < 50.0 }
-                    return if( f != null ) GHPoint(f.lat, f.lon) else loc
-                }
-                else -> null
-            }
-
-            return when {
-            ret != null -> GHPoint(ret.lat, ret.lon)
-            else -> null
         }
     }
 
@@ -160,10 +167,4 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         points.forEach { env.expandToInclude(it.lon, it.lat) }
         return possibleBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
     }
-
-    fun findDescriptionFor(point: GHPoint): String? {
-        return furniture.find { it.lat == point.lat && it.lon == point.lon}?.description
-    }
-
-
 }

@@ -25,7 +25,7 @@
 
 package org.osmosys.maprun
 
-import com.graphhopper.util.shapes.GHPoint
+import org.osmosys.ControlSite
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
@@ -36,22 +36,22 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
 class KmlWriter {
-    private fun getStartKML(control: GHPoint): String = getKML(control, "S1")
-    private fun getFinishKML(control: GHPoint): String = getKML(control, "F1")
-    private fun getControlKML(control: GHPoint, num: Int): String = getKML(control, num.toString())
+    private fun getStartKML(control: ControlSite): String = getKML(control, "S1")
+    private fun getFinishKML(control: ControlSite): String = getKML(control, "F1")
+    private fun getControlKML(control: ControlSite, num: Int): String = getKML(control, num.toString())
 
-    private fun getKML(control: GHPoint, name: String): String =
+    private fun getKML(control: ControlSite, name: String): String =
             """<Placemark>
             |        <name>$name</name>
             |        <styleUrl>#startfinish</styleUrl>
             |        <Point>
             |            <gx:drawOrder>1</gx:drawOrder>
-            |            <coordinates>${control.lon},${control.lat},0</coordinates>
+            |            <coordinates>${control.position.lon},${control.position.lat},0</coordinates>
             |        </Point>
             |</Placemark>""".trimMargin()
 
 
-    fun readFile(kmlFile: String): List<GHPoint>
+    fun readFile(kmlFile: String): List<ControlSite>
     {
         val xmlFile = File(kmlFile)
         val dbFactory = DocumentBuilderFactory.newInstance()
@@ -64,7 +64,7 @@ class KmlWriter {
         //<item type="T1" count="1">Value1</item>
         val xpath = "//Placemark"
 
-        val map = HashMap<Int, GHPoint>()
+        val map = HashMap<Int, ControlSite>()
         val markers = xPath.evaluate(xpath, doc, XPathConstants.NODESET) as NodeList
         for( i in 0 until markers.length) {
             val node = markers.item(i) as Element
@@ -72,7 +72,7 @@ class KmlWriter {
             val point = node.getElementsByTagName("Point").item(0) as Element
             val coords = (point.getElementsByTagName("coordinates").item(0) as Element).textContent
             val x = coords.split(",")
-            val pt = GHPoint(x[1].toDouble(), x[0].toDouble())
+            val pt = ControlSite(x[1].toDouble(), x[0].toDouble())
             val num = when (name) {
                 "S1" -> 0
                 "F1" -> i
@@ -85,7 +85,7 @@ class KmlWriter {
     }
 
 
-    fun generate(controls: List<GHPoint>, mapID: String): String
+    fun generate(controls: List<ControlSite>, mapID: String): String
     {
         var kml = ""
 

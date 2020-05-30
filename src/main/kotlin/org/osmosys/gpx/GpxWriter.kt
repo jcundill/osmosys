@@ -26,12 +26,13 @@
 package org.osmosys.gpx
 
 import com.graphhopper.util.shapes.GHPoint
-import org.osmosys.Course
 import org.alternativevision.gpx.GPXParser
 import org.alternativevision.gpx.beans.GPX
 import org.alternativevision.gpx.beans.Route
 import org.alternativevision.gpx.beans.Track
 import org.alternativevision.gpx.beans.Waypoint
+import org.osmosys.ControlSite
+import org.osmosys.Course
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -43,7 +44,7 @@ import java.text.DecimalFormat
  */
 class GpxWriter {
 
-    fun readFromFile(filename: String): List<GHPoint> {
+    fun readFromFile(filename: String): List<ControlSite> {
 
         val fis = FileInputStream(filename)
         val parser = GPXParser()
@@ -51,7 +52,7 @@ class GpxWriter {
 
         fis.close()
         val route = gpx.routes.toList()[0]
-        return route.routePoints.map { wpt -> GHPoint(wpt.latitude, wpt.longitude) }
+        return route.routePoints.map { wpt -> ControlSite(wpt.latitude, wpt.longitude) }
     }
 
     fun writeToFile(course: Course, filename: String, labels: List<String> = emptyList()) {
@@ -75,8 +76,8 @@ class GpxWriter {
 
         course.controls.forEachIndexed { idx, pt ->
             val wp = Waypoint().apply {
-                latitude = pt.lat
-                longitude = pt.lon
+                latitude = pt.position.lat
+                longitude = pt.position.lon
                 name = when (idx) {
                     0 -> "Start"
                     course.controls.size - 1 -> "Start"

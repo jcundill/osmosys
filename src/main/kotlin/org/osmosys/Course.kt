@@ -44,7 +44,7 @@ fun String.toGHPoint(): GHPoint? {
 data class Course(
         val requestedDistance: Double? = null,
         val requestedNumControls: Int = 6,
-        val controls: List<GHPoint> = emptyList()) {
+        val controls: List<ControlSite> = emptyList()) {
 
     lateinit var legScores: List<Double>
     lateinit var featureScores: Map<String, List<Double>>
@@ -68,7 +68,7 @@ data class Course(
                 null -> emptyList()
                 else -> waypoints.split("|").map {
                     val latlon = it.split(",").map {s -> s.trim().toDouble()}
-                    GHPoint(latlon.first(), latlon.last())
+                    ControlSite(latlon.first(), latlon.last(),"_initial_")
                 }
             }
 

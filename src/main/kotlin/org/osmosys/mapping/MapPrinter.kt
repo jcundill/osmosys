@@ -25,13 +25,13 @@
 
 package org.osmosys.mapping
 
-import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Coordinate
 import com.vividsolutions.jts.geom.Geometry
 import org.geotools.geometry.jts.JTS
 import org.geotools.geometry.jts.JTSFactoryFinder
 import org.geotools.referencing.CRS
 import org.opengis.referencing.crs.CoordinateReferenceSystem
+import org.osmosys.ControlSite
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -55,7 +55,7 @@ class MapPrinter {
         return JTS.transform(pointInWgs84Web, wgs84ToWgs84Web)
     }
 
-    fun generateMapFiles(filename: String, title: String, controls: List<GHPoint>, centre: Coordinate, box: MapBox, descriptions: List<String> = emptyList()) {
+    fun generateMapFiles(filename: String, title: String, controls: List<ControlSite>, centre: Coordinate, box: MapBox) {
         val orientationString = if (box.landscape) "0.297,0.21" else "0.21,0.297"
         val mapCentre = convertBack(centre.x, centre.y).coordinate
 
@@ -64,13 +64,13 @@ class MapPrinter {
         val id = requestKey()
 
         // https://tiler4.oobrien.com/pdf/?style=streeto|paper=0.29700000000000004,0.21000000000000002|scale=10000|centre=6981466,-133774|title=OpenOrienteeringMap|club=|id=5dcfc371bcc02|start=|crosses=|cps=|controls=
-        generateArtifact("pdf", orientationString, box, centreLat, centreLon, title, id, controls, filename, centre, descriptions)
-        generateArtifact("kmz", orientationString, box, centreLat, centreLon, title, id, controls, filename, centre, descriptions)
+        generateArtifact("pdf", orientationString, box, centreLat, centreLon, title, id, controls, filename, centre)
+        generateArtifact("kmz", orientationString, box, centreLat, centreLon, title, id, controls, filename, centre)
         //generateArtifact("jgw", orientationString, box, centreLat, centreLon, title, id, controls, filename, centre, descriptions)
 
     }
 
-    private fun generateArtifact(mapType: String, orientationString: String, box: MapBox, centreLat: Int, centreLon: Int, title: String, id: String, controls: List<GHPoint>, filename: String, centre: Coordinate, descriptions:List<String>) {
+    private fun generateArtifact(mapType: String, orientationString: String, box: MapBox, centreLat: Int, centreLon: Int, title: String, id: String, controls: List<ControlSite>, filename: String, centre: Coordinate) {
         val url = "https://tiler4.oobrien.com/$mapType/?style=streeto|" +
                 "paper=$orientationString" +
                 "|scale=${box.scale}" +

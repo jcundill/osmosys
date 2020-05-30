@@ -39,7 +39,9 @@ class LastControlNearTheFinishScorer(override val weighting: Double = 1.0) : Leg
 
         return List(routedLegs.size - 1) { 0.0 } + when {
             lastLegLength < 50.0 -> 1.0 // way too short
-            lastLegLength < avLegLength / 2 -> 0.0 // all is good
+            lastLegLength < avLegLength * 0.5 -> 0.0 // all is good
+            lastLegLength < avLegLength * 0.75 -> 0.25 // all is fairly good
+            lastLegLength < avLegLength -> 0.5 // all is acceptable
             else -> 1.0 // last is bad
         }
     }
