@@ -29,6 +29,7 @@ import com.graphhopper.util.shapes.GHPoint
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.osmosys.csv.ScoreWriter
 import org.osmosys.gpx.GpxWriter
 import org.osmosys.mapping.MapFitter
 import org.osmosys.mapping.MapPrinter
@@ -43,6 +44,7 @@ import java.util.*
 class MainIT {
     private val gpxWriter = GpxWriter()
     private val kmlWriter = KmlWriter()
+    private val scoreWriter = ScoreWriter()
     private val mapPrinter = MapPrinter()
     private val fitter = MapFitter()
 
@@ -62,13 +64,17 @@ class MainIT {
 
     @Test
     fun courseFromKml() {
-        val initialCourse = Course.buildFromKml("Map-1588865743205.kml")
+        val initialCourse = Course.buildFromKml("Map-1590429897887.kml")
         val course = osmosys.score(initialCourse)
-        printStats(course)
-        val problem = osmosys.makeProblem(course)
-        val newCourse = osmosys.findCourse(problem, 1000)
-        if (newCourse != null )
-            printStats(newCourse)
+        val timestamp = Date().time
+        printStats(course, timestamp)
+        XprintStats(course)
+//        val problem = osmosys.makeProblem(course)
+//        val newCourse = osmosys.findCourse(problem, 1000)
+//        if (newCourse != null ) {
+//            printStats(newCourse, timestamp)
+//            printMap(newCourse, Date().time)
+//        }
 
     }
 
@@ -76,7 +82,8 @@ class MainIT {
     fun kmlFromGpx() {
         val initialCourse = Course.buildFromGPX("Map-1588589961836.gpx")
         val course = osmosys.score(initialCourse)
-        printStats(course)
+        val timestamp = Date().time
+        printStats(course, timestamp)
         val kml = kmlWriter.generate(initialCourse.controls, "mapName")
         File("out.kml").writeText(kml)
     }
@@ -88,7 +95,6 @@ class MainIT {
 
         val initialCourse = Course.buildFromProperties(props)
         //val params = Course.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
-        osmosys.findFurniture(initialCourse.controls[0])
         val problem = osmosys.makeProblem(initialCourse)
         val solution = osmosys.findCourse(problem, 1000)
 
@@ -97,7 +103,7 @@ class MainIT {
             gpxWriter.writeToFile(solution, "Map-$timestamp.gpx")
 
             printMap(solution, timestamp)
-            printStats(solution)
+            printStats(solution, timestamp)
             printControls(solution)
         }
     }
@@ -120,19 +126,19 @@ class MainIT {
         }
     }
 
-    private fun printStats(course: Course) {
+    private fun printStats(course: Course, timestamp: Long) {
+        scoreWriter.writeScores(course, "Map-$timestamp.csv")
+    }
+
+    private fun XprintStats(course: Course) {
         with(course) {
             println()
             println(route.distance)
             println(controls.size)
             println("Energy: $energy")
-            println("${"Leg = ".padStart(43)}${(1 until controls.size).map{ it.toString().padStart(4)}}")
-            println("${"Scores = ".padStart(43)}${legScores.map { scoreFormatter(it) }}")
-            featureScores.forEach { println("${it.key.padStart(40)} = ${it.value.map { scoreFormatter(it)}}") }
-        }
+         }
     }
 
-    private fun scoreFormatter(it: Double) = BigDecimal(it).setScale(2, RoundingMode.HALF_EVEN)
 
     private fun generateAppInput(controls: List<GHPoint>): List<String> {
         return controls.map { "${it.lat.toFloat()},${it.lon.toFloat()}" }

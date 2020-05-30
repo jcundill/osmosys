@@ -48,7 +48,7 @@ fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, 
 
 class TSP(private val csf: ControlSiteFinder) {
 
-    private fun sensitivity(numControls: Int) : Int = (4000 * numControls / 10.0).roundToInt()
+    private fun sensitivity(numControls: Int) : Int = (10000 * numControls / 10.0).roundToInt()
     private fun courseDistance(points: List<ControlSite>): Double {
         return points.windowed(2, 1, false).fold(0.0) { acc, curr ->
             acc + dist(curr[0].position, curr[1].position)

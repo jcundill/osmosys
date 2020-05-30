@@ -33,7 +33,6 @@ import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
 import com.graphhopper.util.shapes.GHPoint
-import com.graphhopper.util.shapes.GHPoint3D
 import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.improvers.dist
 import org.osmosys.mapping.MapBox
@@ -112,22 +111,23 @@ class ControlSiteFinder(private val gh: GraphHopper) {
 
 
     fun findNearestControlSiteTo(p: GHPoint): ControlSite? {
-        // have we got nearby furniture - if so always use that
-        val f = furniture.find {dist(it.position, p) < 20 }
-        return when {
-            f != null -> f
+        return when (val loc = findClosestStreetLocation(p)) {
+            null -> null
             else -> {
-                when (val ret = findClosestStreetLocation(p)) {
-                    null -> null // invalid location
-                    else -> {
-                        val isTower = gh.locationIndex.findClosest(ret.lat, ret.lon, filter).snappedPosition == QueryResult.Position.TOWER
-                        val desc = if (isTower) "junction" else "bend"
-                        ControlSite(ret.lat, ret.lon, desc)
-                    }
+                // have we got nearby furniture - if so always use that
+                val f = findLocalStreetFurniture(loc, 50.0)
+                if (f != null) f
+                else {
+                    val isTower = gh.locationIndex.findClosest(loc.lat, loc.lon, filter).snappedPosition == QueryResult.Position.TOWER
+                    val desc = if (isTower) "junction" else "bend"
+                    ControlSite(loc.lat, loc.lon, desc)
                 }
             }
         }
     }
+
+    private fun findLocalStreetFurniture(p: GHPoint, distance: Double = 20.0) =
+            furniture.find { dist(it.position, p) < distance }
 
     private fun findClosestStreetLocation(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)

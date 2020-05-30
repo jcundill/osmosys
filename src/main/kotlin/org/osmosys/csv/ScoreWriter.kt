@@ -23,27 +23,34 @@
  *
  */
 
-package org.osmosys.scorers
+package org.osmosys.csv
 
-import com.graphhopper.GHResponse
+import org.osmosys.Course
+import java.io.File
+import java.math.BigDecimal
+import java.math.RoundingMode
 
-class LastControlNearTheFinishScorer(override val weighting: Double = 1.0) : LegScorer {
-
-    /**
-     * scores the last numbered control on its distance from the finish.
-     * i.e. control 10 is in a bad place as it is the last control and it is 4k from the finish
-     */
-    override fun score(routedLegs: List<GHResponse>): List<Double> {
-        val avLegLength = routedLegs.sumByDouble { it.best.distance }/ routedLegs.size
-        val lastLegLength = routedLegs.last().best.distance
-
-        return List(routedLegs.size - 1) { 0.0 } + when {
-            lastLegLength < 50.0 -> 1.0 // way too short
-            lastLegLength < avLegLength * 0.5 -> 0.0 // all is good
-            lastLegLength < avLegLength * 0.75 -> 0.25 // all is fairly good
-            lastLegLength < avLegLength -> 0.5 // all is acceptable
-            else -> 1.0 // last is bad
+class ScoreWriter {
+    fun writeScores(course: Course, filename: String) {
+        with(File(filename)) {
+            with(course) {
+                val featureList = featureScores.keys.toList()
+                val titles = getTitles(featureList) + "\n"
+                val legs = (1 until controls.size).map{
+                    getLegDetails(it, legScores[it-1], featureList, featureScores)
+                }
+                writeText( titles + legs.joinToString("\n"))
+            }
         }
     }
+    private fun getLegDetails(leg: Int, score: Double, featureList: List<String>, featureScores: Map<String, List<Double>>): String {
+        return (listOf("$leg", "${scoreFormatter(score)}") + featureList.map { f -> scoreFormatter((featureScores[f] ?: error(""))[leg-1])}).joinToString()
+    }
+
+    private fun getTitles(features: List<String>): String {
+        return (listOf("Leg","Score") + features).joinToString()
+    }
+
+    private fun scoreFormatter(it: Double) = BigDecimal(1.0 - it).setScale(2, RoundingMode.HALF_EVEN)
 
 }

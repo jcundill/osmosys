@@ -75,50 +75,25 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
         val bearing = csf.randomBearing
 
         val first = initialPoints.first()
+        val last = initialPoints.last()
         val second = csf.getCoords(first.position, Math.PI + bearing, scaleFactor)
         val third = csf.getCoords(first.position, Math.PI + bearing + angle, scaleFactor)
 
-        val points = listOf(first.position, second, third, first.position).map{csf.findControlSiteNear(it, 50.0)}
+        val points = listOf(first.position, second, third, first.position).map { csf.findControlSiteNear(it, 50.0) }
         val resp = csf.routeRequest(points)
 
         val pointList = resp.best.points
         val numPoints = pointList.size
 
-        val controls = (1..requestedNumControls).map{
-            val position = pointList.get( it * (numPoints/requestedNumControls - 1))
-            ControlSite(position, "")
+        val controls = (1..requestedNumControls).mapNotNull {
+            val position = pointList.get(it * (numPoints / requestedNumControls - 1))
+            csf.findNearestControlSiteTo(position)
         }
 
-        return TSP(csf).run(listOf(first) + controls + first)
+        return TSP(csf).run(listOf(first) + controls + last)
     }
 
     private fun canBeMapped(env: Envelope) =
             fitter.getForEnvelope(env) != null
 
-
-//    private fun generateControls(numControls: Int, distance: Double, env: Envelope): List<GHPoint> {
-//
-//        val bearing = csf.randomBearing
-//        val angle = (2 * Math.PI) / numControls
-//
-//        val envCentre = GHPoint(env.centre().y, env.centre().x)
-//
-//        // if the env is really small (only a start perhaps)
-//        // treat it as being on the radius of the circle
-//        // otherwise buildFrom an initial circle around its centre
-//        val w = dist2d.calcDist(env.minY, env.minX, env.maxY, env.maxX)
-//
-//        val fudgeFactor = 5.0 / numControls
-//        val radius = fudgeFactor * distance / (2 * Math.PI)
-//        val circleCentre = when {
-//            w < 1000 -> csf.getCoords(envCentre, Math.PI + bearing, radius)
-//            else -> envCentre
-//        }
-//
-//        val positions = (1..numControls).map { num ->
-//            csf.getCoords(circleCentre, (num * angle) + bearing, radius)
-//        }
-//        return positions.map { csf.findControlSiteNear(it, radius / 5.0) }
-//    }
-//
 }

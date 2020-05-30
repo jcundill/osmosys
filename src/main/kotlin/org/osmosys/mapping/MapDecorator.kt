@@ -58,8 +58,14 @@ class MapDecorator {
 
 
     fun decorate(pdfStream: InputStream, controls: List<ControlSite>, outFile: File, box: MapBox, centre: Coordinate) {
-
         val doc = PDDocument.load(pdfStream)
+        drawCourse(doc, centre, controls, box)
+        drawControlSheet(doc, controls)
+        return doc.save(outFile)
+
+    }
+
+    private fun drawCourse(doc: PDDocument, centre: Coordinate, controls: List<ControlSite>, box: MapBox) {
         val page: PDPage = doc.documentCatalog.pages.get(0)
         val width = page.mediaBox.width
         val height = page.mediaBox.height
@@ -68,7 +74,6 @@ class MapDecorator {
 
         // the centre is the thing in the middle
         val mapCentre = GHPoint(centre.y, centre.x) // this is what we told the tiler
-
         val offsetsInPts = getControlOffsets(controls, mapCentre, box, centrePage)
 
         // fade the lines a bit so that you can see the map through them
@@ -77,7 +82,6 @@ class MapDecorator {
         val graphicsState = PDExtendedGraphicsState()
         graphicsState.strokingAlphaConstant = alpha
         graphicsState.nonStrokingAlphaConstant = bold
-
 
         val content = PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true)
 
@@ -101,41 +105,40 @@ class MapDecorator {
         drawCourse(content, offsetsInPts)
 
         content.close()
+    }
 
+    private fun drawControlSheet(doc: PDDocument, controls: List<ControlSite>) {
         val page2 = PDPage(PDRectangle.A4)
         doc.addPage(page2)
 
-            val content2 = PDPageContentStream(doc, page2, PDPageContentStream.AppendMode.APPEND, true, true)
-            val tableBuilder = Table.builder()
-                    .addColumnsOfWidth(60.0f, 100.0f)
-                    .addRow(Row.builder()
-                            .add(CellText.builder().text("Control").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
-                            .add(CellText.builder().text("Description").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
-                            .build())
-            controls.forEachIndexed { idx, control ->
-                val ctrl = when (idx) {
-                    0 -> "Start"
-                    controls.size - 1 -> "Finish"
-                    else -> idx.toString()
-                }
-
-                tableBuilder.addRow(Row.builder()
-                        .add(CellText.builder().text(ctrl).borderWidth(1.0f).horizontalAlignment(HorizontalAlignment.RIGHT).build())
-                        .add(CellText.builder().text(control.description).borderWidth(1.0f).build())
+        val content2 = PDPageContentStream(doc, page2, PDPageContentStream.AppendMode.APPEND, true, true)
+        val tableBuilder = Table.builder()
+                .addColumnsOfWidth(60.0f, 100.0f)
+                .addRow(Row.builder()
+                        .add(CellText.builder().text("Control").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
+                        .add(CellText.builder().text("Description").borderWidth(1.0f).backgroundColor(Color.LIGHT_GRAY).build())
                         .build())
+        controls.forEachIndexed { idx, control ->
+            val ctrl = when (idx) {
+                0 -> "Start"
+                controls.size - 1 -> "Finish"
+                else -> idx.toString()
             }
-            val table = tableBuilder.build()
-            val tableDrawer = TableDrawer.builder()
-                    .contentStream(content2)
-                    .startX(20f)
-                    .startY(page2.mediaBox.upperRightY - 20f)
-                    .table(table)
-                    .build();
-            tableDrawer.draw()
-            content2.close()
 
-        return doc.save(outFile)
-
+            tableBuilder.addRow(Row.builder()
+                    .add(CellText.builder().text(ctrl).borderWidth(1.0f).horizontalAlignment(HorizontalAlignment.RIGHT).build())
+                    .add(CellText.builder().text(control.description).borderWidth(1.0f).build())
+                    .build())
+        }
+        val table = tableBuilder.build()
+        val tableDrawer = TableDrawer.builder()
+                .contentStream(content2)
+                .startX(20f)
+                .startY(page2.mediaBox.upperRightY - 20f)
+                .table(table)
+                .build();
+        tableDrawer.draw()
+        content2.close()
     }
 
     private fun drawCourse(content: PDPageContentStream, offsetsInPts: List<Pair<Float, Float>>) {

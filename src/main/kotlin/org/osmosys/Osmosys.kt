@@ -58,23 +58,23 @@ class Osmosys(db: String) {
     private val scorer = CourseScorer(featureScorers, csf::findRoutes)
     private val seeder = CourseSeeder(csf)
     private val fitter = MapFitter()
+    private val finder = StreetFurnitureFinder()
 
     fun makeProblem(initialCourse: Course): CourseFinder {
-        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
+        findFurniture(initialCourse.controls[0])
 
-         seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
+        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
+        seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
 
         val constraints = listOf(
                 IsRouteableConstraint(),
                 CourseLengthConstraint(initialCourse.distance()),
                 PrintableOnMapConstraint(fitter)
         )
-
         return CourseFinder(csf, constraints, scorer, seededCourse)
     }
 
     fun findCourse(problem: CourseFinder, iterations: Int = 1000): Course? {
-
         val solver = Solver(problem, ExponentialDecayScheduler(1000.0, iterations))
         return try {
             solver.solve().course
@@ -115,8 +115,6 @@ class Osmosys(db: String) {
         val max = csf.getCoords(start.position, Math.PI * 0.25, scaleFactor)
         val min = csf.getCoords(start.position, Math.PI * 1.25, scaleFactor)
         val bbox = BBox(min.lon, max.lon, min.lat, max.lat)
-        val finder = StreetFurnitureFinder()
-        val sf = finder.findForBoundingBox(bbox)
-        csf.furniture = sf
+        csf.furniture = finder.findForBoundingBox(bbox)
     }
 }
