@@ -30,7 +30,7 @@ import de.westnordost.osmapi.OsmConnection
 import de.westnordost.osmapi.overpass.OverpassMapDataDao
 import org.osmosys.ControlSite
 
-class StreetFurnitureFinder {
+class OverpassStreetFurnitureFinder {
 
 
     fun findForBoundingBox(box: BBox): List<ControlSite> {
@@ -38,7 +38,7 @@ class StreetFurnitureFinder {
 
         val connection = OsmConnection("https://overpass-api.de/api/", "osmosys")
         val overpass = OverpassMapDataDao(connection)
-        val handler = StreetFurnitureMapDataHandler(locations)
+        val handler = OverpassMapDataHandler(locations)
         val bbox = "${box.minLat},${box.minLon},${box.maxLat},${box.maxLon}"
         val q = """
             (

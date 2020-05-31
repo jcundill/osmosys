@@ -32,8 +32,10 @@ import com.graphhopper.routing.util.DefaultEdgeFilter
 import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
+import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
+import org.osmosys.furniture.StreetFurnitureRepository
 import org.osmosys.improvers.dist
 import org.osmosys.mapping.MapBox
 import java.lang.Math.toDegrees
@@ -44,9 +46,8 @@ import kotlin.math.*
 /**
  * Created by jcundill on 18/01/2017.
  */
-class ControlSiteFinder(private val gh: GraphHopper) {
+class ControlSiteFinder(private val gh: GraphHopper, private val furnitureRepository: StreetFurnitureRepository) {
 
-    var furniture: List<ControlSite> = emptyList()
     private val filter =  DefaultEdgeFilter.allEdges(gh.encodingManager.getEncoder("orienteering"))
 
     private val env = Envelope()
@@ -55,6 +56,13 @@ class ControlSiteFinder(private val gh: GraphHopper) {
     var hit = 0
     var miss = 0
 
+    fun loadLocalFurniture(start: ControlSite) {
+        val scaleFactor = 5000.0
+        val max = getCoords(start.position, Math.PI * 0.25, scaleFactor)
+        val min = getCoords(start.position, Math.PI * 1.25, scaleFactor)
+        val bbox = BBox(min.lon, max.lon, min.lat, max.lat)
+        furnitureRepository.initialiseForBoundingBox(bbox)
+    }
 
     fun findControlSiteNear(point: GHPoint, distance: Double = 500.0): ControlSite {
         var node = findNearestControlSiteTo(getCoords(point, randomBearing, distance))
@@ -126,8 +134,16 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         }
     }
 
-    private fun findLocalStreetFurniture(p: GHPoint, distance: Double = 20.0) =
-            furniture.find { dist(it.position, p) < distance }
+    private fun findLocalStreetFurniture(p: GHPoint, distance: Double = 20.0): ControlSite? {
+        val possible = furnitureRepository.findNear(p, distance)
+        if( possible != null) {
+            // is this near to a way?
+            val qr = gh.locationIndex.findClosest(possible.position.lat, possible.position.lon, filter)
+            if( qr.queryDistance > 7.5 ) // more than a couple of metres back from 1 side of nearest way
+                return null
+        }
+        return possible
+    }
 
     private fun findClosestStreetLocation(p: GHPoint): GHPoint? {
         val qr = gh.locationIndex.findClosest(p.lat, p.lon, filter)

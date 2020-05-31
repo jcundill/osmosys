@@ -23,34 +23,22 @@
  *
  */
 
-package org.osmosys
+package org.osmosys.furniture
 
-import com.graphhopper.reader.dem.SRTMProvider
-import com.graphhopper.reader.osm.GraphHopperOSM
-import com.graphhopper.routing.util.EncodingManager
-import org.osmosys.furniture.StreetFurnitureRepository
+import com.graphhopper.util.shapes.BBox
+import com.graphhopper.util.shapes.GHPoint
+import org.osmosys.ControlSite
+import org.osmosys.improvers.dist
 
+class StreetFurnitureRepository {
+    private val overpass = OverpassStreetFurnitureFinder()
+    private val localFurniture = mutableListOf<ControlSite>()
 
-object GHWrapper {
-
-    val oFlagEncoder = OrienteeringFlagEncoder()
-    private val furniture = StreetFurnitureRepository()
-
-    fun initGH(name: String): ControlSiteFinder {
-
-        val gh = GraphHopperOSM().apply {
-            forServer()
-            osmFile = "extracts/$name.osm.pbf"
-            graphHopperLocation = "osm_data/grph_$name"
-            isCHEnabled = false
-            setElevation(true)
-            elevationProvider = SRTMProvider()
-            encodingManager = EncodingManager.create(oFlagEncoder)
-            setEnableCalcPoints(true)
-        }
-
-        gh.importOrLoad()
-        return ControlSiteFinder(gh, furniture)
+    fun initialiseForBoundingBox(bbox: BBox) {
+        localFurniture.addAll(overpass.findForBoundingBox(bbox))
     }
 
+    fun findNear(p: GHPoint, distance: Double): ControlSite? {
+        return localFurniture.find { dist(it.position, p) < distance }
+    }
 }

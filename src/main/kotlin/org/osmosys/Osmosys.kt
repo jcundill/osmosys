@@ -36,7 +36,7 @@ import org.osmosys.annealing.Solver
 import org.osmosys.constraints.CourseLengthConstraint
 import org.osmosys.constraints.IsRouteableConstraint
 import org.osmosys.constraints.PrintableOnMapConstraint
-import org.osmosys.furniture.StreetFurnitureFinder
+import org.osmosys.furniture.StreetFurnitureRepository
 import org.osmosys.mapping.MapFitter
 import org.osmosys.scorers.*
 
@@ -58,7 +58,6 @@ class Osmosys(db: String) {
     private val scorer = CourseScorer(featureScorers, csf::findRoutes)
     private val seeder = CourseSeeder(csf)
     private val fitter = MapFitter()
-    private val finder = StreetFurnitureFinder()
 
     fun makeProblem(initialCourse: Course): CourseFinder {
         findFurniture(initialCourse.controls[0])
@@ -111,10 +110,6 @@ class Osmosys(db: String) {
     }
 
     fun findFurniture(start: ControlSite) {
-        val scaleFactor = 5000.0
-        val max = csf.getCoords(start.position, Math.PI * 0.25, scaleFactor)
-        val min = csf.getCoords(start.position, Math.PI * 1.25, scaleFactor)
-        val bbox = BBox(min.lon, max.lon, min.lat, max.lat)
-        csf.furniture = finder.findForBoundingBox(bbox)
+        csf.loadLocalFurniture(start)
     }
 }

@@ -29,7 +29,7 @@ import de.westnordost.osmapi.map.data.*
 import de.westnordost.osmapi.overpass.MapDataWithGeometryHandler
 import org.osmosys.ControlSite
 
-class StreetFurnitureMapDataHandler(private val locations: MutableList<ControlSite>): MapDataWithGeometryHandler {
+class OverpassMapDataHandler(private val locations: MutableList<ControlSite>) : MapDataWithGeometryHandler {
 
     private fun parsePointFeatue(node: Node): ControlSite {
         val lat = node.position.latitude
@@ -42,8 +42,6 @@ class StreetFurnitureMapDataHandler(private val locations: MutableList<ControlSi
             node.tags["barrier"] != null -> node.tags["barrier"]
             else -> "unknown"
         }!!
-        if( description == "")
-            println()
         return ControlSite(lat, lon, description)
     }
 
@@ -56,8 +54,6 @@ class StreetFurnitureMapDataHandler(private val locations: MutableList<ControlSi
             way.tags["barrier"] == "hedge" -> "hedge"
             else -> "unknown"
         }
-        if( description == "")
-            println()
         return ControlSite(lat, lon, description)
 
     }
@@ -65,14 +61,25 @@ class StreetFurnitureMapDataHandler(private val locations: MutableList<ControlSi
     override fun handle(bounds: BoundingBox) {}
 
     override fun handle(node: Node) {
-        if( !node.isDeleted) {
+        if (!node.isDeleted) {
             locations.add(parsePointFeatue(node))
         }
     }
 
     override fun handle(way: Way, bounds: BoundingBox, geometry: MutableList<LatLon>) {
-        locations.add(parseLinearFeature(way, geometry.first()))
-        locations.add(parseLinearFeature(way, geometry.last()))
+        if (isUsable(way)) {
+            locations.add(parseLinearFeature(way, geometry.first()))
+            locations.add(parseLinearFeature(way, geometry.last()))
+        }
+    }
+
+    private fun isUsable(way: Way): Boolean {
+        return way.tags["railway"].isNullOrEmpty() &&
+                way.tags["highway"] != "primary" &&
+                way.tags["highway"] != "trunk" &&
+                way.tags["highway"] != "primary_link" &&
+                way.tags["highway"] != "trunk_link" &&
+                way.tags["foot"] != "no"
     }
 
     override fun handle(relation: Relation, bounds: BoundingBox, nodeGeometries: MutableMap<Long, LatLon>, wayGeometries: MutableMap<Long, MutableList<LatLon>>) {}
