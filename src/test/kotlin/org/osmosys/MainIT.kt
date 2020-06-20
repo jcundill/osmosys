@@ -30,13 +30,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.osmosys.csv.ScoreWriter
+import org.osmosys.genetic.GA
 import org.osmosys.gpx.GpxWriter
 import org.osmosys.mapping.MapFitter
 import org.osmosys.mapping.MapPrinter
 import org.osmosys.maprun.KmlWriter
 import java.io.File
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.*
 
 
@@ -80,12 +79,26 @@ class MainIT {
 
     @Test
     fun kmlFromGpx() {
-        val initialCourse = Course.buildFromGPX("Map-1588589961836.gpx")
-        val course = osmosys.score(initialCourse)
+        val initialCourse = Course.buildFromGPX("aaa.gpx")
+        val c = initialCourse.copy(controls = initialCourse.controls.map { osmosys.csf.findNearestControlSiteTo(it.position)!! })
+        val course = osmosys.score(c)
         val timestamp = Date().time
         printStats(course, timestamp)
-        val kml = kmlWriter.generate(initialCourse.controls, "mapName")
-        File("out.kml").writeText(kml)
+//        val kml = kmlWriter.generate(initialCourse.controls, "mapName")
+//        File("out.kml").writeText(kml)
+        printMap(course, timestamp)
+        printControls(course)
+    }
+
+    @Test
+    fun ga() {
+        val props =  "./streeto.properties"
+        val initialCourse = Course.buildFromProperties(props)
+        val moo = GA(osmosys.csf, 10, initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance())
+        val courseSol = moo.run()
+        val course = osmosys.score(Course(initialCourse.distance(), initialCourse.requestedNumControls, courseSol.controls))
+        gpxWriter.writeToFile(course, "aaa.gpx")
+
     }
 
     @Test
@@ -96,7 +109,7 @@ class MainIT {
         val initialCourse = Course.buildFromProperties(props)
         //val params = Course.buildFromGPX("/Users/jcundill/stash/wobble/Map-1538908777809.gpx")
         val problem = osmosys.makeProblem(initialCourse)
-        val solution = osmosys.findCourse(problem, 1000)
+        val solution = osmosys.findCourse(problem, 2000)
 
         if (solution != null) {
            val timestamp = Date().time

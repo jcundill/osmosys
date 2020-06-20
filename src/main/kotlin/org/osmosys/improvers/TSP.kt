@@ -39,20 +39,15 @@ import kotlin.math.roundToInt
 val dist2d = DistancePlaneProjection()
 fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, b.lon)
 
-//fun courseDistance(points: List<GHPoint>): Double {
-//    return points.windowed(2, 1, false).fold(0.0) { acc, curr ->
-//        acc + dist(curr[0], curr[1])
-//    }
-
-
 
 class TSP(private val csf: ControlSiteFinder) {
 
-    private fun sensitivity(numControls: Int) : Int = (10000 * numControls / 10.0).roundToInt()
+    private val distCache = mutableMapOf<Pair<ControlSite, ControlSite>, Double>()
+
+    private fun sensitivity(numControls: Int) : Int = (5000 * numControls / 10.0).roundToInt()
+
     private fun courseDistance(points: List<ControlSite>): Double {
-        return points.windowed(2, 1, false).fold(0.0) { acc, curr ->
-            acc + dist(curr[0].position, curr[1].position)
-        }
+        return points.windowed(2).map { dist(it.first().position, it.last().position) }.sum()
     }
 
     fun run(points: List<ControlSite>): List<ControlSite> {

@@ -37,8 +37,7 @@ class CourseImprover(private val csf: ControlSiteFinder, val course: Course) : S
     override fun step(): CourseImprover {
         val numberedControlsToChange = findIndexesOfWorst(course.legScores, course.controls.size / 3)
         val newCourse = replaceSelectedNumberedControls(numberedControlsToChange, course.controls)
-        val reorderedControls = tsp.run(newCourse)
-        return CourseImprover(csf, course.copy(controls = reorderedControls))
+        return CourseImprover(csf, course.copy(controls = newCourse))
     }
 
     fun replaceSelectedNumberedControls(selected: List<Int>, existing: List<ControlSite>): List<ControlSite> =

@@ -34,6 +34,29 @@ typealias FeatureScoreList = List<Double>
 
 class CourseScorer(private val legScorers: List<LegScorer>, private val findRoutes: (GHPoint, GHPoint) -> GHResponse) {
 
+    fun score(controls: MutableList<ControlSite>): Pair<List<Double>, List<Double>> {
+        val legs = controls.windowed(2)
+        val legRoutes = legs.map { ab -> findRoutes(ab.first().position, ab.last().position) }
+        val featureScores: List<LegScoreList> = legScorers.map { raw ->
+            raw.score(legRoutes).map {s -> s * raw.weighting}
+        }
+
+        /*
+                featureScores =
+                        1       2       3       4       5       6
+                FS1     0.1     0.2     0.1     0.1     0.5     0.1
+                FS2     0.2     0.1     0.1     0.4     0.3     0.0
+                FS3     0.3     0.1     0.2     0.0     0.0     0.4
+
+                step.numberedControlScores = 0.2, 0.167, 0.167, 0.167, 0.267, 0.167
+                featureScores =
+         */
+        val scores1 = featureScores.map{ it.average()}
+        val legScores: List<FeatureScoreList> = transpose(featureScores)
+        val scores2 = legScores.map{ it.average()}
+        return Pair(scores1, scores2)
+    }
+
     fun score(step: Course): Double {
         // score all the legs individually
         // needed currently for alternative routes
@@ -54,7 +77,7 @@ class CourseScorer(private val legScorers: List<LegScorer>, private val findRout
                 featureScores =
          */
         val legScores: List<FeatureScoreList> = transpose(featureScores)
-        step.legScores = legScores.map{ it.sum()/legScorers.size}
+        step.legScores = legScores.map{ it.average()}
          step.featureScores = getDetailedScores(featureScores)
         return step.legScores.average()
     }

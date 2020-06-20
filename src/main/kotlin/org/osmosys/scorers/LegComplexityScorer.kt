@@ -56,10 +56,11 @@ class LegComplexityScorer(override val weighting: Double = 1.0) : LegScorer {
 
         val num = instructions.size
         val turns = instructions.filter { turnInstructions.contains(it.sign) }.size
+        val turnDensity = 1000.0 * turns / leg.best.distance   // turns per K
 
         return when {
-            turns < 4 -> 1.0
-            else -> 1.0 - (turns.toDouble() / num.toDouble())
+            turnDensity > 4.0 -> 0.0
+            else -> 1.0 //- (turns.toDouble() / num.toDouble())
         }
     }
 }

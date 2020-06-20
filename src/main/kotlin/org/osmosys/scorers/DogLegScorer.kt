@@ -26,6 +26,8 @@
 package org.osmosys.scorers
 
 import com.graphhopper.GHResponse
+import com.graphhopper.util.shapes.GHPoint
+import org.osmosys.improvers.dist
 import kotlin.math.min
 
 class DogLegScorer(override val weighting: Double = 1.0) : LegScorer {
@@ -47,7 +49,17 @@ class DogLegScorer(override val weighting: Double = 1.0) : LegScorer {
 
     fun <T> dogLegScore(a2b: List<T>, b2c: List<T>): Double {
         if (a2b.size < 2 || b2c.size < 2) return 1.0 //controls are in the same place
-        val numInAandB = a2b.dropLast(1).filter { b2c.drop(1).contains(it) }.size
-        return numInAandB.toDouble() / (min(b2c.size, a2b.size).toDouble() - 1.0)
+        val inAandB = a2b.dropLast(1).filter { b2c.drop(1).contains(it) }
+        val numInAandB = inAandB.size
+        return if( numInAandB == 0) 0.0
+        else {
+            val distInAandB = dist(inAandB.first() as GHPoint, inAandB.last() as GHPoint)
+            return when {
+                distInAandB < 50.0 -> 0.0
+                distInAandB < 100.0 -> 0.25
+                distInAandB < 200.0 -> 0.5
+                else -> 1.0
+            }
+        }
     }
 }

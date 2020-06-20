@@ -54,7 +54,7 @@ class Osmosys(db: String) {
             DogLegScorer()
     )
 
-    private val csf = GHWrapper.initGH(db)
+    val csf = GHWrapper.initGH(db)
     private val scorer = CourseScorer(featureScorers, csf::findRoutes)
     private val seeder = CourseSeeder(csf)
     private val fitter = MapFitter()

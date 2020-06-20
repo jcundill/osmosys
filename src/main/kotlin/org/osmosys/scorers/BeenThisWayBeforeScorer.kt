@@ -43,7 +43,12 @@ class BeenThisWayBeforeScorer(override val weighting: Double = 1.0) : LegScorer 
         return when {
             previousLegs.size < 2 -> 0.0 // no legs other than the previous
             else -> {
-                previousLegs.map { l -> compareLegs(l, thisLeg) }.max()!!
+                val xs = previousLegs.map { l -> compareLegs(l, thisLeg) }
+                return if( xs.isNullOrEmpty()) {
+                   0.0
+                } else {
+                    xs.max()!!
+                }
             }
         }
     }
