@@ -36,21 +36,21 @@ package org.osmosys
 object ControlPickingStrategies {
 
     fun pickRandomly(numberedControlScores: List<Double>, num: Int): List<Int> =
-            ControlPickingStrategies.pick(numberedControlScores, num) { _ -> rnd.nextDouble() > 0.5 }
+            pick(numberedControlScores, num) { _ -> rnd.nextDouble() > 0.5 }
 
     fun pickWeightedRandom(numberedControlScores: List<Double>, num: Int): List<Int> {
         val prob = rnd.nextDouble() / numberedControlScores.size
-        return ControlPickingStrategies.pick(numberedControlScores, num) { x -> x.second > prob }
+        return pick(numberedControlScores, num) { x -> x.second > prob }
     }
 
     fun pickAboveAverage(numberedControlScores: List<Double>, num: Int): List<Int> {
         val mean =  numberedControlScores.average()
-        return ControlPickingStrategies.pick(numberedControlScores, num) { x -> x.second > mean }
+        return pick(numberedControlScores, num) { x -> x.second > mean }
     }
 
     fun pickWorstAndNextIfAboveAverage(numberedControlScores: List<Double>, num: Int): List<Int> {
         val mean = numberedControlScores.average()
-        val worsts = ControlPickingStrategies.pick(numberedControlScores, num) { x -> x.second > mean }
+        val worsts = pick(numberedControlScores, num) { x -> x.second > mean }
         val options = worsts.takeWhile { x -> numberedControlScores[x - 1] == numberedControlScores[worsts.first() - 1] }
         return if (options.first() < numberedControlScores.size - 1 &&
                 numberedControlScores[options.first() + 1] > mean)

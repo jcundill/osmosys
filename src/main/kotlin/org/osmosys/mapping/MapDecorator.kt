@@ -136,7 +136,7 @@ class MapDecorator {
                 .startX(20f)
                 .startY(page2.mediaBox.upperRightY - 20f)
                 .table(table)
-                .build();
+                .build()
         tableDrawer.draw()
         content2.close()
     }

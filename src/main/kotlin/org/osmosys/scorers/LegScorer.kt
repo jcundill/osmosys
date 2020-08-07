@@ -28,7 +28,7 @@ package org.osmosys.scorers
 import com.graphhopper.GHResponse
 
 interface LegScorer {
-    abstract val weighting: Double
+    val weighting: Double
     /**
      * returns the points awarded to each numbered control
      * so the returned list is 1 less than the number of passed in legs

@@ -54,7 +54,6 @@ class LegComplexityScorer(override val weighting: Double = 1.0) : LegScorer {
     private fun evaluate(leg: GHResponse): Double {
         val instructions = leg.best.instructions
 
-        val num = instructions.size
         val turns = instructions.filter { turnInstructions.contains(it.sign) }.size
         val turnDensity = 1000.0 * turns / leg.best.distance   // turns per K
 
