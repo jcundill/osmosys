@@ -32,6 +32,7 @@ import com.graphhopper.routing.util.DefaultEdgeFilter
 import com.graphhopper.storage.index.QueryResult
 import com.graphhopper.util.Parameters
 import com.graphhopper.util.PointList
+import com.graphhopper.util.shapes.BBox
 import com.graphhopper.util.shapes.GHPoint
 import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.improvers.dist

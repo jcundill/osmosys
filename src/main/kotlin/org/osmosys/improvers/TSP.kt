@@ -34,17 +34,14 @@ import org.osmosys.annealing.Problem
 import org.osmosys.annealing.SearchState
 import org.osmosys.annealing.Solver
 import org.osmosys.rnd
-import kotlin.math.roundToInt
 
 val dist2d = DistancePlaneProjection()
 fun dist(a: GHPoint, b: GHPoint): Double = dist2d.calcDist(a.lat, a.lon, b.lat, b.lon)
 
 
-class TSP(private val csf: ControlSiteFinder) {
+class TSP(val csf: ControlSiteFinder) {
 
-    private val distCache = mutableMapOf<Pair<ControlSite, ControlSite>, Double>()
-
-    private fun sensitivity(numControls: Int) : Int = (5000 * numControls / 10.0).roundToInt()
+    private fun sensitivity(numControls: Int) : Int = 500 * numControls
 
     private fun courseDistance(points: List<ControlSite>): Double {
         return points.windowed(2).map { dist(it.first().position, it.last().position) }.sum()
@@ -57,12 +54,8 @@ class TSP(private val csf: ControlSiteFinder) {
         return solution.points
     }
 
-    class TSProblem(val courseDistance :(List<ControlSite>)->Double, val points: List<ControlSite>) : Problem<RouteImprover> {
-
-
-        override fun energy(searchState: RouteImprover): Double = courseDistance(searchState.points)
-
-
+    class TSProblem(val metric :(List<ControlSite>)->Double, val points: List<ControlSite>) : Problem<RouteImprover> {
+        override fun energy(searchState: RouteImprover): Double = metric(searchState.points)
         override fun initialState(): RouteImprover = RouteImprover(points)
     }
 

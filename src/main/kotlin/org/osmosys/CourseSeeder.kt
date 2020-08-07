@@ -29,10 +29,29 @@ import com.vividsolutions.jts.geom.Envelope
 import org.osmosys.annealing.InfeasibleProblemException
 import org.osmosys.improvers.TSP
 import org.osmosys.mapping.MapFitter
+import org.osmosys.seeders.*
 
 class CourseSeeder(private val csf: ControlSiteFinder) {
 
     private val fitter = MapFitter()
+    private val rect = RectangleSeeder(csf)
+    private val triangle = TriangleSeeder(csf)
+    private val hourglass = HourglassSeeder(csf)
+    private val fatHourglass = FatHourglassSeeder(csf)
+    private val centredFatHourglass = CentredFatHourglassSeeder(csf)
+    private val centredHourglass = CentredHourglassSeeder(csf)
+
+    private fun chooseSeeder(): SeedingStrategy {
+        val roll = rnd.nextDouble() * 6.0
+        return when {
+            roll < 1.0 -> centredFatHourglass
+            roll < 2.0 -> centredHourglass
+            roll < 3.0 -> rect
+            roll < 4.0 -> triangle
+            roll < 5.0 -> fatHourglass
+            else -> hourglass
+        }
+    }
 
     fun chooseInitialPoints(initialPoints: List<ControlSite>, requestedNumControls: Int, requestedCourseLength: Double): List<ControlSite> {
 
@@ -63,35 +82,11 @@ class CourseSeeder(private val csf: ControlSiteFinder) {
         }
 
         val initialControls = listOf(startPoint) + chosenControls + finishPoint
-        return doGen(initialControls, requestedNumControls, requestedCourseLength)
+        val controls =  chooseSeeder().seed(initialControls, requestedNumControls, requestedCourseLength)
+        val ctrls = if(rnd.nextDouble() < 0.5) controls else controls.reversed()
+        return TSP(csf).run(listOf(startPoint) + ctrls + finishPoint)
     }
 
-    private fun doGen(initialPoints: List<ControlSite>, requestedNumControls: Int, requestedCourseLength: Double): List<ControlSite> {
-        val twistFactor = 0.67
-        val circLength = 3.5
-        val angle = 1.5658238
-
-        val scaleFactor = requestedCourseLength * twistFactor / circLength
-        val bearing = csf.randomBearing
-
-        val first = initialPoints.first()
-        val last = initialPoints.last()
-        val second = csf.getCoords(first.position, Math.PI + bearing, scaleFactor)
-        val third = csf.getCoords(first.position, Math.PI + bearing + angle, scaleFactor)
-
-        val points = listOf(first.position, second, third, first.position).map { csf.findControlSiteNear(it, 50.0) }
-        val resp = csf.routeRequest(points)
-
-        val pointList = resp.best.points
-        val numPoints = pointList.size
-
-        val controls = (1..requestedNumControls).mapNotNull {
-            val position = pointList.get(it * (numPoints / requestedNumControls - 1))
-            csf.findNearestControlSiteTo(position)
-        }
-
-        return TSP(csf).run(listOf(first) + controls + last)
-    }
 
     private fun canBeMapped(env: Envelope) =
             fitter.getForEnvelope(env) != null

@@ -94,7 +94,7 @@ class MainIT {
     fun ga() {
         val props =  "./streeto.properties"
         val initialCourse = Course.buildFromProperties(props)
-        val moo = GA(osmosys.csf, 10, initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance())
+        val moo = GA(osmosys.csf, 50, initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance())
         val courseSol = moo.run()
         val course = osmosys.score(Course(initialCourse.distance(), initialCourse.requestedNumControls, courseSol.controls))
         gpxWriter.writeToFile(course, "aaa.gpx")

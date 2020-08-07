@@ -141,18 +141,4 @@ class MapPrinter {
            response.toString().split(",").find { it.startsWith("\"message\"") }!!.substringAfter("\"message\":\"").dropLast(1)
         }
     }
-
-    private fun formatControlsList(controls: List<Coordinate>): String {
-        //1,45,6981557,-134761
-        val strings = controls.drop(1).dropLast(1).mapIndexed { idx, coord -> "${idx + 1},45,${coord.y.toInt()},${coord.x.toInt()}" }
-        val finishString = when {
-            controls.first() == controls.last() -> ""
-            else -> {
-                val coord = controls.last()
-                ",F,45,${coord.y.toInt()},${coord.x.toInt()}"
-            }
-        }
-        return strings.joinToString(separator = ",") + finishString
-
-    }
 }

@@ -1,13 +1,13 @@
 package org.osmosys.genetic
 
+import com.graphhopper.util.shapes.BBox
 import org.osmosys.*
-import org.osmosys.constraints.CourseLengthConstraint
-import org.osmosys.constraints.IsRouteableConstraint
-import org.osmosys.constraints.MustVisitWaypointsConstraint
-import org.osmosys.constraints.PrintableOnMapConstraint
+import org.osmosys.constraints.*
+import org.osmosys.gpx.GpxWriter
 import org.osmosys.improvers.TSP
 import org.osmosys.mapping.MapFitter
 import org.osmosys.scorers.*
+import java.util.*
 
 class GA(val csf: ControlSiteFinder, val popSize: Int,  val initial: List<ControlSite>, val numControls: Int, val distance: Double) {
     val population = mutableListOf<Course>()
@@ -75,22 +75,20 @@ class GA(val csf: ControlSiteFinder, val popSize: Int,  val initial: List<Contro
         val currEnergy = population.minBy { it.energy }!!.energy
         if( currEnergy < lastEnergy) {
             lastEnergy = currEnergy
-            println("iteration: " + currIter + " enery: " + currEnergy)
+            println("iteration: $currIter energy: $currEnergy")
         }
 
     }
 
+    private fun mates(xs: List<Course>): List<Pair<Course, Course>> {
+        return when {
+            xs.isEmpty() || xs.drop(1).isEmpty() -> emptyList()
+            else -> xs.drop(1).map { Pair(xs.first(), it) } + mates(xs.drop(1))
+        }
+    }
+
     private fun reproduction(matingPopulation: List<Course>): List<Course> {
-
-        val parents = listOf(Pair(matingPopulation[0], matingPopulation[1]),
-                Pair(matingPopulation[0], matingPopulation[2]),
-                Pair(matingPopulation[0], matingPopulation[3]),
-                Pair(matingPopulation[1], matingPopulation[2]),
-                Pair(matingPopulation[1], matingPopulation[3]),
-                Pair(matingPopulation[2], matingPopulation[3])
-        )
-
-        return parents.map { p ->
+        return mates(matingPopulation).map { p ->
             mutate(crossover(p.first, p.second))
         }
     }
@@ -128,11 +126,12 @@ class GA(val csf: ControlSiteFinder, val popSize: Int,  val initial: List<Contro
     }
 
     private fun selection(population: List<Course>): List<Course> {
-        return population.sortedBy { it.energy }.take(4)
+        val num = 12 //population.size/4
+        return population.sortedBy { it.energy }.take( num )
     }
 
     private fun isStoppingConditionReached(): Boolean {
-        return currIter > 1000
+        return currIter > 100
     }
 
     private fun initProgress() {

@@ -32,7 +32,7 @@ import com.graphhopper.routing.util.EncodingManager
 
 object GHWrapper {
 
-    val oFlagEncoder = OrienteeringFlagEncoder()
+    private val oFlagEncoder = OrienteeringFlagEncoder()
 
     fun initGH(name: String): ControlSiteFinder {
 
