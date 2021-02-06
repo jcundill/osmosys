@@ -37,9 +37,7 @@ interface RandomStream {
 
 class PseudoRandom : RandomStream {
     private val rnd = Random(System.currentTimeMillis())
-    private val doubleStream = rnd.doubles().iterator()
-
-    override fun nextDouble(): Double = doubleStream.next()
+    override fun nextDouble(): Double = rnd.nextDouble()
 }
 
 class RepeatableRandom(seed: Long) : RandomStream {

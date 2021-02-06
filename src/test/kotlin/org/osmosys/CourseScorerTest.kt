@@ -37,15 +37,15 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CourseScorerTest {
 
-    lateinit var scorer: CourseScorer
-    lateinit var csf: ControlSiteFinder
-    lateinit var mockResponse: GHResponse
-    lateinit var step: CourseImprover
-    lateinit var course: Course
-    lateinit var mockFS1: LegScorer
-    lateinit var mockFS2: LegScorer
-    lateinit var mockFS3: LegScorer
-    lateinit var mockRoute: GHResponse
+    private lateinit var scorer: CourseScorer
+    private lateinit var csf: ControlSiteFinder
+    private lateinit var mockResponse: GHResponse
+//    private lateinit var step: CourseImprover
+    private lateinit var course: Course
+    private lateinit var mockFS1: LegScorer
+    private lateinit var mockFS2: LegScorer
+    private lateinit var mockFS3: LegScorer
+    private lateinit var mockRoute: GHResponse
 
     @BeforeTest
     fun beforeAll() {
@@ -68,7 +68,7 @@ internal class CourseScorerTest {
     fun setUp() {
         course = Course(controls = listOf(ControlSite(1.0, 2.0), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5), ControlSite(1.5, 2.5)))
         course.route = mockRoute.best
-        step = CourseImprover(csf, course)
+//        step = CourseImprover(csf, course)
         scorer = CourseScorer(listOf(mockFS1, mockFS2, mockFS3), csf::findRoutes)
     }
 
@@ -175,7 +175,7 @@ internal class CourseScorerTest {
 
     @Test
     fun transpose0() {
-        val ins: List<List<Int>> = listOf(emptyList<Int>())
+        val ins: List<List<Int>> = listOf(emptyList())
 
         val ans: List<List<Int>> = scorer.transpose(ins)
         assertEquals(0, ans.size)

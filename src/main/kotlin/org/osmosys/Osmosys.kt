@@ -48,9 +48,6 @@ class Osmosys(db: String) {
             LegComplexityScorer(),
             BeenThisWayBeforeScorer(),
             ComingBackHereLaterScorer(),
-            OnlyGoToTheFinishAtTheEndScorer(),
-            DidntMoveScorer(),
-            LastControlNearTheFinishScorer(),
             DogLegScorer()
     )
 
@@ -60,36 +57,36 @@ class Osmosys(db: String) {
     private val fitter = MapFitter()
     private val finder = StreetFurnitureFinder()
 
-    fun makeProblem(initialCourse: Course): CourseFinder {
-        findFurniture(initialCourse.controls[0])
-
-        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
-        seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
-
-        val constraints = listOf(
-                IsRouteableConstraint(),
-                CourseLengthConstraint(initialCourse.distance()),
-                PrintableOnMapConstraint(fitter)
-        )
-        return CourseFinder(csf, constraints, scorer, seededCourse)
-    }
-
-    fun findCourse(problem: CourseFinder, iterations: Int = 1000): Course? {
-        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, iterations))
-        return try {
-            solver.solve().course
-        } catch (e: InfeasibleProblemException) {
-            println(e.message ?: "All gone badly wrong")
-            null
-        }
-    }
+//    fun makeProblem(initialCourse: Course): CourseFinder {
+//        findFurniture(initialCourse.controls[0])
+//
+//        val seededCourse = initialCourse.copy(controls = seeder.chooseInitialPoints(initialCourse.controls, initialCourse.requestedNumControls, initialCourse.distance()))
+//        seededCourse.legScores = List(seededCourse.controls.size - 1) { 0.5 }
+//
+//        val constraints = listOf(
+//                IsRouteableConstraint(),
+//                CourseLengthConstraint(initialCourse.distance()),
+//                PrintableOnMapConstraint(fitter)
+//        )
+//        return CourseFinder(csf, constraints, scorer, seededCourse)
+//    }
+//
+//    fun findCourse(problem: CourseFinder, iterations: Int = 1000): Course? {
+//        val solver = Solver(problem, ExponentialDecayScheduler(1000.0, iterations))
+//        return try {
+//            solver.solve().course
+//        } catch (e: InfeasibleProblemException) {
+//            println(e.message ?: "All gone badly wrong")
+//            null
+//        }
+//    }
 
     fun findBestRoute(controls: List<ControlSite>): PathWrapper = csf.routeRequest(controls).best
 
 
     fun getEnvelopeForProbableRoutes(controls: List<ControlSite>): Envelope {
-        val routes = controls.windowed(2).flatMap {
-            csf.routeRequest(it, 3).all
+        val routes = controls.windowed(2).map {
+            csf.routeRequest(it, 3).best
         }
 
         val env = Envelope()
@@ -100,7 +97,8 @@ class Osmosys(db: String) {
     fun score(course: Course): Course {
         val route = csf.routeRequest(course.controls)
         course.route = route.best
-        scorer.score(course)
+        val score = scorer.score(course)
+        course.energy = score
         return course
 
     }

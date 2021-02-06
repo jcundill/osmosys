@@ -26,6 +26,8 @@
 package org.osmosys.scorers
 
 import com.graphhopper.GHResponse
+import java.lang.Double.min
+import kotlin.math.min
 
 class LegRouteChoiceScorer(override val weighting: Double = 1.0) : LegScorer {
 
@@ -44,7 +46,15 @@ class LegRouteChoiceScorer(override val weighting: Double = 1.0) : LegScorer {
 
     private fun evalAlts(leg: GHResponse): Double {
         val sorted = leg.all.map{  it.distance  }.sorted()
-        return (sorted.last() - sorted.first()) / sorted.first()
+        val ratio = (sorted.last() - sorted.first()) / sorted.first()
+        val common = leg.all.first().points.intersect(leg.all.last().points).size
+        val total = min(leg.all.first().points.size, leg.all.last().points.size)
+        val commonRatio = common.toDouble() / total.toDouble();
+        return when {
+            commonRatio > 0.5 && ratio > 0.5 -> 0.9
+            commonRatio > 0.5 && ratio < 0.2 -> 0.75
+            else -> ratio
+        }
     }
 
 }

@@ -40,7 +40,7 @@ class LegStraightLineScorer(override val weighting: Double = 1.0) : LegScorer {
 
         return when {
             leg.best.distance == 0.0 -> 1.0
-            else -> (1.0 - ratio) / 3.0
+            else -> 1.0 - ratio
         }
 
     }

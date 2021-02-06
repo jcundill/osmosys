@@ -27,7 +27,7 @@ package org.osmosys.mapping
 
 import com.vividsolutions.jts.geom.Envelope
 
-data class MapBox(val maxWidth: Double, val maxHeight: Double, val scale: Int, val landscape: Boolean)
+data class MapBox(val maxWidth: Double, val maxHeight: Double, public val scale: Int, val landscape: Boolean)
 
 /**
  * finds, from the available possibilities, the best map scale and orientation that would allow
@@ -117,5 +117,7 @@ class MapFitter {
      */
     fun getForEnvelope(env: Envelope): MapBox? =
             possibleBoxes.find { env.width < it.maxWidth && env.height < it.maxHeight }
+
+    fun canFitOnMap(env: Envelope, box: MapBox): Boolean = env.width < box.maxWidth && env.height < box.maxHeight
 
 }

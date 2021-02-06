@@ -56,6 +56,11 @@ class BeenThisWayBeforeScorer(override val weighting: Double = 1.0) : LegScorer 
     private fun compareLegs(a: GHResponse, b: GHResponse): Double {
         val pointsA = a.best.points.drop(1).dropLast(1)
         val pointsB = b.best.points.drop(1).dropLast(1)
-        return pointsB.intersect(pointsA).size.toDouble() / min(pointsB.size.toDouble(), pointsA.size.toDouble())
+        return when {
+            pointsA.isEmpty() -> 0.0
+            pointsB.isEmpty() -> 0.0
+            else -> pointsB.intersect(pointsA).size.toDouble() / min(pointsB.size.toDouble(), pointsA.size.toDouble())
+        }
+
     }
 }

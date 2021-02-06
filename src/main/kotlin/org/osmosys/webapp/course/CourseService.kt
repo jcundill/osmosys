@@ -56,8 +56,9 @@ class CourseService : ApplicationEventPublisherAware {
     }
 
     fun generate(initialCourse: Course): Course? {
-        val problem = osmosys.makeProblem(initialCourse)
-        return osmosys.findCourse(problem = problem)!!
+//        val problem = osmosys.makeProblem(initialCourse)
+//        return osmosys.findCourse(problem = problem)!!
+        return null
     }
 
     fun printMap(ctrls: List<ControlSite>): ByteArray? {

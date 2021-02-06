@@ -79,6 +79,10 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         return routeRequest(req, numAlternatives)
     }
 
+    fun routeRequest(ctrls: List<ControlSite>): GHResponse {
+        return routeRequest( ctrls, 0)
+    }
+
     fun routeRequest(req: GHRequest, numAlternatives: Int = 0): GHResponse {
         req.weighting = "fastest"
         if (numAlternatives > 1) {
@@ -168,4 +172,6 @@ class ControlSiteFinder(private val gh: GraphHopper) {
         points.forEach { env.expandToInclude(it.lon, it.lat) }
         return possibleBoxes.any { env.width < it.maxWidth && env.height < it.maxHeight }
     }
+
+
 }
